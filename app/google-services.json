@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "221722591872",
+    "project_id": "qrtrainertruck",
+    "storage_bucket": "qrtrainertruck.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:221722591872:android:e7f94f0170ea787e51dc65",
+        "android_client_info": {
+          "package_name": "com.vicegym.qrtrainertruck"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "221722591872-t5hvu0n165qun073hcn25mvgdp9d05sq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.vicegym.qrtrainertruck",
+            "certificate_hash": "b6ba90eafa831fbb27cc9ebe645ffd85fa2386fe"
+          }
+        },
+        {
+          "client_id": "221722591872-jlvphplkniffg14edipp6ujb492ke1im.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBTSsv_mgUUOSc5YUwgVdZMztwzR6XxB8E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "221722591872-jlvphplkniffg14edipp6ujb492ke1im.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
