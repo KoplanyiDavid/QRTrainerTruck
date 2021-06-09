@@ -27,24 +27,35 @@ class RegisterFormActivity : BaseActivity() {
         else if (binding.etPassword.text.toString() != binding.etConfirmPassword.text.toString())
             Toast.makeText(this, "Password confirmation failed (did you misspelled something?)", Toast.LENGTH_SHORT).show()
         else {
-            auth.createUserWithEmailAndPassword(binding.etEmail.text.toString(), binding.etPassword.text.toString())
-                .addOnCompleteListener(this) { task ->
-                    if (task.isSuccessful) {
-                        // Sign in success, update UI with the signed-in user's information
-                        Log.d(TAG, "createUserWithEmail:success")
-                        user = auth.currentUser
-                        Toast.makeText(baseContext, "Registration successful", Toast.LENGTH_SHORT).show()
-                        //updateUI(user)
-                    } else {
-                        // If sign in fails, display a message to the user.
-                        Log.w(TAG, "createUserWithEmail:failure", task.exception)
-                        Toast.makeText(
-                            baseContext, "Authentication failed.",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        //updateUI(null)
+            if (binding.cbTermsAndConditions.isChecked) {
+                //set user data
+                userAcceptedTermsAndConditions = true
+                userName = binding.etName.text.toString()
+                userEmail = binding.etEmail.text.toString()
+                //register to database
+                auth.createUserWithEmailAndPassword(binding.etEmail.text.toString(), binding.etPassword.text.toString())
+                    .addOnCompleteListener(this) { task ->
+                        if (task.isSuccessful) {
+                            // Sign in success, update UI with the signed-in user's information
+                            Log.d(TAG, "createUserWithEmail:success")
+                            user = auth.currentUser
+                            userID = user?.uid
+                            uploadUserData() //upload username, email etc to cloud firebase
+                            Toast.makeText(baseContext, "Registration successful", Toast.LENGTH_SHORT).show()
+                            //updateUI(user)
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.w(TAG, "createUserWithEmail:failure", task.exception)
+                            Toast.makeText(
+                                baseContext, task.exception.toString(),
+                                Toast.LENGTH_LONG
+                            ).show()
+                            //updateUI(null)
+                        }
                     }
-                }
+            }
+            else
+                Toast.makeText(baseContext, "You have to accept Terms And Conditions!", Toast.LENGTH_SHORT).show()
         }
     }
 

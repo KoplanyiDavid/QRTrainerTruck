@@ -44,7 +44,10 @@ class LoginActivity : BaseActivity() {
 
 
     private fun signInWithEmailAndPassword() {
-        if (binding.etEmail.text != null && binding.etPassword.text != null) {
+        if (binding.etEmail.text.isEmpty() || binding.etPassword.text.isEmpty()) {
+            Toast.makeText(baseContext, "Missing attributes", Toast.LENGTH_SHORT).show()
+        }
+        else {
             auth.signInWithEmailAndPassword(binding.etEmail.text.toString(), binding.etPassword.text.toString())
                 .addOnCompleteListener(this) { task ->
                     if (task.isSuccessful) {
@@ -88,10 +91,11 @@ class LoginActivity : BaseActivity() {
                 // Google Sign In was successful, authenticate with Firebase
                 val account = task.getResult(ApiException::class.java)!!
                 Log.d(TAG, "firebaseAuthWithGoogle:" + account.id)
-                userName = account.familyName + account.givenName
+                userName = account.displayName
                 userEmail = account.email
-                userProfilePictureUrl = account.photoUrl
-                firebaseAuthWithGoogle(account.idToken!!)
+                userAcceptedTermsAndConditions = true
+                //userProfilePictureUrl = account.photoUrl
+                account.idToken?.let { firebaseAuthWithGoogle(it) }
             } catch (e: ApiException) {
                 // Google Sign In failed, update UI appropriately
                 Log.w(TAG, "Google sign in failed", e)
@@ -107,6 +111,8 @@ class LoginActivity : BaseActivity() {
                     // Sign in success, update UI with the signed-in user's information
                     Log.d(TAG, "signInWithCredential:success")
                     user = auth.currentUser
+                    userID = user?.uid
+                    uploadUserData()
                     updateUI(user)
                 } else {
                     // If sign in fails, display a message to the user.

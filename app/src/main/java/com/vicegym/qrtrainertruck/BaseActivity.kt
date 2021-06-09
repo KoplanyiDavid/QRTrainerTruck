@@ -15,23 +15,25 @@ abstract class BaseActivity : AppCompatActivity() {
     protected var user: FirebaseUser? = null
 
     //userdata
+    protected var userID: String? = null
     protected var userName: String? = null
     protected var userEmail: String? = null
     protected var userPhoneNumber: String? = null
     protected var userProfilePictureUrl: Uri? = null
     protected var userAcceptedTermsAndConditions: Boolean = false
 
-    private fun uploadUserData() {
+    protected fun uploadUserData() {
 
         val user = hashMapOf(
+            "ID" to userID,
             "Name" to userName,
             "Phone number" to userPhoneNumber,
             "Email" to userEmail,
             "AcceptedTermsAndConditions" to userAcceptedTermsAndConditions
         )
 
-        userName?.let {
-            db.collection("Registered users").document(it)
+        userID?.let {
+            db.collection("Registered users").document("$userName.$it")
                 .set(user)
                 .addOnSuccessListener {
                     Toast.makeText(this, "Document snapshot successfully written", Toast.LENGTH_SHORT).show()
