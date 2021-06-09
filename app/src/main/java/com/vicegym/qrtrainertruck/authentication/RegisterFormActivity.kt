@@ -1,13 +1,14 @@
 package com.vicegym.qrtrainertruck.authentication
 
 import android.os.Bundle
+import android.text.method.LinkMovementMethod
 import android.util.Log
 import android.widget.Toast
 import com.vicegym.qrtrainertruck.BaseActivity
 import com.vicegym.qrtrainertruck.databinding.ActivityRegisterFormBinding
 
 class RegisterFormActivity : BaseActivity() {
-    private val TAG = "GoogleActivity"
+    private val TAG = "UserRegistration"
 
     private lateinit var binding: ActivityRegisterFormBinding
 
@@ -17,6 +18,7 @@ class RegisterFormActivity : BaseActivity() {
         setContentView(binding.root)
 
         binding.btnRegister.setOnClickListener { registerWithEmailAndPassword() }
+        setupHyperlink()
     }
 
     private fun registerWithEmailAndPassword() {
@@ -31,6 +33,7 @@ class RegisterFormActivity : BaseActivity() {
                         // Sign in success, update UI with the signed-in user's information
                         Log.d(TAG, "createUserWithEmail:success")
                         user = auth.currentUser
+                        Toast.makeText(baseContext, "Registration successful", Toast.LENGTH_SHORT).show()
                         //updateUI(user)
                     } else {
                         // If sign in fails, display a message to the user.
@@ -43,5 +46,10 @@ class RegisterFormActivity : BaseActivity() {
                     }
                 }
         }
+    }
+
+    private fun setupHyperlink() {
+        val linkTextView = binding.cbTermsAndConditions
+        linkTextView.movementMethod = LinkMovementMethod.getInstance()
     }
 }

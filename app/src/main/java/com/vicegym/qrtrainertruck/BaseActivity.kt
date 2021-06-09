@@ -25,17 +25,20 @@ abstract class BaseActivity : AppCompatActivity() {
 
         val user = hashMapOf(
             "Name" to userName,
-            "Phone number" to null,
-            "Email" to userEmail
+            "Phone number" to userPhoneNumber,
+            "Email" to userEmail,
+            "AcceptedTermsAndConditions" to userAcceptedTermsAndConditions
         )
 
-        db.collection("Registered users").document(userName!!)
-            .set(user)
-            .addOnSuccessListener {
-                Toast.makeText(this, "Document snapshot successfully written", Toast.LENGTH_SHORT).show()
-            }
-            .addOnFailureListener {
-                Toast.makeText(this, "Error writing document", Toast.LENGTH_SHORT).show()
-            }
+        userName?.let {
+            db.collection("Registered users").document(it)
+                .set(user)
+                .addOnSuccessListener {
+                    Toast.makeText(this, "Document snapshot successfully written", Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener {
+                    Toast.makeText(this, "Error writing document", Toast.LENGTH_SHORT).show()
+                }
+        }
     }
 }
