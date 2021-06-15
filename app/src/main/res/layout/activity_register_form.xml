@@ -4,15 +4,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@mipmap/bg_loginscreen"
     tools:context=".authentication.RegisterFormActivity">
 
     <TextView
+        android:id="@+id/tvWelcome"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="WELCOME!"
+        android:backgroundTint="#146F85"
+        android:fontFamily="@font/vicecityfont"
+        android:text="Szia Uram!"
         android:textAlignment="center"
-        android:textSize="40sp"
-        app:layout_constraintBottom_toTopOf="@+id/etName"
+        android:textColor="#2999b5"
+        android:textSize="60sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -21,71 +25,98 @@
         android:id="@+id/etName"
         android:layout_width="350dp"
         android:layout_height="50dp"
-        android:hint="Name"
-        app:layout_constraintBottom_toTopOf="@id/etEmail"
+        android:layout_marginTop="30dp"
+        android:background="#172a41"
+        android:hint="Ide írd a neved:)"
+        android:textColor="#2999b5"
+        android:textColorHint="#2999b5"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.501"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.765" />
+        app:layout_constraintTop_toBottomOf="@id/tvWelcome" />
 
     <EditText
         android:id="@+id/etEmail"
         android:layout_width="350dp"
         android:layout_height="50dp"
-        android:hint="Email"
-        app:layout_constraintBottom_toTopOf="@id/etPassword"
+        android:layout_marginTop="20dp"
+        android:background="#172a41"
+        android:hint="Ide pedig az Emailed *-*"
+        android:textColor="#2999b5"
+        android:textColorHint="#2999b5"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.829" />
+        app:layout_constraintTop_toBottomOf="@+id/etName" />
 
-    <EditText
-        android:id="@+id/etPassword"
-        android:layout_width="350dp"
-        android:layout_height="50dp"
-        android:hint="Password"
-        android:inputType="textPassword"
-        app:layout_constraintBottom_toTopOf="@id/etConfirmPassword"
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/etPasswordLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:textColorHint="#2999b5"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.907" />
+        app:layout_constraintTop_toBottomOf="@id/etEmail"
+        app:passwordToggleEnabled="true">
 
-    <EditText
-        android:id="@+id/etConfirmPassword"
-        android:layout_width="350dp"
-        android:layout_height="50dp"
-        android:hint="Confirm password"
-        android:inputType="textPassword"
-        app:layout_constraintBottom_toBottomOf="parent"
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etPassword"
+            android:layout_width="350dp"
+            android:layout_height="wrap_content"
+            android:autofillHints="password"
+            android:background="#172a41"
+            android:hint="Kéne egy frappáns jelszó..."
+            android:inputType="textPassword"
+            android:textColor="#2999b5" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/etConfirmPasswordLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:textColorHint="#2999b5"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.501"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.696" />
+        app:layout_constraintTop_toBottomOf="@id/etPasswordLayout"
+        app:passwordToggleEnabled="true">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etConfirmPassword"
+            android:layout_width="350dp"
+            android:layout_height="wrap_content"
+            android:autofillHints="password"
+            android:background="#172a41"
+            android:hint="De jegyezd meg! Írd ide mégegyszer:P"
+            android:inputType="textPassword"
+            android:textColor="#2999b5" />
+
+    </com.google.android.material.textfield.TextInputLayout>
 
     <CheckBox
         android:id="@+id/cbTermsAndConditions"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
         android:text="@string/terms_and_conditions"
-        app:layout_constraintBottom_toTopOf="@id/btnRegister"
+        android:textColor="#2999b5"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/etConfirmPassword" />
+        app:layout_constraintTop_toBottomOf="@id/etConfirmPasswordLayout" />
 
     <Button
         android:id="@+id/btnRegister"
         android:layout_width="350dp"
-        android:layout_height="50dp"
-        android:text="Register"
-        android:textSize="20sp"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#172a41"
+        android:text="gyúrjunk máááár!"
+        android:textColor="@color/white"
+        android:textSize="25sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/etConfirmPassword" />
+        app:layout_constraintTop_toBottomOf="@+id/cbTermsAndConditions"
+        app:layout_constraintVertical_bias="0" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -11,7 +11,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.QRTrainerTruck">
-        <activity android:name=".authentication.RegisterFormActivity"></activity>
+        <activity android:name=".mainactivity.MainActivity" />
+        <activity android:name=".authentication.RegisterFormActivity" />
         <activity android:name=".authentication.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

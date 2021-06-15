@@ -22,16 +22,16 @@ class RegisterFormActivity : BaseActivity() {
     }
 
     private fun registerWithEmailAndPassword() {
-        if (binding.etName.text.isEmpty() || binding.etEmail.text.isEmpty() || binding.etPassword.text.isEmpty() || binding.etConfirmPassword.text.isEmpty())
+        if (binding.etName.text.toString().isEmpty() || binding.etEmail.text.toString().isEmpty() || binding.etPassword.text.toString().isEmpty() || binding.etConfirmPassword.text.toString().isEmpty())
             Toast.makeText(this, "Missing requirement(s)", Toast.LENGTH_SHORT).show()
         else if (binding.etPassword.text.toString() != binding.etConfirmPassword.text.toString())
             Toast.makeText(this, "Password confirmation failed (did you misspelled something?)", Toast.LENGTH_SHORT).show()
         else {
             if (binding.cbTermsAndConditions.isChecked) {
                 //set user data
-                userAcceptedTermsAndConditions = true
-                userName = binding.etName.text.toString()
-                userEmail = binding.etEmail.text.toString()
+                User.acceptedTermsAndConditions = true
+                User.name = binding.etName.text.toString()
+                User.email = binding.etEmail.text.toString()
                 //register to database
                 auth.createUserWithEmailAndPassword(binding.etEmail.text.toString(), binding.etPassword.text.toString())
                     .addOnCompleteListener(this) { task ->
@@ -39,10 +39,11 @@ class RegisterFormActivity : BaseActivity() {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "createUserWithEmail:success")
                             user = auth.currentUser
-                            userID = user?.uid
+                            User.id = user?.uid
                             uploadUserData() //upload username, email etc to cloud firebase
+                            saveUserData(this)
                             Toast.makeText(baseContext, "Registration successful", Toast.LENGTH_SHORT).show()
-                            //updateUI(user)
+                            updateUI(user)
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "createUserWithEmail:failure", task.exception)
@@ -50,7 +51,7 @@ class RegisterFormActivity : BaseActivity() {
                                 baseContext, task.exception.toString(),
                                 Toast.LENGTH_LONG
                             ).show()
-                            //updateUI(null)
+                            updateUI(null)
                         }
                     }
             }

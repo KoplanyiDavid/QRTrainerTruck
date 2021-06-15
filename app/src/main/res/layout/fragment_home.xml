@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@mipmap/bg_loginscreen"
+    tools:context=".mainactivity.HomeFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:id="@+id/rlUserOverviewContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="20dp">
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/ivProfilePicture"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_centerVertical="true"
+                android:background="@android:color/transparent"
+                android:backgroundTint="@android:color/transparent"
+                android:src="@mipmap/profpic"
+                app:shapeAppearanceOverlay="@style/Circular" />
+
+            <TextView
+                android:id="@+id/tvUserName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@id/ivProfilePicture"
+                android:layout_marginStart="20dp"
+                android:layout_toEndOf="@id/ivProfilePicture"
+                android:text="UserName"
+                android:textSize="30sp" />
+
+            <TextView
+                android:id="@+id/tvUserRank"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tvUserName"
+                android:layout_alignStart="@+id/tvUserName"
+                android:layout_alignEnd="@+id/tvUserName"
+                android:text="UserRank"
+                android:textSize="23sp" />
+
+            <TextView
+                android:id="@+id/tvUserScore"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tvUserRank"
+                android:layout_alignStart="@+id/tvUserName"
+                android:layout_alignEnd="@+id/tvUserRank"
+                android:text="UserScore"
+                android:textSize="18sp" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/rlTrainingOverviewContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="20dp">
+
+            <TextView
+                android:id="@+id/tvNextTraining"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"
+                android:text="Következő edzés"
+                android:textSize="30sp" />
+
+            <TextView
+                android:id="@+id/tvTime"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tvNextTraining"
+                android:layout_alignParentStart="true"
+                android:text="Időpont:"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/tvTrainingTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/tvTime"
+                android:layout_alignBottom="@+id/tvTime"
+                android:layout_alignParentEnd="true"
+                android:layout_toEndOf="@+id/tvTime"
+                android:text="nincs kiválasztott időpont"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/tvPlace"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tvTime"
+                android:layout_alignParentStart="true"
+                android:text="Helyszín:"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/tvTrainingPlace"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@id/tvPlace"
+                android:layout_alignBottom="@id/tvPlace"
+                android:layout_alignParentEnd="true"
+                android:layout_toEndOf="@+id/tvPlace"
+                android:text="nincs kiválasztott helyszín"
+                android:textSize="20sp" />
+        </RelativeLayout>
+    </LinearLayout>
+</FrameLayout>

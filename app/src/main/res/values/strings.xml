@@ -1,4 +1,5 @@
 <resources>
-    <string name="app_name">QRTrainerTruck</string>
-    <string name="terms_and_conditions">I have read and agreed <a href="https://docs.google.com/document/d/1jmm1wLmqKIgFZMPiUWM2nMmfHlh4yq1HrLc_-bT-EAo/edit?usp=sharing">TERMS AND CONDITIONS</a></string>
+    <string name="app_name"> <font></font> QR Trainer Truck</string>
+    <string name="terms_and_conditions">Elolvastam és elfogadom az<a href="https://docs.google.com/document/d/1jmm1wLmqKIgFZMPiUWM2nMmfHlh4yq1HrLc_-bT-EAo/edit?usp=sharing"> ÁSZF </a> -et</string>
+
 </resources>

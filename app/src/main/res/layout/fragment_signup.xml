@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@mipmap/bg_loginscreen"
+    tools:context=".mainactivity.SignUpFragment">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingTop="20dp">
+
+        <TextView
+            android:id="@+id/tvTimeTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:text="Válassz időpontot!"
+            android:textAlignment="center"
+            android:textSize="25sp" />
+
+        <ImageView
+            android:id="@+id/btnDatePicker"
+            android:layout_width="125dp"
+            android:layout_height="125dp"
+            android:layout_below="@+id/tvTimeTitle"
+            android:layout_centerHorizontal="true"
+            android:src="@mipmap/calendar" />
+
+        <TextView
+            android:id="@+id/tvPlaceTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/btnDatePicker"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="30dp"
+            android:text="Válassz helyszínt!"
+            android:textAlignment="center"
+            android:textSize="25sp" />
+
+        <ImageView
+            android:id="@+id/btnPlacePicker"
+            android:layout_width="125dp"
+            android:layout_height="125dp"
+            android:layout_below="@+id/tvPlaceTitle"
+            android:layout_centerHorizontal="true"
+            android:src="@mipmap/mapicon" />
+
+        <TextView
+            android:id="@+id/tvAttekintes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/btnPlacePicker"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginEnd="20dp"
+            android:text="Tekintsd át, hogy minden rendben-e:"
+            android:textAlignment="center"
+            android:textSize="25sp" />
+
+        <TextView
+            android:id="@+id/tvTime"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvAttekintes"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="10dp"
+            android:text="Időpont:"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/tvTrainingTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/tvTime"
+            android:layout_alignBottom="@+id/tvTime"
+            android:layout_alignParentEnd="true"
+            android:layout_toEndOf="@+id/tvTime"
+            android:text="nincs kiválasztott időpont"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/tvPlace"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvTime"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="20dp"
+            android:text="Helyszín:"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/tvTrainingPlace"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@id/tvPlace"
+            android:layout_alignBottom="@id/tvPlace"
+            android:layout_alignParentEnd="true"
+            android:layout_toEndOf="@+id/tvPlace"
+            android:text="nincs kiválasztott helyszín"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/tvMindenRendben"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvTrainingPlace"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="20dp"
+            android:text="Ha mindent rendben találtál, már csak egy dolgod maradt:"
+            android:textAlignment="center"
+            android:textSize="20sp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSignUpToTraining"
+            android:layout_width="350dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvMindenRendben"
+            android:layout_centerInParent="true"
+            android:layout_marginTop="15dp"
+            android:text="Mehet!"
+            app:cornerRadius="100dp"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="20sp" />
+
+
+    </RelativeLayout>
+
+</FrameLayout>

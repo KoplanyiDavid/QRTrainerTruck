@@ -8,7 +8,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.vicegym.qrtrainertruck.BaseActivity
 import com.vicegym.qrtrainertruck.R
@@ -44,7 +43,7 @@ class LoginActivity : BaseActivity() {
 
 
     private fun signInWithEmailAndPassword() {
-        if (binding.etEmail.text.isEmpty() || binding.etPassword.text.isEmpty()) {
+        if (binding.etEmail.text.toString().isEmpty() || binding.etPassword.text.toString().isEmpty()) {
             Toast.makeText(baseContext, "Missing attributes", Toast.LENGTH_SHORT).show()
         }
         else {
@@ -91,9 +90,9 @@ class LoginActivity : BaseActivity() {
                 // Google Sign In was successful, authenticate with Firebase
                 val account = task.getResult(ApiException::class.java)!!
                 Log.d(TAG, "firebaseAuthWithGoogle:" + account.id)
-                userName = account.displayName
-                userEmail = account.email
-                userAcceptedTermsAndConditions = true
+                User.name = account.displayName
+                User.email = account.email
+                User.acceptedTermsAndConditions = true
                 //userProfilePictureUrl = account.photoUrl
                 account.idToken?.let { firebaseAuthWithGoogle(it) }
             } catch (e: ApiException) {
@@ -111,8 +110,9 @@ class LoginActivity : BaseActivity() {
                     // Sign in success, update UI with the signed-in user's information
                     Log.d(TAG, "signInWithCredential:success")
                     user = auth.currentUser
-                    userID = user?.uid
+                    User.id = user?.uid
                     uploadUserData()
+                    saveUserData(this)
                     updateUI(user)
                 } else {
                     // If sign in fails, display a message to the user.
@@ -120,10 +120,5 @@ class LoginActivity : BaseActivity() {
                     updateUI(null)
                 }
             }
-    }
-
-    private fun updateUI(user: FirebaseUser?) {
-        if (user != null) {
-        }
     }
 }
