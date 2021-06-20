@@ -49,7 +49,8 @@
             android:layout_height="wrap_content"
             android:background="@color/white"
             android:fontFamily="@font/nexa_bold"
-            android:hint="Email" />
+            android:hint="Email"
+            android:inputType="textEmailAddress" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -82,9 +83,9 @@
         android:layout_marginTop="15dp"
         android:text="Bejelentkezés"
         android:textAllCaps="false"
-        app:cornerRadius="200dp"
         android:textColor="@color/white"
         android:textSize="20sp"
+        app:cornerRadius="200dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/etPasswordLayout" />
@@ -118,10 +119,11 @@
         android:text="Még nincs fiókod? Itt a megoldás!"
         android:textColor="@color/white"
         android:textSize="20sp"
-        app:layout_constraintTop_toBottomOf="@id/btnGoogleSignIn"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintTop_toBottomOf="@id/btnGoogleSignIn" />
+
     <Button
         android:id="@+id/btnRegister"
         android:layout_width="350dp"

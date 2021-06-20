@@ -1,90 +1,126 @@
 package com.vicegym.qrtrainertruck
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.location.Location
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import android.net.Uri
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.component1
+import com.google.firebase.storage.ktx.component2
+import com.google.firebase.storage.ktx.storage
+import com.google.firebase.storage.ktx.storageMetadata
 import com.vicegym.qrtrainertruck.mainactivity.MainActivity
-import java.util.*
+import java.io.File
 
 abstract class BaseActivity : AppCompatActivity() {
-    protected var db: FirebaseFirestore = FirebaseFirestore.getInstance()
+    protected var db: FirebaseFirestore = Firebase.firestore
     protected var auth: FirebaseAuth = Firebase.auth
-    protected var user: FirebaseUser? = null
-
-    //user
-    object User {
-        var id: String? = null
-        var name: String? = null
-        var email: String? = null
-        var phoneNumber: String? = null
-        var profilePictureUrl: Uri? = null
-        var acceptedTermsAndConditions: Boolean = false
-        var rank: String? = "Újonc"
-        var score: Int = 0
-    }
+    protected var user: FirebaseUser? = auth.currentUser
 
     protected fun uploadUserData() {
-
-        val user = hashMapOf(
-            "ID" to User.id,
-            "Név" to User.name,
-            "Telefonszám" to User.phoneNumber,
-            "Email" to User.email,
-            "ÁSZF-et elfogadta" to User.acceptedTermsAndConditions,
-            "Rang" to User.rank,
-            "Pontok" to User.score
+        val userHashMap = hashMapOf(
+            "id" to myUser.id,
+            "name" to myUser.name,
+            "phonenumber" to myUser.phoneNumber,
+            "email" to myUser.email,
+            "profpic" to myUser.profilePicture,
+            "traininglocation" to myUser.address,
+            "acceptedtermsandcons" to myUser.acceptedTermsAndConditions,
+            "rank" to myUser.rank,
+            "score" to myUser.score,
+            "trainings" to myUser.trainingList
         )
 
-        User.id?.let {
-            db.collection("Registered users").document("${User.name}.$it")
-                .set(user)
-                .addOnSuccessListener {
-                    Toast.makeText(
-                        this,
-                        "Document snapshot successfully written",
-                        Toast.LENGTH_SHORT
-                    ).show()
+        db.collection("users").document("${user?.uid}")
+            .set(userHashMap)
+            .addOnSuccessListener {
+                uploadUserProfilePicture(myUser.profilePicture)
+                Toast.makeText(
+                    this,
+                    "Document snapshot successfully written",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Error writing document", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    protected fun getUserData() {
+        db.collection("users").document("${user?.uid}").get()
+            .addOnSuccessListener { document ->
+                if (document != null) {
+                    myUser.id = document.data?.get("id") as String?
+                    myUser.name = document.data?.get("name") as String?
+                    myUser.email = document.data?.get("email") as String?
+                    myUser.phoneNumber = document.data?.get("phonenumber") as String?
+                    myUser.profilePicture = document.data?.get("profpic") as String
+                    myUser.acceptedTermsAndConditions = document.data?.get("acceptedtermsandcons") as Boolean
+                    myUser.rank = document.data?.get("rank") as String
+                    myUser.score = document.data?.get("score") as Number
+                    myUser.trainingList = document.data?.get("trainings") as MutableList<TrainingData>
+                    Log.d("FC", "${document.data}")
+                    downloadUserProfilePicture()
+                } else {
+                    Log.d("FirestoreComm", "No such document")
                 }
-                .addOnFailureListener {
-                    Toast.makeText(this, "Error writing document", Toast.LENGTH_SHORT).show()
-                }
+            }
+            .addOnFailureListener { exception ->
+                Log.d("FirestoreComm", "get failed with ", exception)
+            }
+    }
+
+    private fun uploadUserProfilePicture(file: String) {
+        val storageRef = Firebase.storage.reference
+        val metadata = storageMetadata { contentType = "profile_image/jpeg" }
+        val uploadTask = storageRef.child("${user?.uid}/profileimage.jpg").putFile(Uri.parse(file), metadata)
+        uploadTask.addOnProgressListener { (bytesTransferred, totalByteCount) ->
+            val progress = (100.0 * bytesTransferred) / totalByteCount
+            Log.d("UploadImage", "Upload is $progress% done")
+        }.addOnPausedListener {
+            Log.d("UploadImage", "Upload is paused")
+        }.addOnFailureListener {
+            Log.d("UploadImage", "NEM OK: $it")
+        }.addOnSuccessListener {
+            Log.d("UploadImage", "OK")
         }
     }
 
-    protected fun updateUI(user: FirebaseUser?) {
-        if (user != null) {
-            startActivity(Intent(baseContext, MainActivity::class.java))
-        } else
-            Toast.makeText(baseContext, "user is null", Toast.LENGTH_SHORT).show()
+    private fun downloadUserProfilePicture() {
+        val storageRef = Firebase.storage.reference
+        val imageRef = storageRef.child("${user?.uid}/profileimage.jpg")
+        val localFile = File.createTempFile("profilepicture", "jpg")
+        imageRef.getFile(localFile).addOnSuccessListener {
+            Log.d("DWPIC", "OK")
+            myUser.profilePicture = Uri.fromFile(localFile).toString()
+            startMainActivity(baseContext)
+        }
+            .addOnFailureListener {
+                Log.d("DWPIC", "NEM OK: $it")
+            }
     }
 
-    protected fun saveUserData(activity: Activity?) {
-        val sharedPref = activity?.getSharedPreferences("UserData", Context.MODE_PRIVATE) ?: return
-        with(sharedPref.edit()) {
-            putString("Name", User.name)
-            putString("Email", User.email)
-            putString("PhoneNumber", User.phoneNumber)
-            putString("Rank", User.rank)
-            putInt("Score", User.score)
-            apply()
+    protected fun haveInternedConnection(context: Context?): Boolean {
+        return if (context != null) {
+            val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val activeNetwork: NetworkInfo? = cm.activeNetworkInfo
+            activeNetwork?.isConnected == true
+        } else {
+            Log.e("haveInternetConnection", "contect argument is null")
+            false
         }
     }
 
-    protected fun getUserData(activity: Activity?) {
-        val sharedPref = activity?.getSharedPreferences("UserData", Context.MODE_PRIVATE) ?: return
-        User.name = sharedPref.getString("Name", "null")
-        User.email = sharedPref.getString("Email", "null")
-        User.phoneNumber = sharedPref.getString("PhoneNumber", "null")
-        User.rank = sharedPref.getString("Rank", "null")
-        User.score = sharedPref.getInt("Score", 0)
+    protected fun startMainActivity(context: Context) {
+        startActivity(Intent(context, MainActivity::class.java))
     }
 }

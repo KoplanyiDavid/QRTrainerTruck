@@ -16,23 +16,35 @@
         android:text="Szia Uram!"
         android:textAlignment="center"
         android:textColor="#2999b5"
-        android:textSize="60sp"
+        android:textSize="40sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/ivRegisterProfPic"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="10dp"
+        android:background="@color/white"
+        android:src="@drawable/ic_name"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvWelcome"
+        app:shapeAppearanceOverlay="@style/Circular" />
 
     <EditText
         android:id="@+id/etName"
         android:layout_width="350dp"
         android:layout_height="50dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="10dp"
         android:background="#172a41"
         android:hint="Ide írd a neved:)"
         android:textColor="#2999b5"
         android:textColorHint="#2999b5"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvWelcome" />
+        app:layout_constraintTop_toBottomOf="@+id/ivRegisterProfPic" />
 
     <EditText
         android:id="@+id/etEmail"

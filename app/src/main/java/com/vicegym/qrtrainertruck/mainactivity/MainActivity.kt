@@ -13,14 +13,13 @@ class MainActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        getUserData(this)
 
         //Fragments
-        val homeFragment = HomeFragment.newInstance(User.name, User.rank, User.score)
+        val homeFragment = HomeFragment.newInstance()
         val signUpFragment = SignUpFragment.newInstance()
-        val onlineTrainingFragment = OnlineTrainingFragment.newInstance("param1", "param2")
+        val onlineTrainingFragment = OnlineTrainingFragment.newInstance()
         val forumFragment = ForumFragment.newInstance("param1", "param2")
-        val profileFragment = ProfileFragment.newInstance("param1", "param2")
+        val profileFragment = ProfileFragment.newInstance()
 
         setCurrentFragment(homeFragment)
 
