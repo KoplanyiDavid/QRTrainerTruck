@@ -30,7 +30,7 @@ abstract class BaseActivity : AppCompatActivity() {
         val userHashMap = hashMapOf(
             "id" to myUser.id,
             "name" to myUser.name,
-            "phonenumber" to myUser.phoneNumber,
+            "mobile" to myUser.mobile,
             "email" to myUser.email,
             "profpic" to myUser.profilePicture,
             "traininglocation" to myUser.address,
@@ -62,7 +62,7 @@ abstract class BaseActivity : AppCompatActivity() {
                     myUser.id = document.data?.get("id") as String?
                     myUser.name = document.data?.get("name") as String?
                     myUser.email = document.data?.get("email") as String?
-                    myUser.phoneNumber = document.data?.get("phonenumber") as String?
+                    myUser.mobile = document.data?.get("mobile") as String?
                     myUser.profilePicture = document.data?.get("profpic") as String
                     myUser.acceptedTermsAndConditions = document.data?.get("acceptedtermsandcons") as Boolean
                     myUser.rank = document.data?.get("rank") as String

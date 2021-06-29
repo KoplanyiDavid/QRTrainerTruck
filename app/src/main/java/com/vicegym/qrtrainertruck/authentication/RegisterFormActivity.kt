@@ -25,7 +25,7 @@ class RegisterFormActivity : BaseActivity() {
 
     private fun setProfilePicture() {
         val openGalleryIntent =
-            Intent(Intent.ACTION_OPEN_DOCUMENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+            Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         startActivityForResult(openGalleryIntent, 1000)
     }
 
@@ -64,10 +64,11 @@ class RegisterFormActivity : BaseActivity() {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "createUserWithEmail:success")
                             user = auth.currentUser
-                            //set user data
+                            /* -- Set myUser object data --*/
                             myUser.id = user?.uid
                             myUser.name = binding.etName.text.toString()
                             myUser.email = binding.etEmail.text.toString()
+                            myUser.mobile = binding.etMobileNum.text.toString()
                             myUser.acceptedTermsAndConditions = true
                             uploadUserData() //upload username, email etc to cloud firebase
                             Toast.makeText(baseContext, "Sikeres regisztráció:)", Toast.LENGTH_SHORT).show()

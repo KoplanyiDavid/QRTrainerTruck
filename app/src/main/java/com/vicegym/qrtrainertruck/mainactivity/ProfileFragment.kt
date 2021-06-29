@@ -36,7 +36,7 @@ class ProfileFragment : Fragment() {
         binding.tvProfEmail.text = myUser.email
         binding.tvProfFragmentName.text = myUser.name
         binding.tvProfFragmentEmail.text = myUser.email
-        binding.tvProfFragmentMobile.text = myUser.phoneNumber
+        binding.tvProfFragmentMobile.text = myUser.mobile
         binding.tvProfFragmentAddress.text = myUser.address
         binding.ivProfPic.setImageURI(Uri.parse(myUser.profilePicture))
         binding.ivProfPic.setOnClickListener {
@@ -46,7 +46,7 @@ class ProfileFragment : Fragment() {
 
     private fun changeProfilePicture() {
         val openGalleryIntent =
-            Intent(Intent.ACTION_OPEN_DOCUMENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+            Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         startActivityForResult(openGalleryIntent, galleryReqCode)
     }
 

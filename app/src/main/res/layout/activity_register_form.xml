@@ -59,6 +59,21 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/etName" />
 
+    <EditText
+        android:id="@+id/etMobileNum"
+        android:layout_width="350dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="20dp"
+        android:background="#172a41"
+        android:hint="Jöhet egy mobilszám, hogy elérhessünk:)"
+        android:inputType="phone"
+        android:textColor="#2999b5"
+        android:textColorHint="#2999b5"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/etEmail" />
+
+
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/etPasswordLayout"
         android:layout_width="wrap_content"
@@ -67,7 +82,7 @@
         android:textColorHint="#2999b5"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/etEmail"
+        app:layout_constraintTop_toBottomOf="@id/etMobileNum"
         app:passwordToggleEnabled="true">
 
         <com.google.android.material.textfield.TextInputEditText

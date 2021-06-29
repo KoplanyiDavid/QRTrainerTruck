@@ -10,14 +10,12 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
 import com.google.firebase.firestore.FirebaseFirestore
-import com.vicegym.qrtrainertruck.R
 import com.vicegym.qrtrainertruck.TrainingData
 import com.vicegym.qrtrainertruck.databinding.FragmentSignupBinding
 import com.vicegym.qrtrainertruck.myUser
 import java.util.*
 
-class SignUpFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener,
-    AdapterView.OnItemSelectedListener {
+class SignUpFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
 
     companion object {
         @JvmStatic
@@ -39,7 +37,7 @@ class SignUpFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimePicke
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.btnDatePicker.setOnClickListener { showDatePickerDialog() }
-        binding.btnPlacePicker.setOnClickListener { showPlacePicker() }
+        //binding.btnPlacePicker.setOnClickListener { showPlacePicker() }
         binding.btnSignUpToTraining.setOnClickListener {
             uploadTrainingData()
             //activity?.supportFragmentManager?.beginTransaction()
@@ -78,25 +76,10 @@ class SignUpFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimePicke
         binding.tvTrainingTime.text = trainingData.date
     }
 
-    private fun showPlacePicker() {
-        val spinner: Spinner = binding.trainingplacesSpinner
-// Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter.createFromResource(
-            requireContext(),
-            R.array.training_places,
-            android.R.layout.simple_spinner_item
-        ).also { adapter ->
-            // Specify the layout to use when the list of choices appears
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            // Apply the adapter to the spinner
-            spinner.adapter = adapter
-        }
-    }
-
     private fun uploadTrainingData() {
         if (trainingData.date == null || trainingData.location == null)
             Toast.makeText(requireContext(), "Hiányzó adatok", Toast.LENGTH_SHORT).show()
-        else {
+        else if (trainingTimeNotExist()) {
             myUser.trainingList.add(trainingData)
             val db = FirebaseFirestore.getInstance()
             db.collection("users")
@@ -107,19 +90,18 @@ class SignUpFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimePicke
                 .addOnFailureListener {
                     Log.d("EdzesekUpdate", "Nem OK: $it")
                 }
-        }
+        } else
+            Toast.makeText(requireContext(), "Már van edzésed ezzel az időponttal!", Toast.LENGTH_SHORT).show()
     }
 
-    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        if (parent != null) {
-            binding.tvTrainingPlace.text = parent.getItemAtPosition(position).toString()
-            Log.d("PLACE", "OK")
+    private fun trainingTimeNotExist(): Boolean {
+        var notExist = true
+        myUser.trainingList.forEach {
+            if (it.date == trainingData.date) {
+                notExist = false
+                return@forEach
+            }
         }
-        else
-            Log.d("PLACE", "NEM OK")
-    }
-
-    override fun onNothingSelected(parent: AdapterView<*>?) {
-        Toast.makeText(requireContext(), "nincs valasztott hely", Toast.LENGTH_SHORT).show()
+        return notExist
     }
 }
