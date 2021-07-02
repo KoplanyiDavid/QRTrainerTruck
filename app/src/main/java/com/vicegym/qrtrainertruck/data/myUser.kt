@@ -1,4 +1,6 @@
-package com.vicegym.qrtrainertruck
+package com.vicegym.qrtrainertruck.data
+
+import com.vicegym.qrtrainertruck.R
 
 object myUser {
     var id: String? = null

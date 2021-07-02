@@ -2,21 +2,38 @@ package com.vicegym.qrtrainertruck.mainactivity
 
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException
+import com.google.android.gms.maps.*
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import com.vicegym.qrtrainertruck.R
 import com.vicegym.qrtrainertruck.databinding.FragmentHomeBinding
-import com.vicegym.qrtrainertruck.myUser
+import com.vicegym.qrtrainertruck.data.myUser
 
 class HomeFragment : Fragment(), OnMapReadyCallback {
     private lateinit var binding: FragmentHomeBinding
+    private lateinit var mapView: MapView
+    private lateinit var gMap: GoogleMap
+    private var marker: Marker? = null
+
+    companion object {
+        @JvmStatic
+        fun newInstance() =
+            HomeFragment()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -38,22 +55,87 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
             binding.tvTrainingPlace.text = myUser.trainingList[0].location
         }
 
-        //Map fragment init
-        val mapFragment = parentFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
-        mapFragment.getMapAsync(this)
+        mapInit(savedInstanceState)
     }
 
-    companion object {
-        @JvmStatic
-        fun newInstance() =
-            HomeFragment()
+    override fun onStart() {
+        super.onStart()
+        mapView.onStart()
     }
 
-    override fun onMapReady(p0: GoogleMap) {
-        p0.addMarker(
-            MarkerOptions()
-                .position(LatLng(0.0, 0.0))
-                .title("Marker")
+    override fun onResume() {
+        super.onResume()
+        mapView.onResume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        mapView.onPause()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        mapView.onStop()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        mapView.onSaveInstanceState(outState)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        mapView.onDestroy()
+    }
+
+    override fun onLowMemory() {
+        super.onLowMemory()
+        mapView.onLowMemory()
+    }
+
+    /* Google MapView */
+    private fun mapInit(savedInstanceState: Bundle?) {
+        mapView = binding.map
+        mapView.onCreate(savedInstanceState)
+        mapView.getMapAsync(this)
+        try {
+            MapsInitializer.initialize(requireActivity())
+        } catch (e: GooglePlayServicesNotAvailableException) {
+            e.printStackTrace()
+        }
+    }
+
+    override fun onMapReady(googleMap: GoogleMap) {
+        gMap = googleMap
+        locationUpdate()
+    }
+
+    private fun locationUpdate() {
+        val database = Firebase.database.reference.child("TrainerTruckLocation")
+        database.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                marker?.remove()
+                updateMap(dataSnapshot)
+                Log.d("lU", "OK")
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.e("LU", "Failed to read value.")
+            }
+        })
+    }
+
+    private fun updateMap(dataSnapshot: DataSnapshot) {
+        val lat: Double = dataSnapshot.child("latitude").value as Double
+        val lng: Double = dataSnapshot.child("longitude").value as Double
+
+        val truckLatLng = LatLng(lat, lng)
+        marker = gMap.addMarker(
+            MarkerOptions().position(truckLatLng).title("Trainer Truck")
+                .icon(BitmapDescriptorFactory.fromResource(R.mipmap.truckvektor))
         )
+        gMap.animateCamera(CameraUpdateFactory.newLatLngZoom(truckLatLng, 10f))
+        //mMap.setMaxZoomPreference(10f)
+        Toast.makeText(requireContext(), truckLatLng.toString(), Toast.LENGTH_SHORT).show()
     }
 }

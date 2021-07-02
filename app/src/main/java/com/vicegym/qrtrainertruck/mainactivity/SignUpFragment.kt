@@ -10,9 +10,9 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
 import com.google.firebase.firestore.FirebaseFirestore
-import com.vicegym.qrtrainertruck.TrainingData
+import com.vicegym.qrtrainertruck.data.TrainingData
 import com.vicegym.qrtrainertruck.databinding.FragmentSignupBinding
-import com.vicegym.qrtrainertruck.myUser
+import com.vicegym.qrtrainertruck.data.myUser
 import java.util.*
 
 class SignUpFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
@@ -71,6 +71,7 @@ class SignUpFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimePicke
         showTimePickerDialog()
     }
 
+    //a kiválasztott időt tartalmazza
     override fun onTimeSet(view: TimePicker?, hourOfDay: Int, minute: Int) {
         trainingData.date += "($hourOfDay:$minute)"
         binding.tvTrainingTime.text = trainingData.date

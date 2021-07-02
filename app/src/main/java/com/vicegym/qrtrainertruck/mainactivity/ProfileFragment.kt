@@ -14,13 +14,14 @@ import com.google.firebase.storage.ktx.component1
 import com.google.firebase.storage.ktx.component2
 import com.google.firebase.storage.ktx.storage
 import com.google.firebase.storage.ktx.storageMetadata
+import com.vicegym.qrtrainertruck.data.myUser
 import com.vicegym.qrtrainertruck.databinding.FragmentProfileBinding
-import com.vicegym.qrtrainertruck.myUser
 
 class ProfileFragment : Fragment() {
 
     private lateinit var binding: FragmentProfileBinding
-    private var galleryReqCode = 1000
+    private val galleryReqCode = 1000
+    private val userDataModifyCode = 1001
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -58,6 +59,10 @@ class ProfileFragment : Fragment() {
                 myUser.profilePicture = it.toString()
                 binding.ivProfPic.setImageURI(it)
             }
+        }
+
+        if (requestCode == userDataModifyCode) {
+            //TODO
         }
     }
 

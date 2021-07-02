@@ -1,4 +1,4 @@
-package com.vicegym.qrtrainertruck
+package com.vicegym.qrtrainertruck.otheractivities
 
 import android.content.Context
 import android.content.Intent
@@ -18,6 +18,8 @@ import com.google.firebase.storage.ktx.component1
 import com.google.firebase.storage.ktx.component2
 import com.google.firebase.storage.ktx.storage
 import com.google.firebase.storage.ktx.storageMetadata
+import com.vicegym.qrtrainertruck.data.TrainingData
+import com.vicegym.qrtrainertruck.data.myUser
 import com.vicegym.qrtrainertruck.mainactivity.MainActivity
 import java.io.File
 
@@ -33,7 +35,7 @@ abstract class BaseActivity : AppCompatActivity() {
             "mobile" to myUser.mobile,
             "email" to myUser.email,
             "profpic" to myUser.profilePicture,
-            "traininglocation" to myUser.address,
+            "address" to myUser.address,
             "acceptedtermsandcons" to myUser.acceptedTermsAndConditions,
             "rank" to myUser.rank,
             "score" to myUser.score,
@@ -63,6 +65,7 @@ abstract class BaseActivity : AppCompatActivity() {
                     myUser.name = document.data?.get("name") as String?
                     myUser.email = document.data?.get("email") as String?
                     myUser.mobile = document.data?.get("mobile") as String?
+                    myUser.address = document.data?.get("address") as String?
                     myUser.profilePicture = document.data?.get("profpic") as String
                     myUser.acceptedTermsAndConditions = document.data?.get("acceptedtermsandcons") as Boolean
                     myUser.rank = document.data?.get("rank") as String

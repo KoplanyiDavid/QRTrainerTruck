@@ -6,9 +6,9 @@ import android.provider.MediaStore
 import android.text.method.LinkMovementMethod
 import android.util.Log
 import android.widget.Toast
-import com.vicegym.qrtrainertruck.BaseActivity
+import com.vicegym.qrtrainertruck.otheractivities.BaseActivity
 import com.vicegym.qrtrainertruck.databinding.ActivityRegisterFormBinding
-import com.vicegym.qrtrainertruck.myUser
+import com.vicegym.qrtrainertruck.data.myUser
 
 class RegisterFormActivity : BaseActivity() {
     private val TAG = "UserRegistration"

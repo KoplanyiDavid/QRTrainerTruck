@@ -2,7 +2,7 @@ package com.vicegym.qrtrainertruck.mainactivity
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
-import com.vicegym.qrtrainertruck.BaseActivity
+import com.vicegym.qrtrainertruck.otheractivities.BaseActivity
 import com.vicegym.qrtrainertruck.R
 import com.vicegym.qrtrainertruck.databinding.ActivityMainBinding
 

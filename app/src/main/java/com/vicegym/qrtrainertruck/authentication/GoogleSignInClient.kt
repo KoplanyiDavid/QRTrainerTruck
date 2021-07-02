@@ -5,9 +5,9 @@ import android.util.Log
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.GoogleAuthProvider
-import com.vicegym.qrtrainertruck.BaseActivity
+import com.vicegym.qrtrainertruck.otheractivities.BaseActivity
 import com.vicegym.qrtrainertruck.R
-import com.vicegym.qrtrainertruck.myUser
+import com.vicegym.qrtrainertruck.data.myUser
 
 class GoogleSignInClient: BaseActivity() {
     companion object {

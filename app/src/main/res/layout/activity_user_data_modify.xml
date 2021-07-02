@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="20dp"
+    tools:context=".otheractivities.UserDataModifyActivity">
+
+    <!-- Név -->
+    <ImageView
+        android:id="@+id/ivProf"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="10dp"
+        android:src="@drawable/ic_name"
+        app:layout_constraintStart_toStartOf="@id/tvProfilInfo"
+        app:layout_constraintTop_toBottomOf="@id/tvProfilInfo" />
+
+    <TextView
+        android:id="@+id/tvName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:text="Név"
+        android:textColor="@color/black"
+        android:textSize="30sp"
+        app:layout_constraintStart_toEndOf="@id/ivProf"
+        app:layout_constraintTop_toTopOf="@id/ivProf" />
+
+    <EditText
+        android:id="@+id/etProfName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:textColor="#a1a1a1"
+        android:textSize="25sp"
+        android:textStyle="italic"
+        app:layout_constraintBottom_toBottomOf="@+id/ivProf"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/tvName" />
+
+    <!-- Email -->
+    <ImageView
+        android:id="@+id/ivEmail"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="20dp"
+        android:src="@drawable/ic_email"
+        app:layout_constraintStart_toStartOf="@id/tvProfilInfo"
+        app:layout_constraintTop_toBottomOf="@id/ivProf" />
+
+    <TextView
+        android:id="@+id/tvEmail"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:text="Email"
+        android:textColor="@color/black"
+        android:textSize="30sp"
+        app:layout_constraintStart_toEndOf="@id/ivEmail"
+        app:layout_constraintTop_toTopOf="@id/ivEmail" />
+
+    <EditText
+        android:id="@+id/etProfEmail"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:textColor="#a1a1a1"
+        android:textSize="25sp"
+        android:textStyle="italic"
+        app:layout_constraintBottom_toBottomOf="@+id/ivEmail"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/tvEmail" />
+
+    <!-- Telefonszám -->
+    <ImageView
+        android:id="@+id/ivMobile"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="20dp"
+        android:src="@drawable/ic_mobile"
+        app:layout_constraintStart_toStartOf="@id/tvProfilInfo"
+        app:layout_constraintTop_toBottomOf="@id/ivEmail" />
+
+    <TextView
+        android:id="@+id/tvMobile"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:text="Telefonszám"
+        android:textColor="@color/black"
+        android:textSize="30sp"
+        app:layout_constraintStart_toEndOf="@id/ivMobile"
+        app:layout_constraintTop_toTopOf="@id/ivMobile" />
+
+    <EditText
+        android:id="@+id/etProfMobile"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:textColor="#a1a1a1"
+        android:textSize="25sp"
+        android:textStyle="italic"
+        app:layout_constraintBottom_toBottomOf="@+id/ivMobile"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/tvMobile" />
+
+    <!-- Edzés helyszíne -->
+    <ImageView
+        android:id="@+id/ivAddress"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="20dp"
+        android:src="@drawable/ic_address"
+        app:layout_constraintStart_toStartOf="@id/tvProfilInfo"
+        app:layout_constraintTop_toBottomOf="@id/ivMobile" />
+
+    <TextView
+        android:id="@+id/tvAddress"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:text="Edzés helyszíne"
+        android:textColor="@color/black"
+        android:textSize="30sp"
+        app:layout_constraintStart_toEndOf="@id/ivAddress"
+        app:layout_constraintTop_toTopOf="@id/ivAddress" />
+
+    <EditText
+        android:id="@+id/etProfAddress"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textColor="#a1a1a1"
+        android:textSize="25sp"
+        android:textStyle="italic"
+        app:layout_constraintBottom_toBottomOf="@+id/ivAddress"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/tvAddress" />
+
+    <Button
+        android:id="@+id/btnModifyData"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:backgroundTint="#a1a1a1"
+        android:text="megerősítés"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ivAddress" />
+</androidx.constraintlayout.widget.ConstraintLayout>

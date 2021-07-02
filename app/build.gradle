@@ -60,8 +60,10 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth-ktx'
     // Also declare the dependency for the Google Play services library and specify its version
     implementation 'com.google.android.gms:play-services-auth:19.0.0'
-    //Cloud Firestore
+    // Cloud Firestore
     implementation 'com.google.firebase:firebase-firestore-ktx'
+    // Firebase Database
+    implementation 'com.google.firebase:firebase-database-ktx'
 
     //--Google Maps--//
     implementation 'com.google.android.gms:play-services-maps:17.0.1'

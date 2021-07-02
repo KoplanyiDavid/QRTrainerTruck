@@ -6,9 +6,9 @@ import android.util.Log
 import android.widget.Toast
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
-import com.vicegym.qrtrainertruck.BaseActivity
+import com.vicegym.qrtrainertruck.data.myUser
 import com.vicegym.qrtrainertruck.databinding.ActivityLoginBinding
-import com.vicegym.qrtrainertruck.myUser
+import com.vicegym.qrtrainertruck.otheractivities.BaseActivity
 
 class LoginActivity : BaseActivity() {
 
