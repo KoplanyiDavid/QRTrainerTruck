@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "221722591872",
+    "firebase_url": "https://qrtrainertruck-default-rtdb.europe-west1.firebasedatabase.app",
     "project_id": "qrtrainertruck",
     "storage_bucket": "qrtrainertruck.appspot.com"
   },
@@ -35,7 +36,7 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "221722591872-jlvphplkniffg14edipp6ujb492ke1im.apps.googleusercontent.com",
+              "client_id": "221722591872-al0fsftkcr0tb69ojnas2cvv95n2jmn2.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

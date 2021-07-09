@@ -4,56 +4,69 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
-import com.vicegym.qrtrainertruck.R
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.firebase.firestore.DocumentChange
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.ktx.toObject
+import com.google.firebase.ktx.Firebase
+import com.vicegym.qrtrainertruck.adapter.PostsAdapter
+import com.vicegym.qrtrainertruck.data.Post
+import com.vicegym.qrtrainertruck.databinding.FragmentForumBinding
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [ForumFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class ForumFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    private lateinit var binding: FragmentForumBinding
+    private lateinit var postsAdapter: PostsAdapter
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
+    companion object {
+        fun newInstance() =
+            ForumFragment()
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_forum, container, false)
+    ): View {
+        binding = FragmentForumBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment ForumFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            ForumFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        postsAdapter = PostsAdapter(requireContext())
+        binding.contentPosts.rvPosts.layoutManager = LinearLayoutManager(requireContext()).apply {
+            reverseLayout = true
+            stackFromEnd = true
+        }
+        binding.contentPosts.rvPosts.adapter = postsAdapter
+
+        initPostsListener()
+    }
+
+    private fun initPostsListener() {
+        val db = Firebase.firestore
+        db.collection("posts")
+            .addSnapshotListener { snapshots, e ->
+                if (e != null) {
+                    Toast.makeText(requireContext(), e.toString(), Toast.LENGTH_SHORT).show()
+                    return@addSnapshotListener
+                }
+
+                for (dc in snapshots!!.documentChanges) {
+                    when (dc.type) {
+                        DocumentChange.Type.ADDED -> postsAdapter.addPost(dc.document.toObject<Post>())
+                        DocumentChange.Type.MODIFIED -> Toast.makeText(
+                            requireContext(),
+                            dc.document.data.toString(),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        DocumentChange.Type.REMOVED -> Toast.makeText(
+                            requireContext(),
+                            dc.document.data.toString(),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
             }
     }

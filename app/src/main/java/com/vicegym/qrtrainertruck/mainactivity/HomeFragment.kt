@@ -1,5 +1,7 @@
 package com.vicegym.qrtrainertruck.mainactivity
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -16,12 +18,12 @@ import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
 import com.vicegym.qrtrainertruck.R
-import com.vicegym.qrtrainertruck.databinding.FragmentHomeBinding
 import com.vicegym.qrtrainertruck.data.myUser
+import com.vicegym.qrtrainertruck.databinding.FragmentHomeBinding
+
 
 class HomeFragment : Fragment(), OnMapReadyCallback {
     private lateinit var binding: FragmentHomeBinding
@@ -111,7 +113,8 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun locationUpdate() {
-        val database = Firebase.database.reference.child("TrainerTruckLocation")
+        /*--DB URL megadása kötelező, különben US centralt keres!--*/
+        val database = FirebaseDatabase.getInstance("https://qrtrainertruck-default-rtdb.europe-west1.firebasedatabase.app").reference.child("TrainerTruckLocation")
         database.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 marker?.remove()
@@ -130,11 +133,13 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         val lng: Double = dataSnapshot.child("longitude").value as Double
 
         val truckLatLng = LatLng(lat, lng)
+        val markerIcon = BitmapFactory.decodeResource(context?.resources, R.mipmap.truckvektor)
+
         marker = gMap.addMarker(
             MarkerOptions().position(truckLatLng).title("Trainer Truck")
-                .icon(BitmapDescriptorFactory.fromResource(R.mipmap.truckvektor))
+                .icon(BitmapDescriptorFactory.fromBitmap(Bitmap.createScaledBitmap(markerIcon, 80, 60, false)))
         )
-        gMap.animateCamera(CameraUpdateFactory.newLatLngZoom(truckLatLng, 10f))
+        gMap.animateCamera(CameraUpdateFactory.newLatLngZoom(truckLatLng, 16f))
         //mMap.setMaxZoomPreference(10f)
         Toast.makeText(requireContext(), truckLatLng.toString(), Toast.LENGTH_SHORT).show()
     }

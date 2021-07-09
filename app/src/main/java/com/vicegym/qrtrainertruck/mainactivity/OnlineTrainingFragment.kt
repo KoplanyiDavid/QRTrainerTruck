@@ -27,12 +27,12 @@ class OnlineTrainingFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.ytIv1.setOnClickListener {
+        /*binding.ytIv1.setOnClickListener {
             ytplaylistList["Mobilizacio"]?.let { it1 -> startYtActivity(it1) }
         }
         binding.ytIv2.setOnClickListener {
             ytplaylistList["Erosites"]?.let { it2 -> startYtActivity(it2) }
-        }
+        }*/
     }
 
     private fun startYtActivity(category: String) {

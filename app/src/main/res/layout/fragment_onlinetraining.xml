@@ -6,81 +6,41 @@
     android:layout_height="match_parent"
     tools:context=".mainactivity.OnlineTrainingFragment">
 
-    <FrameLayout
-        android:id="@+id/frameLayout"
-        android:layout_width="match_parent"
-        android:layout_height="120dp"
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/ivMorning"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/reggeli"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:src="@mipmap/trucklogo" />
-
-    </FrameLayout>
-
-    <LinearLayout
-        android:id="@+id/linearLayout"
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/ivNight"
         android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/frameLayout">
-
-        <ImageView
-            android:id="@+id/ytIv1"
-            android:layout_width="150dp"
-            android:layout_height="125dp"
-            android:layout_margin="20dp"
-            android:src="@mipmap/trucklogo"/>
-
-        <ImageView
-            android:id="@+id/ytIv2"
-            android:layout_width="150dp"
-            android:layout_height="125dp"
-            android:layout_margin="20dp"
-            android:src="@mipmap/trucklogo"/>
-
-        <ImageView
-            android:id="@+id/ytIv3"
-            android:layout_width="150dp"
-            android:layout_height="125dp"
-            android:layout_margin="20dp"
-            android:src="@mipmap/trucklogo"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/esti"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/frameLayout">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ivMorning" />
 
-        <ImageView
-            android:id="@+id/ytIv4"
-            android:layout_width="150dp"
-            android:layout_height="125dp"
-            android:layout_margin="20dp"
-            android:src="@mipmap/trucklogo"/>
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/ivBodyweight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/reggeli"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ivNight" />
 
-        <ImageView
-            android:id="@+id/ytIv5"
-            android:layout_width="150dp"
-            android:layout_height="125dp"
-            android:layout_margin="20dp"
-            android:src="@mipmap/trucklogo"/>
-
-        <ImageView
-            android:id="@+id/ytIv6"
-            android:layout_width="150dp"
-            android:layout_height="125dp"
-            android:layout_margin="20dp"
-            android:src="@mipmap/trucklogo"/>
-    </LinearLayout>
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/ivTools"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/reggeli"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ivBodyweight" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
