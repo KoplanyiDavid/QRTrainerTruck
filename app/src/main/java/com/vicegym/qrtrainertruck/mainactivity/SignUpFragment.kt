@@ -91,6 +91,7 @@ class SignUpFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimePicke
     override fun onTimeSet(view: TimePicker?, hourOfDay: Int, minute: Int) {
         trainingDate.hourOfDay = hourOfDay
         trainingDate.minute = minute
+        trainingData = TrainingData(myUser.id)
         trainingData.date = GregorianCalendar(
             trainingDate.year,
             trainingDate.month,

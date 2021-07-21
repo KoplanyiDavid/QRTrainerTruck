@@ -11,19 +11,19 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.vicegym.qrtrainertruck.data.Post
 import com.vicegym.qrtrainertruck.databinding.CardPostBinding
 
 class PostsAdapter(private val context: Context) :
-    ListAdapter<Post, PostsAdapter.PostViewHolder>(itemCallback) {
+    ListAdapter<Post, PostsAdapter.PostViewHolder>(ItemCallback) {
 
     private val postList: MutableList<Post> = mutableListOf()
     private var lastPosition = -1
 
     class PostViewHolder(binding: CardPostBinding) : RecyclerView.ViewHolder(binding.root) {
         val tvAuthor: TextView = binding.tvAuthor
-        val tvTitle: TextView = binding.tvTitle
-        val tvBody: TextView = binding.tvBody
+        val tvDescription: TextView = binding.tvDescription
         val imgPost: ImageView = binding.imgPost
     }
 
@@ -33,15 +33,9 @@ class PostsAdapter(private val context: Context) :
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
         val tmpPost = postList[position]
         holder.tvAuthor.text = tmpPost.author
-        holder.tvTitle.text = tmpPost.title
-        holder.tvBody.text = tmpPost.body
+        holder.tvDescription.text = tmpPost.description
 
-        if (tmpPost.imageUrl.isNullOrBlank()) {
-            holder.imgPost.visibility = View.GONE
-        } else {
-            Glide.with(context).load(tmpPost.imageUrl).into(holder.imgPost)
-            holder.imgPost.visibility = View.VISIBLE
-        }
+        Glide.with(context).load(tmpPost.imageUrl).into(holder.imgPost)
 
         setAnimation(holder.itemView, position)
     }
@@ -62,7 +56,7 @@ class PostsAdapter(private val context: Context) :
     }
 
     companion object {
-        object itemCallback : DiffUtil.ItemCallback<Post>() {
+        object ItemCallback : DiffUtil.ItemCallback<Post>() {
             override fun areItemsTheSame(oldItem: Post, newItem: Post): Boolean {
                 return oldItem == newItem
             }

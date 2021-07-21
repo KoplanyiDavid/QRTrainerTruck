@@ -1,5 +1,6 @@
 package com.vicegym.qrtrainertruck.mainactivity
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,12 +13,13 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import com.vicegym.qrtrainertruck.adapter.PostsAdapter
-import com.vicegym.qrtrainertruck.data.Post
 import com.vicegym.qrtrainertruck.databinding.FragmentForumBinding
+import com.vicegym.qrtrainertruck.otheractivities.CreatePostActivity
 
 class ForumFragment : Fragment() {
     private lateinit var binding: FragmentForumBinding
     private lateinit var postsAdapter: PostsAdapter
+    private val createPostReqCode = 1011
 
     companion object {
         fun newInstance() =
@@ -34,18 +36,22 @@ class ForumFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        init()
+    }
+
+    private fun init() {
         postsAdapter = PostsAdapter(requireContext())
-        binding.contentPosts.rvPosts.layoutManager = LinearLayoutManager(requireContext()).apply {
+        binding.rvPosts.layoutManager = LinearLayoutManager(requireContext()).apply {
             reverseLayout = true
             stackFromEnd = true
         }
-        binding.contentPosts.rvPosts.adapter = postsAdapter
-
+        binding.rvPosts.adapter = postsAdapter
         initPostsListener()
     }
 
     private fun initPostsListener() {
         val db = Firebase.firestore
+        db.collection("posts").orderBy("posts")
         db.collection("posts")
             .addSnapshotListener { snapshots, e ->
                 if (e != null) {
@@ -55,7 +61,7 @@ class ForumFragment : Fragment() {
 
                 for (dc in snapshots!!.documentChanges) {
                     when (dc.type) {
-                        DocumentChange.Type.ADDED -> postsAdapter.addPost(dc.document.toObject<Post>())
+                        DocumentChange.Type.ADDED -> postsAdapter.addPost(dc.document.toObject())
                         DocumentChange.Type.MODIFIED -> Toast.makeText(
                             requireContext(),
                             dc.document.data.toString(),
@@ -69,5 +75,15 @@ class ForumFragment : Fragment() {
                     }
                 }
             }
+        binding.ivNewPost.setOnClickListener {
+            val createPostIntent = Intent(requireContext(), CreatePostActivity::class.java)
+            startActivityForResult(createPostIntent, createPostReqCode)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == createPostReqCode)
+            init()
     }
 }

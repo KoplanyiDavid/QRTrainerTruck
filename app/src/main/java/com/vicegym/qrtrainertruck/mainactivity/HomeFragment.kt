@@ -53,7 +53,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         binding.tvUserScore.text = myUser.score.toString()
         binding.ivProfilePicture.setImageURI((Uri.parse(myUser.profilePicture)))
         if (myUser.trainingList.isNotEmpty()) {
-            binding.tvTrainingTime.text = myUser.trainingList[0].date
+            binding.tvTrainingTime.text = myUser.trainingList[0].date.toString()
             binding.tvTrainingPlace.text = myUser.trainingList[0].location
         }
 

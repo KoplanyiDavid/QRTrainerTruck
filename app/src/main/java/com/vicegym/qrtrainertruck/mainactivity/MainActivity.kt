@@ -1,10 +1,15 @@
 package com.vicegym.qrtrainertruck.mainactivity
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import androidx.fragment.app.Fragment
-import com.vicegym.qrtrainertruck.otheractivities.BaseActivity
 import com.vicegym.qrtrainertruck.R
+import com.vicegym.qrtrainertruck.authentication.LoginActivity
 import com.vicegym.qrtrainertruck.databinding.ActivityMainBinding
+import com.vicegym.qrtrainertruck.otheractivities.BaseActivity
 
 class MainActivity : BaseActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -18,7 +23,7 @@ class MainActivity : BaseActivity() {
         val homeFragment = HomeFragment.newInstance()
         val signUpFragment = SignUpFragment.newInstance()
         val onlineTrainingFragment = OnlineTrainingFragment.newInstance()
-        val forumFragment = ForumFragment.newInstance("param1", "param2")
+        val forumFragment = ForumFragment.newInstance()
         val profileFragment = ProfileFragment.newInstance()
 
         setCurrentFragment(homeFragment)
@@ -55,6 +60,34 @@ class MainActivity : BaseActivity() {
     private fun setCurrentFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction().apply {
             replace(R.id.fragmentMainMenu, fragment).commit()
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.toolbar_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.menu_logout -> {
+                auth.signOut()
+                startActivity(Intent(baseContext, LoginActivity::class.java))
+                return true
+            }
+            R.id.menu_TandC -> {
+                val intent = Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse("https://docs.google.com/document/d/1jmm1wLmqKIgFZMPiUWM2nMmfHlh4yq1HrLc_-bT-EAo/edit?usp=sharing")
+                )
+                startActivity(intent)
+                return true
+            }
+            R.id.menu_help -> {
+                //TODO
+                return true
+            }
+            else -> return super.onOptionsItemSelected(item)
         }
     }
 }

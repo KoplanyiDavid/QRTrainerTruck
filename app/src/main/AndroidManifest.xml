@@ -13,7 +13,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.QRTrainerTruck">
-        <activity android:name=".otheractivities.UserDataModifyActivity" />
+
+        <activity
+            android:name=".otheractivities.CreatePostActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".otheractivities.UserDataModifyActivity"
+            android:screenOrientation="portrait" />
 
         <meta-data
             android:name="com.google.android.gms.version"
@@ -22,9 +28,15 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="${MAPS_API_KEY}" />
 
-        <activity android:name=".mainactivity.MainActivity" />
-        <activity android:name=".authentication.RegisterFormActivity" />
-        <activity android:name=".authentication.LoginActivity">
+        <activity
+            android:name=".mainactivity.MainActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".authentication.RegisterFormActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".authentication.LoginActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

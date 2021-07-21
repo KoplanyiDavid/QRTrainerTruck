@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@mipmap/bg_loginscreen"
+    android:background="@drawable/bg_login_reg"
     tools:context=".mainactivity.HomeFragment">
 
     <LinearLayout
@@ -25,7 +25,8 @@
                 android:layout_centerVertical="true"
                 android:background="@android:color/transparent"
                 android:backgroundTint="@android:color/transparent"
-                android:src="@mipmap/profpic"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_profile"
                 app:shapeAppearanceOverlay="@style/Circular" />
 
             <TextView
@@ -35,6 +36,7 @@
                 android:layout_alignTop="@id/ivProfilePicture"
                 android:layout_marginStart="20dp"
                 android:layout_toEndOf="@id/ivProfilePicture"
+                android:lines="1"
                 android:text="UserName"
                 android:textSize="30sp" />
 
@@ -45,6 +47,7 @@
                 android:layout_below="@+id/tvUserName"
                 android:layout_alignStart="@+id/tvUserName"
                 android:layout_alignEnd="@+id/tvUserName"
+                android:lines="1"
                 android:text="UserRank"
                 android:textSize="23sp" />
 
@@ -55,6 +58,7 @@
                 android:layout_below="@+id/tvUserRank"
                 android:layout_alignStart="@+id/tvUserName"
                 android:layout_alignEnd="@+id/tvUserRank"
+                android:lines="1"
                 android:text="UserScore"
                 android:textSize="18sp" />
         </RelativeLayout>

@@ -14,7 +14,7 @@ android {
 
     defaultConfig {
         applicationId "com.vicegym.qrtrainertruck"
-        minSdkVersion 21
+        minSdkVersion 26
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
@@ -66,7 +66,12 @@ dependencies {
     implementation 'com.google.firebase:firebase-database-ktx'
     // Firebase Storage
     implementation 'com.google.firebase:firebase-storage-ktx'
+    //Firebase push messages
+    implementation 'com.google.firebase:firebase-messaging-ktx'
 
     //--Google Maps--//
     implementation 'com.google.android.gms:play-services-maps:17.0.1'
+
+    //--for PostsAdaper Glide--//
+    implementation 'com.github.bumptech.glide:glide:4.12.0'
 }

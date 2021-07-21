@@ -16,6 +16,7 @@ import com.google.firebase.storage.ktx.storage
 import com.google.firebase.storage.ktx.storageMetadata
 import com.vicegym.qrtrainertruck.data.myUser
 import com.vicegym.qrtrainertruck.databinding.FragmentProfileBinding
+import com.vicegym.qrtrainertruck.otheractivities.UserDataModifyActivity
 
 class ProfileFragment : Fragment() {
 
@@ -33,6 +34,10 @@ class ProfileFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        init()
+    }
+
+    private fun init() {
         binding.tvProfName.text = myUser.name
         binding.tvProfEmail.text = myUser.email
         binding.tvProfFragmentName.text = myUser.name
@@ -42,6 +47,9 @@ class ProfileFragment : Fragment() {
         binding.ivProfPic.setImageURI(Uri.parse(myUser.profilePicture))
         binding.ivProfPic.setOnClickListener {
             changeProfilePicture()
+        }
+        binding.btnModifyData.setOnClickListener {
+            startActivityForResult(Intent(requireContext(), UserDataModifyActivity::class.java), userDataModifyCode)
         }
     }
 
@@ -62,7 +70,7 @@ class ProfileFragment : Fragment() {
         }
 
         if (requestCode == userDataModifyCode) {
-            //TODO
+            init()
         }
     }
 

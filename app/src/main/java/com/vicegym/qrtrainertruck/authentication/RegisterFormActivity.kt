@@ -1,23 +1,36 @@
 package com.vicegym.qrtrainertruck.authentication
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.method.LinkMovementMethod
 import android.util.Log
 import android.widget.Toast
-import com.vicegym.qrtrainertruck.otheractivities.BaseActivity
-import com.vicegym.qrtrainertruck.databinding.ActivityRegisterFormBinding
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.component1
+import com.google.firebase.storage.ktx.component2
+import com.google.firebase.storage.ktx.storage
+import com.google.firebase.storage.ktx.storageMetadata
 import com.vicegym.qrtrainertruck.data.myUser
+import com.vicegym.qrtrainertruck.databinding.ActivityRegisterFormBinding
+import com.vicegym.qrtrainertruck.otheractivities.BaseActivity
 
-class RegisterFormActivity : BaseActivity() {
+open class RegisterFormActivity : BaseActivity() {
     private val TAG = "UserRegistration"
+    private val REQUEST_GALLERY = 1000
+    private var user: FirebaseUser? = null
     private lateinit var binding: ActivityRegisterFormBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityRegisterFormBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        init()
+    }
+
+    private fun init() {
         binding.ivRegisterProfPic.setOnClickListener { setProfilePicture() }
         binding.btnRegister.setOnClickListener { registerWithEmailAndPassword() }
         setupHyperlink()
@@ -26,12 +39,12 @@ class RegisterFormActivity : BaseActivity() {
     private fun setProfilePicture() {
         val openGalleryIntent =
             Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-        startActivityForResult(openGalleryIntent, 1000)
+        startActivityForResult(openGalleryIntent, REQUEST_GALLERY)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == 1000) {
+        if (requestCode == REQUEST_GALLERY) {
             data?.data?.let {
                 myUser.profilePicture = it.toString()
                 binding.ivRegisterProfPic.setImageURI(it)
@@ -63,12 +76,11 @@ class RegisterFormActivity : BaseActivity() {
                         if (task.isSuccessful) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "createUserWithEmail:success")
-                            user = auth.currentUser
                             /* -- Set myUser object data --*/
-                            myUser.id = user?.uid
+                            user = auth.currentUser
+                            myUser.id = user!!.uid
                             myUser.name = binding.etName.text.toString()
                             myUser.email = binding.etEmail.text.toString()
-                            myUser.mobile = binding.etMobileNum.text.toString()
                             myUser.acceptedTermsAndConditions = true
                             uploadUserData() //upload username, email etc to cloud firebase
                             Toast.makeText(baseContext, "Sikeres regisztráció:)", Toast.LENGTH_SHORT).show()
@@ -89,6 +101,51 @@ class RegisterFormActivity : BaseActivity() {
                     Toast.LENGTH_SHORT
                 )
                     .show()
+        }
+    }
+
+    private fun uploadUserData() {
+        val userHashMap = hashMapOf(
+            "id" to myUser.id,
+            "name" to myUser.name,
+            "mobile" to myUser.mobile,
+            "email" to myUser.email,
+            "profpic" to myUser.profilePicture,
+            "address" to myUser.address,
+            "acceptedtermsandcons" to myUser.acceptedTermsAndConditions,
+            "rank" to myUser.rank,
+            "score" to myUser.score,
+            "trainings" to myUser.trainingList
+        )
+
+        db.collection("users").document(myUser.id!!)
+            .set(userHashMap)
+            .addOnSuccessListener {
+                uploadUserProfilePicture(myUser.profilePicture)
+                Toast.makeText(
+                    this,
+                    "Document snapshot successfully written",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Error writing document", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun uploadUserProfilePicture(file: String) {
+        val storageRef = Firebase.storage.reference
+        val metadata = storageMetadata { contentType = "profile_image/jpeg" }
+        val uploadTask = storageRef.child("${myUser.id!!}/profileimage.jpg").putFile(Uri.parse(file), metadata)
+        uploadTask.addOnProgressListener { (bytesTransferred, totalByteCount) ->
+            val progress = (100.0 * bytesTransferred) / totalByteCount
+            Log.d("UploadImage", "Upload is $progress% done")
+        }.addOnPausedListener {
+            Log.d("UploadImage", "Upload is paused")
+        }.addOnFailureListener {
+            Log.d("UploadImage", "NEM OK: $it")
+        }.addOnSuccessListener {
+            Log.d("UploadImage", "OK")
         }
     }
 

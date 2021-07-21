@@ -12,9 +12,11 @@ import com.vicegym.qrtrainertruck.databinding.FragmentOnlinetrainingBinding
 class OnlineTrainingFragment : Fragment() {
     private lateinit var binding: FragmentOnlinetrainingBinding
     private val ytplaylistList = hashMapOf(
-        "Mobilizacio" to "https://www.youtube.com/playlist?list=PLyfiU-McsWgsQIQmNp2l0zJ6kX5IhUak2",
-        "Erosites" to "https://www.youtube.com/playlist?list=PLyfiU-McsWguH9D584n9rynvMMnjSSI3X",
-        "Rehab" to "https://www.youtube.com/playlist?list=PLyfiU-McsWgsibGwfffPg4QePw6wQBXZS"
+        "Mobilization" to "https://youtube.com/playlist?list=PLyfiU-McsWgsy-90ZaEwVkx1Mk0bM7cxZ",
+        "BodyWeight" to "https://youtube.com/playlist?list=PLyfiU-McsWgv27WjcGS7RS3hezsnQjITZ",
+        "Equipment" to "https://youtube.com/playlist?list=PLyfiU-McsWguH9D584n9rynvMMnjSSI3X",
+        "GoodMorning" to "https://youtube.com/playlist?list=PLyfiU-McsWgsibGwfffPg4QePw6wQBXZS",
+        "GoodNight" to "https://youtube.com/playlist?list=PLyfiU-McsWgsQIQmNp2l0zJ6kX5IhUak2"
     )
 
     override fun onCreateView(
@@ -27,12 +29,21 @@ class OnlineTrainingFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        /*binding.ytIv1.setOnClickListener {
-            ytplaylistList["Mobilizacio"]?.let { it1 -> startYtActivity(it1) }
+        binding.ivMorning.setOnClickListener {
+            ytplaylistList["GoodMorning"]?.let { it1 -> startYtActivity(it1) }
         }
-        binding.ytIv2.setOnClickListener {
-            ytplaylistList["Erosites"]?.let { it2 -> startYtActivity(it2) }
-        }*/
+        binding.ivBodyweight.setOnClickListener {
+            ytplaylistList["BodyWeight"]?.let { it2 -> startYtActivity(it2) }
+        }
+        binding.ivEquipment.setOnClickListener {
+            ytplaylistList["Equipment"]?.let { it3 -> startYtActivity(it3) }
+        }
+        binding.ivMobilize.setOnClickListener {
+            ytplaylistList["Mobilization"]?.let { it4 -> startYtActivity(it4) }
+        }
+        binding.ivBodyweight.setOnClickListener {
+            ytplaylistList["GoodNight"]?.let { it5 -> startYtActivity(it5) }
+        }
     }
 
     private fun startYtActivity(category: String) {

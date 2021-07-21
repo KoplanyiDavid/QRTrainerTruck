@@ -6,41 +6,63 @@
     android:layout_height="match_parent"
     tools:context=".mainactivity.OnlineTrainingFragment">
 
-    <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/ivMorning"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@mipmap/reggeli"
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
 
-    <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/ivNight"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@mipmap/esti"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ivMorning" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-    <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/ivBodyweight"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@mipmap/reggeli"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ivNight" />
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/ivMorning"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="20dp"
+                android:src="@mipmap/reggeli"
+                app:shapeAppearanceOverlay="@style/RoundCorner" />
 
-    <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/ivTools"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@mipmap/reggeli"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ivBodyweight" />
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/ivBodyweight"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="20dp"
+                android:src="@mipmap/sajattestsulyos"
+                app:shapeAppearanceOverlay="@style/RoundCorner" />
 
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/ivEquipment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="20dp"
+                android:src="@mipmap/eszkozos"
+                app:shapeAppearanceOverlay="@style/RoundCorner" />
 
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/ivMobilize"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="20dp"
+                android:src="@mipmap/mobilizacio"
+                app:shapeAppearanceOverlay="@style/RoundCorner" />
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/ivNight"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="20dp"
+                android:src="@mipmap/esti"
+                app:shapeAppearanceOverlay="@style/RoundCorner" />
+        </LinearLayout>
+    </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

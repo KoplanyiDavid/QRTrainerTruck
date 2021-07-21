@@ -4,139 +4,115 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@mipmap/bg_loginscreen"
+    android:background="@drawable/bg_login_reg"
     tools:context=".authentication.LoginActivity">
 
-    <!--<TextView
-        android:id="@+id/tvQRT"
+    <LinearLayout
+        android:id="@+id/llLogin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/pricedown"
-        android:text="QR Trainer Truck"
-        android:textAlignment="center"
-        android:textSize="50sp"
-        app:layout_constraintBottom_toTopOf="@id/ivTruckLogo"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />-->
-
-
-    <!--<ImageView
-        android:id="@+id/ivTruckLogo"
-        android:layout_width="match_parent"
-        android:layout_height="350dp"
-        android:contentDescription="trucklogo"
-        android:src="@mipmap/trucklogo"
+        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.03" />-->
+        app:layout_constraintVertical_bias="0.35">
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/etEmailLayout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.2">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etEmail"
-            android:layout_width="350dp"
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/white"
-            android:fontFamily="@font/nexa_bold"
             android:hint="Email"
-            android:inputType="textEmailAddress" />
-    </com.google.android.material.textfield.TextInputLayout>
+            android:textColorHint="@color/grey">
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/etPasswordLayout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/etEmailLayout"
-        app:passwordToggleEnabled="true">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etEmail"
+                android:layout_width="350dp"
+                android:layout_height="wrap_content"
+                android:autofillHints="Email"
+                android:fontFamily="@font/nexa_bold"
+                android:inputType="textEmailAddress"
+                android:textColor="@color/grey" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etPassword"
-            android:layout_width="350dp"
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:autofillHints="password"
-            android:background="@color/white"
-            android:fontFamily="@font/nexa_bold"
+            android:layout_marginTop="15dp"
             android:hint="Jelszó"
-            android:inputType="textPassword" />
+            android:textColorHint="@color/grey"
+            app:passwordToggleEnabled="true"
+            app:passwordToggleTint="@color/grey">
 
-    </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etPassword"
+                android:layout_width="350dp"
+                android:layout_height="wrap_content"
+                android:autofillHints="password"
+                android:fontFamily="@font/nexa_bold"
+                android:inputType="textPassword"
+                android:textColor="@color/grey" />
 
+        </com.google.android.material.textfield.TextInputLayout>
 
-    <Button
-        android:id="@+id/btnSignIn"
-        android:layout_width="350dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        android:text="Bejelentkezés"
-        android:textAllCaps="false"
-        android:textColor="@color/white"
-        android:textSize="20sp"
-        app:cornerRadius="200dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/etPasswordLayout" />
+        <androidx.cardview.widget.CardView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="15dp"
+            android:backgroundTint="@color/braun_transparent"
+            app:cardCornerRadius="30dp">
 
-    <TextView
-        android:id="@+id/tvGoogleSignIn"
+            <Button
+                android:id="@+id/btnSignIn"
+                android:layout_width="200dp"
+                android:layout_height="60dp"
+                android:background="@android:color/transparent"
+                android:text="Bejelentkezés"
+                android:textAlignment="center"
+                android:textAllCaps="false"
+                android:textColor="@color/grey"
+                android:textSize="20sp" />
+
+        </androidx.cardview.widget.CardView>
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        android:text="vagy jelentkezz be Google fiókoddal"
-        android:textColor="@color/white"
-        android:textSize="15sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btnSignIn" />
-
-    <com.google.android.gms.common.SignInButton
-        android:id="@+id/btnGoogleSignIn"
-        android:layout_width="350dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        app:buttonSize="wide"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvGoogleSignIn" />
-
-    <TextView
-        android:id="@+id/tvRegister"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Még nincs fiókod? Itt a megoldás!"
-        android:textColor="@color/white"
-        android:textSize="20sp"
+        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btnGoogleSignIn" />
+        app:layout_constraintTop_toBottomOf="@+id/llLogin">
 
-    <Button
-        android:id="@+id/btnRegister"
-        android:layout_width="350dp"
-        android:layout_height="wrap_content"
-        android:background="@drawable/my_button_bg"
-        android:text="Regisztráció"
-        android:textAllCaps="false"
-        android:textColor="@color/white"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvRegister"
-        app:layout_constraintVertical_bias="0.1" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="100dp"
+            android:text="Még nincs fiókod? Itt a megoldás!"
+            android:textColor="@color/grey"
+            android:textSize="20sp" />
 
+        <androidx.cardview.widget.CardView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="10dp"
+            android:backgroundTint="@color/braun_transparent"
+            app:cardCornerRadius="30dp">
+
+            <Button
+                android:id="@+id/btnRegister"
+                android:layout_width="200dp"
+                android:layout_height="50dp"
+                android:background="@android:color/transparent"
+                android:text="Regisztráció"
+                android:textAllCaps="false"
+                android:textColor="@color/grey"
+                android:textSize="20sp"
+                app:cornerRadius="100dp" />
+
+        </androidx.cardview.widget.CardView>
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

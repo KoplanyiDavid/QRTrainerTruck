@@ -5,7 +5,8 @@
     android:id="@+id/body_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".mainactivity.MainActivity">
+    tools:context=".mainactivity.MainActivity"
+    android:background="@drawable/bg_login_reg">
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragmentMainMenu"
@@ -29,7 +30,7 @@
         app:itemIconSize="30dp"
         app:itemIconTint="@drawable/item_selector"
         app:itemRippleColor="@android:color/transparent"
-        app:itemTextColor="#2999b5"
+        app:itemTextColor="@color/teal_200"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
