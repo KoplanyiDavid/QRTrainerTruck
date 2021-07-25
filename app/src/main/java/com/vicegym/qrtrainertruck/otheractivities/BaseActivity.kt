@@ -24,8 +24,7 @@ import com.vicegym.qrtrainertruck.mainactivity.MainActivity
 import java.io.File
 
 abstract class BaseActivity : AppCompatActivity() {
-    protected var auth: FirebaseAuth = Firebase.auth
-    protected var db: FirebaseFirestore = Firebase.firestore
+
 
     protected fun haveInternedConnection(context: Context?): Boolean {
         return if (context != null) {
@@ -36,9 +35,5 @@ abstract class BaseActivity : AppCompatActivity() {
             Log.e("haveInternetConnection", "contect argument is null")
             false
         }
-    }
-
-    protected fun startMainActivity(context: Context) {
-        startActivity(Intent(context, MainActivity::class.java))
     }
 }

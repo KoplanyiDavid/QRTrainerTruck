@@ -5,19 +5,19 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
-import com.google.firebase.auth.FirebaseUser
+import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.vicegym.qrtrainertruck.data.TrainingData
 import com.vicegym.qrtrainertruck.data.myUser
 import com.vicegym.qrtrainertruck.databinding.ActivityLoginBinding
-import com.vicegym.qrtrainertruck.otheractivities.BaseActivity
+import com.vicegym.qrtrainertruck.mainactivity.MainActivity
 import java.io.File
 
-class LoginActivity : BaseActivity() {
-
+class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
-    private var user: FirebaseUser? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         binding = ActivityLoginBinding.inflate(layoutInflater)
@@ -25,25 +25,25 @@ class LoginActivity : BaseActivity() {
         setContentView(binding.root)
     }
 
+    override fun onStart() {
+        super.onStart()
+        // Check if user is signed in (non-null)
+        if (Firebase.auth.currentUser != null)
+            getUserData()
+        else
+            init()
+    }
+
     private fun init() {
         binding.btnSignIn.setOnClickListener { signInWithEmailAndPassword() }
         binding.btnRegister.setOnClickListener { startActivity(Intent(this, RegisterFormActivity::class.java)) }
     }
 
-    override fun onStart() {
-        super.onStart()
-        // Check if user is signed in (non-null)
-        user = auth.currentUser
-        user?.let { getUserData() } //ha user nem null, akk lefut
-        init()
-    }
-
-
     private fun signInWithEmailAndPassword() {
         if (binding.etEmail.text.toString().isEmpty() || binding.etPassword.text.toString().isEmpty()) {
             Toast.makeText(baseContext, "Hiányzó adatok!", Toast.LENGTH_SHORT).show()
         } else {
-            auth.signInWithEmailAndPassword(binding.etEmail.text.toString(), binding.etPassword.text.toString())
+            Firebase.auth.signInWithEmailAndPassword(binding.etEmail.text.toString(), binding.etPassword.text.toString())
                 .addOnCompleteListener(this) { task ->
                     if (task.isSuccessful) {
                         // Sign in success, update UI with the signed-in user's information
@@ -62,7 +62,7 @@ class LoginActivity : BaseActivity() {
     }
 
     private fun getUserData() {
-        db.collection("users").document("${auth.currentUser?.uid}").get()
+        Firebase.firestore.collection("users").document("${Firebase.auth.currentUser?.uid}").get()
             .addOnSuccessListener { document ->
                 if (document != null) {
                     myUser.id = document.data?.get("id") as String?
@@ -88,12 +88,12 @@ class LoginActivity : BaseActivity() {
 
     private fun downloadUserProfilePicture() {
         val storageRef = Firebase.storage.reference
-        val imageRef = storageRef.child("${auth.currentUser?.uid}/profileimage.jpg")
+        val imageRef = storageRef.child("${Firebase.auth.currentUser?.uid}/profileimage.jpg")
         val localFile = File.createTempFile("profilepicture", "jpg")
         imageRef.getFile(localFile).addOnSuccessListener {
             Log.d("DWPIC", "OK")
             myUser.profilePicture = Uri.fromFile(localFile).toString()
-            startMainActivity(baseContext)
+            startActivity(Intent(baseContext, MainActivity::class.java))
         }
             .addOnFailureListener {
                 Log.d("DWPIC", "NEM OK: $it")

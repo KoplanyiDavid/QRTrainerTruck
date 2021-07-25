@@ -7,7 +7,10 @@ import android.provider.MediaStore
 import android.text.method.LinkMovementMethod
 import android.util.Log
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.component1
 import com.google.firebase.storage.ktx.component2
@@ -15,9 +18,9 @@ import com.google.firebase.storage.ktx.storage
 import com.google.firebase.storage.ktx.storageMetadata
 import com.vicegym.qrtrainertruck.data.myUser
 import com.vicegym.qrtrainertruck.databinding.ActivityRegisterFormBinding
-import com.vicegym.qrtrainertruck.otheractivities.BaseActivity
+import com.vicegym.qrtrainertruck.mainactivity.MainActivity
 
-open class RegisterFormActivity : BaseActivity() {
+open class RegisterFormActivity : AppCompatActivity() {
     private val TAG = "UserRegistration"
     private val REQUEST_GALLERY = 1000
     private var user: FirebaseUser? = null
@@ -68,7 +71,7 @@ open class RegisterFormActivity : BaseActivity() {
         else {
             if (binding.cbTermsAndConditions.isChecked) {
                 //register to database
-                auth.createUserWithEmailAndPassword(
+                Firebase.auth.createUserWithEmailAndPassword(
                     binding.etEmail.text.toString(),
                     binding.etPassword.text.toString()
                 )
@@ -77,14 +80,14 @@ open class RegisterFormActivity : BaseActivity() {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "createUserWithEmail:success")
                             /* -- Set myUser object data --*/
-                            user = auth.currentUser
+                            user = Firebase.auth.currentUser
                             myUser.id = user!!.uid
                             myUser.name = binding.etName.text.toString()
                             myUser.email = binding.etEmail.text.toString()
                             myUser.acceptedTermsAndConditions = true
                             uploadUserData() //upload username, email etc to cloud firebase
                             Toast.makeText(baseContext, "Sikeres regisztráció:)", Toast.LENGTH_SHORT).show()
-                            startMainActivity(baseContext)
+                            startActivity(Intent(baseContext, MainActivity::class.java))
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "createUserWithEmail:failure", task.exception)
@@ -118,7 +121,7 @@ open class RegisterFormActivity : BaseActivity() {
             "trainings" to myUser.trainingList
         )
 
-        db.collection("users").document(myUser.id!!)
+        Firebase.firestore.collection("users").document(myUser.id!!)
             .set(userHashMap)
             .addOnSuccessListener {
                 uploadUserProfilePicture(myUser.profilePicture)

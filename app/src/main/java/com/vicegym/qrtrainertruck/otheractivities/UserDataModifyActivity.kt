@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.auth.ktx.userProfileChangeRequest
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -41,19 +42,17 @@ class UserDataModifyActivity : BaseActivity() {
 
             override fun afterTextChanged(s: Editable?) {
                 myUser.name = s.toString()
-                val user = auth.currentUser
                 val profileUpdates = userProfileChangeRequest {
                     displayName = myUser.name
                 }
 
-                user!!.updateProfile(profileUpdates)
+                Firebase.auth.currentUser!!.updateProfile(profileUpdates)
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
                             Log.d("FBUpdateUserName", "User profile updated.")
                         }
                     }
-                val db = Firebase.firestore
-                db.collection("users").document("${myUser.id}").update("name", myUser.name)
+                Firebase.firestore.collection("users").document("${myUser.id}").update("name", myUser.name)
             }
         })
         binding.etProfEmail.addTextChangedListener(object : TextWatcher {
@@ -63,7 +62,7 @@ class UserDataModifyActivity : BaseActivity() {
 
             override fun afterTextChanged(s: Editable?) {
                 myUser.email = s.toString()
-                val user = auth.currentUser
+                val user = Firebase.auth.currentUser
                 user!!.updateEmail(myUser.email!!)
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
