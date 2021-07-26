@@ -1,9 +1,11 @@
 package com.vicegym.qrtrainertruck.mainactivity
 
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -20,12 +22,18 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.component1
+import com.google.firebase.storage.ktx.component2
+import com.google.firebase.storage.ktx.storage
+import com.google.firebase.storage.ktx.storageMetadata
 import com.vicegym.qrtrainertruck.R
 import com.vicegym.qrtrainertruck.data.myUser
 import com.vicegym.qrtrainertruck.databinding.FragmentHomeBinding
 
 
 class HomeFragment : Fragment(), OnMapReadyCallback {
+    private val galleryReqCode = 101
     private lateinit var binding: FragmentHomeBinding
     private lateinit var mapView: MapView
     private lateinit var gMap: GoogleMap
@@ -47,17 +55,53 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        init()
+        mapInit(savedInstanceState)
+    }
 
+    private fun init() {
         binding.tvUserName.text = myUser.name
         binding.tvUserRank.text = myUser.rank
         binding.tvUserScore.text = myUser.score.toString()
         binding.ivProfilePicture.setImageURI((Uri.parse(myUser.profilePicture)))
+        binding.ivProfilePicture.setOnClickListener { changeProfilePicture() }
+
         if (myUser.trainingList.isNotEmpty()) {
             binding.tvTrainingTime.text = myUser.trainingList[0].date.toString()
             binding.tvTrainingPlace.text = myUser.trainingList[0].location
         }
+    }
 
-        mapInit(savedInstanceState)
+    private fun changeProfilePicture() {
+        val openGalleryIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        startActivityForResult(openGalleryIntent, galleryReqCode)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == galleryReqCode) {
+            data?.data?.let {
+                uploadImageToStorage(it)
+                myUser.profilePicture = it.toString()
+                binding.ivProfilePicture.setImageURI(it)
+            }
+        }
+    }
+
+    private fun uploadImageToStorage(file: Uri) {
+        val storageRef = Firebase.storage.reference
+        val metadata = storageMetadata { contentType = "profile_image/jpeg" }
+        val uploadTask = storageRef.child("${myUser.id}/profileimage.jpg").putFile(file, metadata)
+        uploadTask.addOnProgressListener { (bytesTransferred, totalByteCount) ->
+            val progress = (100.0 * bytesTransferred) / totalByteCount
+            Log.d("UploadImage", "Upload is $progress% done")
+        }.addOnPausedListener {
+            Log.d("UploadImage", "Upload is paused")
+        }.addOnFailureListener {
+            Log.d("UploadImage", "NEM OK: $it")
+        }.addOnSuccessListener {
+            Log.d("UploadImage", "OK")
+        }
     }
 
     override fun onStart() {
@@ -114,7 +158,8 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
 
     private fun locationUpdate() {
         /*--DB URL megadása kötelező, különben US centralt keres!--*/
-        val database = FirebaseDatabase.getInstance("https://qrtrainertruck-default-rtdb.europe-west1.firebasedatabase.app").reference.child("TrainerTruckLocation")
+        val database =
+            FirebaseDatabase.getInstance("https://qrtrainertruck-default-rtdb.europe-west1.firebasedatabase.app").reference.child("TrainerTruckLocation")
         database.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 marker?.remove()
@@ -140,7 +185,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
                 .icon(BitmapDescriptorFactory.fromBitmap(Bitmap.createScaledBitmap(markerIcon, 80, 60, false)))
         )
         gMap.animateCamera(CameraUpdateFactory.newLatLngZoom(truckLatLng, 16f))
-        //mMap.setMaxZoomPreference(10f)
         Toast.makeText(requireContext(), truckLatLng.toString(), Toast.LENGTH_SHORT).show()
     }
 }

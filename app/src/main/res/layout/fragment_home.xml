@@ -38,6 +38,7 @@
                 android:layout_toEndOf="@id/ivProfilePicture"
                 android:lines="1"
                 android:text="UserName"
+                android:textColor="@color/grey"
                 android:textSize="30sp" />
 
             <TextView
@@ -49,6 +50,7 @@
                 android:layout_alignEnd="@+id/tvUserName"
                 android:lines="1"
                 android:text="UserRank"
+                android:textColor="@color/grey"
                 android:textSize="23sp" />
 
             <TextView
@@ -60,6 +62,7 @@
                 android:layout_alignEnd="@+id/tvUserRank"
                 android:lines="1"
                 android:text="UserScore"
+                android:textColor="@color/grey"
                 android:textSize="18sp" />
         </RelativeLayout>
 
@@ -77,6 +80,7 @@
                 android:layout_alignParentTop="true"
                 android:layout_alignParentEnd="true"
                 android:text="Következő edzés"
+                android:textColor="@color/grey"
                 android:textSize="30sp" />
 
             <TextView
@@ -86,6 +90,7 @@
                 android:layout_below="@id/tvNextTraining"
                 android:layout_alignParentStart="true"
                 android:text="Időpont:"
+                android:textColor="@color/grey"
                 android:textSize="20sp" />
 
             <TextView
@@ -97,6 +102,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_toEndOf="@+id/tvTime"
                 android:text="nincs kiválasztott időpont"
+                android:textColor="@color/grey"
                 android:textSize="20sp" />
 
             <TextView
@@ -106,6 +112,7 @@
                 android:layout_below="@id/tvTime"
                 android:layout_alignParentStart="true"
                 android:text="Helyszín:"
+                android:textColor="@color/grey"
                 android:textSize="20sp" />
 
             <TextView
@@ -117,6 +124,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_toEndOf="@+id/tvPlace"
                 android:text="nincs kiválasztott helyszín"
+                android:textColor="@color/grey"
                 android:textSize="20sp" />
 
         </RelativeLayout>

@@ -8,11 +8,13 @@ import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.net.toUri
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.vicegym.qrtrainertruck.data.Post
+import com.vicegym.qrtrainertruck.data.myUser
 import com.vicegym.qrtrainertruck.databinding.CardPostBinding
 
 class PostsAdapter(private val context: Context) :
@@ -22,8 +24,10 @@ class PostsAdapter(private val context: Context) :
     private var lastPosition = -1
 
     class PostViewHolder(binding: CardPostBinding) : RecyclerView.ViewHolder(binding.root) {
+        val ivProfilePicture = binding.ivPostCardProfilePicture
         val tvAuthor: TextView = binding.tvAuthor
-        val tvDescription: TextView = binding.tvDescription
+        val tvTime: TextView = binding.tvDailyChallengeTime
+        val tvDescription: TextView = binding.tvDailyChallengeDescription
         val imgPost: ImageView = binding.imgPost
     }
 
@@ -32,7 +36,9 @@ class PostsAdapter(private val context: Context) :
 
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
         val tmpPost = postList[position]
+        holder.ivProfilePicture.setImageURI(myUser.profilePicture.toUri())
         holder.tvAuthor.text = tmpPost.author
+        holder.tvTime.text = tmpPost.time
         holder.tvDescription.text = tmpPost.description
 
         Glide.with(context).load(tmpPost.imageUrl).into(holder.imgPost)

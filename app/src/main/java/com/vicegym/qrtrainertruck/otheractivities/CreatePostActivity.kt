@@ -7,7 +7,6 @@ import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.LayoutInflater
-import android.view.View
 import android.widget.Toast
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -22,35 +21,55 @@ import java.util.*
 class CreatePostActivity : BaseActivity() {
 
     companion object {
-        private const val REQUEST_CODE = 101
+        private const val CAMERA_REQ_CODE = 101
     }
 
+    private var isPictureTaken = false
     private lateinit var binding: ActivityCreatePostBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityCreatePostBinding.inflate(LayoutInflater.from(this))
         setContentView(binding.root)
-        binding.btnSend.setOnClickListener { sendClick() }
-        binding.btnAttach.setOnClickListener { attachClick() }
+        init()
+    }
+
+    private fun init() {
+        binding.ivDailyChallengePicture.setOnClickListener { attachClick() }
+        binding.btnDailyChallengeSendPost.setOnClickListener { sendClick() }
+    }
+
+    private fun attachClick() {
+        val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        startActivityForResult(takePictureIntent, CAMERA_REQ_CODE)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode != Activity.RESULT_OK) {
+            return
+        }
+
+        if (requestCode == CAMERA_REQ_CODE) {
+            val imageBitmap = data?.extras?.get("data") as? Bitmap ?: return
+            binding.ivDailyChallengePicture.setImageBitmap(imageBitmap)
+            isPictureTaken = true
+        }
     }
 
     private fun sendClick() {
-        /*if (binding.etTitle.text.isNullOrEmpty() || binding.etBody.text.isNullOrEmpty()) {
-            return
-        }*/
-        if (binding.ivAttach.visibility == View.VISIBLE) {
+        if (isPictureTaken && binding.etDailyChallengeTime.text.isNotBlank() && binding.etDailyChallengeTime.text.isNotEmpty())
             try {
                 uploadPostWithImage()
             } catch (e: Exception) {
                 e.printStackTrace()
             }
-        } else
-            Toast.makeText(this, "Nem készítettél képet!", Toast.LENGTH_SHORT).show()
+        else
+            Toast.makeText(baseContext, "Nem csináltál képet, vagy nem írtad be a futott idődet!", Toast.LENGTH_SHORT).show()
     }
 
     private fun uploadPostWithImage() {
-        val bitmap: Bitmap = (binding.ivAttach.drawable as BitmapDrawable).bitmap
+        val bitmap: Bitmap = (binding.ivDailyChallengePicture.drawable as BitmapDrawable).bitmap
         val baos = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos)
         val imageInBytes = baos.toByteArray()
@@ -78,8 +97,10 @@ class CreatePostActivity : BaseActivity() {
     private fun uploadPost(imageUrl: String? = null) {
         val newPost = Post(
             myUser.id,
+            myUser.profilePicture,
             myUser.name,
-            binding.etDescription.text.toString(),
+            binding.etDailyChallengeTime.text.toString(),
+            binding.etDailyChallengeDescription.text.toString(),
             imageUrl
         )
 
@@ -94,21 +115,5 @@ class CreatePostActivity : BaseActivity() {
             .addOnFailureListener { e -> Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show() }
     }
 
-    private fun attachClick() {
-        val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        startActivityForResult(takePictureIntent, REQUEST_CODE)
-    }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode != Activity.RESULT_OK) {
-            return
-        }
-
-        if (requestCode == REQUEST_CODE) {
-            val imageBitmap = data?.extras?.get("data") as? Bitmap ?: return
-            binding.ivAttach.setImageBitmap(imageBitmap)
-            binding.ivAttach.visibility = View.VISIBLE
-        }
-    }
 }

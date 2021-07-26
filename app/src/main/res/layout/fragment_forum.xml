@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".mainactivity.ForumFragment"
-    android:background="@color/white">
+    android:background="@color/black"
+    tools:context=".mainactivity.ForumFragment">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvPosts"

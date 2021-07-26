@@ -31,7 +31,8 @@
                 android:autofillHints="Email"
                 android:fontFamily="@font/nexa_bold"
                 android:inputType="textEmailAddress"
-                android:textColor="@color/grey" />
+                android:textColor="@color/grey"
+                app:backgroundTint="@color/grey" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
@@ -50,7 +51,8 @@
                 android:autofillHints="password"
                 android:fontFamily="@font/nexa_bold"
                 android:inputType="textPassword"
-                android:textColor="@color/grey" />
+                android:textColor="@color/grey"
+                app:backgroundTint="@color/grey" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
