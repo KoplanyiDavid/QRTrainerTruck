@@ -40,6 +40,7 @@ class PostsAdapter(private val context: Context) :
         holder.tvAuthor.text = tmpPost.author
         holder.tvTime.text = tmpPost.time
         holder.tvDescription.text = tmpPost.description
+        holder.imgPost.rotation = 90f
 
         Glide.with(context).load(tmpPost.imageUrl).into(holder.imgPost)
 
