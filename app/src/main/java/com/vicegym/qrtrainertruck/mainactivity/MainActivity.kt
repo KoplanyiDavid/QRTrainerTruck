@@ -23,21 +23,21 @@ class MainActivity : AppCompatActivity() {
 
         //Fragments
         val homeFragment = HomeFragment.newInstance()
-        val signUpFragment = SignUpFragment.newInstance()
+        val trainingsFragment = TrainingsFragment.newInstance()
         val onlineTrainingFragment = OnlineTrainingFragment.newInstance()
         val forumFragment = ForumFragment.newInstance()
         val profileFragment = ProfileFragment.newInstance()
 
         setCurrentFragment(homeFragment)
 
-        binding.bottomNavBar.setOnNavigationItemSelectedListener {
+        binding.bottomNavBar.setOnItemSelectedListener {
             when (it.itemId) {
                 R.id.bottomnav_home -> {
                     setCurrentFragment(homeFragment)
                     true
                 }
                 R.id.bottomnav_training -> {
-                    setCurrentFragment(signUpFragment)
+                    setCurrentFragment(trainingsFragment)
                     true
                 }
                 R.id.bottomnav_videos -> {

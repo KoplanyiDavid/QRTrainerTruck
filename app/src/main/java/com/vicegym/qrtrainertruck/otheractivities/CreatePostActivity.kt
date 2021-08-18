@@ -1,7 +1,10 @@
 package com.vicegym.qrtrainertruck.otheractivities
 
+import android.Manifest
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
@@ -12,6 +15,8 @@ import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -22,7 +27,6 @@ import com.vicegym.qrtrainertruck.databinding.ActivityCreatePostBinding
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
-import java.net.URLEncoder
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -30,11 +34,13 @@ import java.util.*
 class CreatePostActivity : BaseActivity() {
 
     companion object {
-        private const val CAMERA_REQ_CODE = 101
+        private const val REQUEST_WRITE = 101
+        private const val REQUEST_CAMERA = 100
     }
 
     private var isPictureTaken = false
     private lateinit var binding: ActivityCreatePostBinding
+    private lateinit var photoPath: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,11 +50,70 @@ class CreatePostActivity : BaseActivity() {
     }
 
     private fun init() {
-        binding.ivDailyChallengePicture.setOnClickListener { createPhoto() }
+        binding.ivDailyChallengePicture.setOnClickListener { checkCameraPermission() }
         binding.btnDailyChallengeSendPost.setOnClickListener { sendClick() }
     }
 
+    private fun checkCameraPermission() {
+        when (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)) {
+            PackageManager.PERMISSION_GRANTED -> {
+                createPhoto()
+            }
+            else -> ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), REQUEST_CAMERA)
+        }
+    }
+
+    private fun checkWritePermission() {
+        when (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            PackageManager.PERMISSION_GRANTED -> {
+                return
+            }
+            else -> ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), REQUEST_WRITE)
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        when (requestCode) {
+            REQUEST_CAMERA -> {
+                // If request is cancelled, the result arrays are empty.
+                if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                    createPhoto()
+                } else {
+                    val dialog = AlertDialog.Builder(this).setTitle("FIGYELEM")
+                        .setMessage("Engedély nélkül nem tudom megnyitni a kamerát :(")
+                        .setPositiveButton("Engedély megadása") { _, _ ->
+                            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), REQUEST_CAMERA)
+                        }
+                        .setNegativeButton("Engedély elutasítása") { dialog, _ -> dialog.cancel() }
+                        .create()
+                    dialog.show()
+                }
+                return
+            }
+            REQUEST_WRITE -> {
+                // If request is cancelled, the result arrays are empty.
+                if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                    createPhoto()
+                } else {
+                    val dialog = AlertDialog.Builder(this).setTitle("FIGYELEM")
+                        .setMessage("Engedély nélkül nem tudom elmenteni a fotót a háttértárra :(")
+                        .setPositiveButton("Engedély megadása") { _, _ ->
+                            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), REQUEST_WRITE)
+                        }
+                        .setNegativeButton("Engedély elutasítása") { dialog, _ -> dialog.cancel() }
+                        .create()
+                    dialog.show()
+                }
+                return
+            }
+            else -> {
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+            }
+        }
+    }
+
     private fun createPhoto() {
+        checkWritePermission()
         Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
             // Ensure that there's a camera activity to handle the intent
             takePictureIntent.resolveActivity(packageManager)?.also {
@@ -69,7 +134,7 @@ class CreatePostActivity : BaseActivity() {
                         it
                     )
                     takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
-                    startActivityForResult(takePictureIntent, CAMERA_REQ_CODE)
+                    startActivityForResult(takePictureIntent, REQUEST_CAMERA)
                 }
             }
         }
@@ -82,7 +147,7 @@ class CreatePostActivity : BaseActivity() {
         val storageDir: File? = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         return if (storageDir != null) {
             File.createTempFile("JPEG_${timeStamp}_", ".jpg", storageDir)
-                .apply { myUser.profilePicture = absolutePath }
+                .apply { photoPath = absolutePath }
         } else {
             Log.e("PhotoSave", "Photo not saved")
             Toast.makeText(this, "Photo not saved", Toast.LENGTH_SHORT).show()
@@ -96,7 +161,7 @@ class CreatePostActivity : BaseActivity() {
             return
         }
 
-        if (requestCode == CAMERA_REQ_CODE) {
+        if (requestCode == REQUEST_CAMERA) {
             setPic()
             isPictureTaken = true
         }
@@ -111,7 +176,7 @@ class CreatePostActivity : BaseActivity() {
             // Get the dimensions of the bitmap
             inJustDecodeBounds = true
 
-            BitmapFactory.decodeFile(myUser.profilePicture, this)
+            BitmapFactory.decodeFile(photoPath, this)
 
             val photoW: Int = outWidth
             val photoH: Int = outHeight
@@ -122,9 +187,8 @@ class CreatePostActivity : BaseActivity() {
             // Decode the image file into a Bitmap sized to fill the View
             inJustDecodeBounds = false
             inSampleSize = scaleFactor
-            inPurgeable = true
         }
-        BitmapFactory.decodeFile(myUser.profilePicture, bmOptions)?.also { bitmap ->
+        BitmapFactory.decodeFile(photoPath, bmOptions)?.also { bitmap ->
             binding.ivDailyChallengePicture.rotation = 90f
             binding.ivDailyChallengePicture.setImageBitmap(bitmap)
         }
@@ -146,13 +210,14 @@ class CreatePostActivity : BaseActivity() {
     }
 
     private fun uploadPostWithImage() {
-        val bitmap: Bitmap = (binding.ivDailyChallengePicture.drawable as BitmapDrawable).bitmap
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, ByteArrayOutputStream())
-        val imageInBytes = ByteArrayOutputStream().toByteArray()
-
         val storageReference = Firebase.storage.reference
-        val newImageName = URLEncoder.encode(UUID.randomUUID().toString(), "UTF-8") + ".jpg"
+        val newImageName = myUser.id + "_${Date().time}" + ".jpg"
         val newImageRef = storageReference.child("images/$newImageName")
+
+        val bitmap: Bitmap = (binding.ivDailyChallengePicture.drawable as BitmapDrawable).bitmap
+        val baos = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+        val imageInBytes = baos.toByteArray()
 
         newImageRef.putBytes(imageInBytes)
             .addOnFailureListener { exception ->
@@ -166,14 +231,14 @@ class CreatePostActivity : BaseActivity() {
                 newImageRef.downloadUrl
             }
             .addOnSuccessListener { downloadUri ->
-                uploadPost(downloadUri.toString())
+                uploadPost("gs://qrtrainertruck.appspot.com/${myUser.id}/profileimage.jpg", downloadUri.toString())
             }
     }
 
-    private fun uploadPost(imageUrl: String? = null) {
+    private fun uploadPost(profilePicture: String? = null, imageUrl: String? = null) {
         val newPost = Post(
             myUser.id,
-            myUser.profilePicture,
+            profilePicture,
             myUser.name,
             binding.etDailyChallengeTime.text.toString(),
             binding.etDailyChallengeDescription.text.toString(),
@@ -190,6 +255,4 @@ class CreatePostActivity : BaseActivity() {
             }
             .addOnFailureListener { e -> Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show() }
     }
-
-
 }

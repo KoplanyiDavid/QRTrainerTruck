@@ -8,13 +8,11 @@ import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.net.toUri
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.vicegym.qrtrainertruck.data.Post
-import com.vicegym.qrtrainertruck.data.myUser
 import com.vicegym.qrtrainertruck.databinding.CardPostBinding
 
 class PostsAdapter(private val context: Context) :
@@ -36,7 +34,7 @@ class PostsAdapter(private val context: Context) :
 
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
         val tmpPost = postList[position]
-        holder.ivProfilePicture.setImageURI(myUser.profilePicture.toUri())
+        Glide.with(context).load(tmpPost.profilePic).into(holder.ivProfilePicture)
         holder.tvAuthor.text = tmpPost.author
         holder.tvTime.text = tmpPost.time
         holder.tvDescription.text = tmpPost.description

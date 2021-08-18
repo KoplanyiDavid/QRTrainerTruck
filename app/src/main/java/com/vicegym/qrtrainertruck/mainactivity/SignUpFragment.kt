@@ -10,7 +10,8 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
 import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import com.vicegym.qrtrainertruck.data.TrainingData
 import com.vicegym.qrtrainertruck.data.myUser
 import com.vicegym.qrtrainertruck.databinding.FragmentSignupBinding
@@ -92,13 +93,13 @@ class SignUpFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimePicke
         trainingDate.hourOfDay = hourOfDay
         trainingDate.minute = minute
         trainingData = TrainingData(myUser.id)
-        trainingData.date = GregorianCalendar(
+        /*trainingData.date = GregorianCalendar(
             trainingDate.year,
             trainingDate.month,
             trainingDate.dayOfMonth,
             trainingDate.hourOfDay,
             trainingDate.minute
-        )
+        )*/
         binding.tvTrainingTime.text = trainingDate.toString()
     }
 
@@ -107,7 +108,7 @@ class SignUpFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimePicke
             Toast.makeText(requireContext(), "Hiányzó adatok", Toast.LENGTH_SHORT).show()
         else if (trainingDataValidate()) {
             myUser.trainingList.add(trainingData)
-            val db = FirebaseFirestore.getInstance()
+            val db = Firebase.firestore
             /*-- új TrainingData felvétele a Userhez tartozó dokumentumba --*/
             db.collection("users")
                 .document("${myUser.id}")
@@ -135,9 +136,6 @@ class SignUpFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimePicke
                 return@forEach
             }
         }
-
-
-
         return notExistInList
     }
 }

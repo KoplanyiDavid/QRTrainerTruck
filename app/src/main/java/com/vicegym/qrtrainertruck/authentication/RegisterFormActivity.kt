@@ -1,6 +1,9 @@
 package com.vicegym.qrtrainertruck.authentication
 
+import android.Manifest
+import android.app.AlertDialog
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -8,6 +11,9 @@ import android.text.method.LinkMovementMethod
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
@@ -18,11 +24,14 @@ import com.google.firebase.storage.ktx.storage
 import com.google.firebase.storage.ktx.storageMetadata
 import com.vicegym.qrtrainertruck.data.myUser
 import com.vicegym.qrtrainertruck.databinding.ActivityRegisterFormBinding
-import com.vicegym.qrtrainertruck.mainactivity.MainActivity
 
 open class RegisterFormActivity : AppCompatActivity() {
-    private val TAG = "UserRegistration"
-    private val REQUEST_GALLERY = 1000
+
+    companion object {
+        private const val TAG = "UserRegistration"
+        private const val REQUEST_GALLERY = 1000
+    }
+
     private var user: FirebaseUser? = null
     private lateinit var binding: ActivityRegisterFormBinding
 
@@ -40,19 +49,39 @@ open class RegisterFormActivity : AppCompatActivity() {
     }
 
     private fun setProfilePicture() {
-        val openGalleryIntent =
-            Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-        startActivityForResult(openGalleryIntent, REQUEST_GALLERY)
+        when (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+            PackageManager.PERMISSION_GRANTED -> {
+                val openGalleryIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+                startActivityForResult(openGalleryIntent, REQUEST_GALLERY)
+            }
+            else -> ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), REQUEST_GALLERY)
+        }
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_GALLERY) {
+        if (requestCode == REQUEST_GALLERY && resultCode == RESULT_OK) {
             data?.data?.let {
                 myUser.profilePicture = it.toString()
                 binding.ivRegisterProfPic.setImageURI(it)
             }
-        }
+        } else
+            Toast.makeText(this, "baj", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun sendVerificationEmail() {
+        user!!.sendEmailVerification()
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Log.d(TAG, "Email sent.")
+                    Toast.makeText(
+                        this,
+                        "A regisztráció megerősítésére vonatkozó email-t elküldtük a megadott email címre, megerősítés után tudsz belépni :)",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
     }
 
     private fun registerWithEmailAndPassword() {
@@ -84,10 +113,11 @@ open class RegisterFormActivity : AppCompatActivity() {
                             myUser.id = user!!.uid
                             myUser.name = binding.etName.text.toString()
                             myUser.email = binding.etEmail.text.toString()
+                            myUser.password = binding.etPassword.text.toString()
                             myUser.acceptedTermsAndConditions = true
                             uploadUserData() //upload username, email etc to cloud firebase
-                            Toast.makeText(baseContext, "Sikeres regisztráció:)", Toast.LENGTH_SHORT).show()
-                            startActivity(Intent(baseContext, MainActivity::class.java))
+                            sendVerificationEmail()
+                            finish()
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "createUserWithEmail:failure", task.exception)
@@ -113,8 +143,8 @@ open class RegisterFormActivity : AppCompatActivity() {
             "name" to myUser.name,
             "mobile" to myUser.mobile,
             "email" to myUser.email,
+            "password" to myUser.password,
             "profpic" to myUser.profilePicture,
-            "address" to myUser.address,
             "acceptedtermsandcons" to myUser.acceptedTermsAndConditions,
             "rank" to myUser.rank,
             "score" to myUser.score,
@@ -124,22 +154,22 @@ open class RegisterFormActivity : AppCompatActivity() {
         Firebase.firestore.collection("users").document(myUser.id!!)
             .set(userHashMap)
             .addOnSuccessListener {
-                uploadUserProfilePicture(myUser.profilePicture)
                 Toast.makeText(
                     this,
                     "Document snapshot successfully written",
                     Toast.LENGTH_SHORT
                 ).show()
+                uploadUserProfilePicture(myUser.profilePicture.toUri())
             }
             .addOnFailureListener {
                 Toast.makeText(this, "Error writing document", Toast.LENGTH_SHORT).show()
             }
     }
 
-    private fun uploadUserProfilePicture(file: String) {
+    private fun uploadUserProfilePicture(file: Uri) {
         val storageRef = Firebase.storage.reference
         val metadata = storageMetadata { contentType = "profile_image/jpeg" }
-        val uploadTask = storageRef.child("${myUser.id!!}/profileimage.jpg").putFile(Uri.parse(file), metadata)
+        val uploadTask = storageRef.child("profile_pictures/${myUser.id!!}.jpg").putFile(file, metadata)
         uploadTask.addOnProgressListener { (bytesTransferred, totalByteCount) ->
             val progress = (100.0 * bytesTransferred) / totalByteCount
             Log.d("UploadImage", "Upload is $progress% done")
@@ -149,6 +179,29 @@ open class RegisterFormActivity : AppCompatActivity() {
             Log.d("UploadImage", "NEM OK: $it")
         }.addOnSuccessListener {
             Log.d("UploadImage", "OK")
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        when (requestCode) {
+            REQUEST_GALLERY -> {
+                // If request is cancelled, the result arrays are empty.
+                if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                    setProfilePicture()
+                } else {
+                    val dialog = AlertDialog.Builder(this).setTitle("FIGYELEM").setMessage("Engedély nélkül nem férek hozzá a fotódhoz")
+                        .setPositiveButton("Engedély megadása") { _, _ ->
+                            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), REQUEST_GALLERY)
+                        }
+                        .setNegativeButton("Engedély elutasítása") { dialog, _ -> dialog.cancel() }
+                        .create()
+                    dialog.show()
+                }
+                return
+            }
+            else -> {
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+            }
         }
     }
 

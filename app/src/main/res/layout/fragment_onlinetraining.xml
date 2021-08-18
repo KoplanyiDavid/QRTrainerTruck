@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/bg_login_reg"
     tools:context=".mainactivity.OnlineTrainingFragment">
 
     <ScrollView
@@ -17,51 +18,56 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="20dp">
 
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/ivMorning"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="20dp"
-                android:src="@mipmap/reggeli"
-                app:shapeAppearanceOverlay="@style/RoundCorner" />
-
-            <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/ivBodyweight"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="20dp"
-                android:src="@mipmap/sajattestsulyos"
-                app:shapeAppearanceOverlay="@style/RoundCorner" />
-
-            <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/ivEquipment"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="20dp"
-                android:src="@mipmap/eszkozos"
+                android:scaleType="fitXY"
+                android:src="@mipmap/ytmorning"
                 app:shapeAppearanceOverlay="@style/RoundCorner" />
 
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/ivMobilize"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="20dp"
-                android:src="@mipmap/mobilizacio"
+                android:scaleType="fitXY"
+                android:src="@mipmap/ytmobilize"
+                app:shapeAppearanceOverlay="@style/RoundCorner" />
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/ivBodyWeight"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="20dp"
+                android:scaleType="fitXY"
+                android:src="@mipmap/ytbodyw"
+                app:shapeAppearanceOverlay="@style/RoundCorner" />
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/ivEquipment"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="20dp"
+                android:scaleType="fitXY"
+                android:src="@mipmap/ytequipment"
                 app:shapeAppearanceOverlay="@style/RoundCorner" />
 
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/ivNight"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="20dp"
-                android:src="@mipmap/esti"
+                android:scaleType="fitXY"
+                android:src="@mipmap/ytnight"
                 app:shapeAppearanceOverlay="@style/RoundCorner" />
         </LinearLayout>
     </ScrollView>

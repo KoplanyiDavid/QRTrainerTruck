@@ -1,6 +1,9 @@
 package com.vicegym.qrtrainertruck.mainactivity
 
+import android.Manifest
+import android.app.AlertDialog
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -8,6 +11,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.component1
@@ -21,8 +26,6 @@ import com.vicegym.qrtrainertruck.otheractivities.UserDataModifyActivity
 class ProfileFragment : Fragment() {
 
     private lateinit var binding: FragmentProfileBinding
-    private val galleryReqCode = 1000
-    private val userDataModifyCode = 1001
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -43,24 +46,51 @@ class ProfileFragment : Fragment() {
         binding.tvProfFragmentName.text = myUser.name
         binding.tvProfFragmentEmail.text = myUser.email
         binding.tvProfFragmentMobile.text = myUser.mobile
-        binding.tvProfFragmentAddress.text = myUser.address
         binding.ivProfPic.setImageURI(Uri.parse(myUser.profilePicture))
         binding.ivProfPic.setOnClickListener {
             changeProfilePicture()
         }
         binding.btnModifyData.setOnClickListener {
-            startActivityForResult(Intent(requireContext(), UserDataModifyActivity::class.java), userDataModifyCode)
+            startActivityForResult(Intent(requireContext(), UserDataModifyActivity::class.java), REQUEST_USER_DATA_MODIFY_ACTIVITY)
         }
     }
 
     private fun changeProfilePicture() {
-        val openGalleryIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-        startActivityForResult(openGalleryIntent, galleryReqCode)
+        when (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE)) {
+            PackageManager.PERMISSION_GRANTED -> {
+                val openGalleryIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+                startActivityForResult(openGalleryIntent, REQUEST_GALLERY)
+            }
+            else -> ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), REQUEST_GALLERY)
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        when (requestCode) {
+            REQUEST_GALLERY -> {
+                // If request is cancelled, the result arrays are empty.
+                if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                    changeProfilePicture()
+                } else {
+                    val dialog = AlertDialog.Builder(requireContext()).setTitle("FIGYELEM").setMessage("Engedély nélkül nem férek hozzá a fotódhoz")
+                        .setPositiveButton("Engedély megadása") { _, _ ->
+                            ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), REQUEST_GALLERY)
+                        }
+                        .setNegativeButton("Engedély elutasítása") { dialog, _ -> dialog.cancel() }
+                        .create()
+                    dialog.show()
+                }
+                return
+            }
+            else -> {
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+            }
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == galleryReqCode) {
+        if (requestCode == REQUEST_GALLERY) {
             data?.data?.let {
                 uploadImageToStorage(it)
                 myUser.profilePicture = it.toString()
@@ -68,7 +98,7 @@ class ProfileFragment : Fragment() {
             }
         }
 
-        if (requestCode == userDataModifyCode) {
+        if (requestCode == REQUEST_USER_DATA_MODIFY_ACTIVITY) {
             init()
         }
     }
@@ -76,7 +106,7 @@ class ProfileFragment : Fragment() {
     private fun uploadImageToStorage(file: Uri) {
         val storageRef = Firebase.storage.reference
         val metadata = storageMetadata { contentType = "profile_image/jpeg" }
-        val uploadTask = storageRef.child("${myUser.id}/profileimage.jpg").putFile(file, metadata)
+        val uploadTask = storageRef.child("profile_pictures/${myUser.id!!}.jpg").putFile(file, metadata)
         uploadTask.addOnProgressListener { (bytesTransferred, totalByteCount) ->
             val progress = (100.0 * bytesTransferred) / totalByteCount
             Log.d("UploadImage", "Upload is $progress% done")
@@ -90,6 +120,9 @@ class ProfileFragment : Fragment() {
     }
 
     companion object {
+        private const val REQUEST_GALLERY = 1000
+        private const val REQUEST_USER_DATA_MODIFY_ACTIVITY = 1001
+
         @JvmStatic
         fun newInstance() =
             ProfileFragment()

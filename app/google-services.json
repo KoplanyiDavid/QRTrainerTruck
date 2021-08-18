@@ -42,6 +42,35 @@
           ]
         }
       }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:221722591872:android:b3964eb554e10b6251dc65",
+        "android_client_info": {
+          "package_name": "com.vicegym.qrtrainertruckadminapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "221722591872-jlvphplkniffg14edipp6ujb492ke1im.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBTSsv_mgUUOSc5YUwgVdZMztwzR6XxB8E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "221722591872-al0fsftkcr0tb69ojnas2cvv95n2jmn2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
     }
   ],
   "configuration_version": "1"

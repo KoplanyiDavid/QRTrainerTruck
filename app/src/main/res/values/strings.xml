@@ -1,16 +1,4 @@
 <resources>
     <string name="app_name"> <font></font> QR Trainer Truck</string>
     <string name="terms_and_conditions">Elolvastam és elfogadom az<a href="https://docs.google.com/document/d/1jmm1wLmqKIgFZMPiUWM2nMmfHlh4yq1HrLc_-bT-EAo/edit?usp=sharing"> ÁSZF </a> -et</string>
-
-    <!--edzes helyek -->
-    <string-array name="training_places">
-        <item>hely1</item>
-        <item>hely2</item>
-        <item>hely3</item>
-        <item>hely4</item>
-        <item>hely5</item>
-        <item>hely6</item>
-        <item>hely7</item>
-        <item>hely8</item>
-    </string-array>
 </resources>

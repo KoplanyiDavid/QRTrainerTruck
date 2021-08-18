@@ -1,5 +1,9 @@
 package com.vicegym.qrtrainertruck.data
 
-import java.util.*
-
-data class TrainingData(var uid: String? = null, var date: GregorianCalendar? = null, var location: String? = null)
+data class TrainingData(
+    var id: String? = null,
+    var title: String? = null,
+    var trainer: String? = null,
+    var location: String? = null,
+    var date: String? = null
+)

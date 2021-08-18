@@ -32,16 +32,16 @@ class OnlineTrainingFragment : Fragment() {
         binding.ivMorning.setOnClickListener {
             ytplaylistList["GoodMorning"]?.let { it1 -> startYtActivity(it1) }
         }
-        binding.ivBodyweight.setOnClickListener {
-            ytplaylistList["BodyWeight"]?.let { it2 -> startYtActivity(it2) }
+        binding.ivMobilize.setOnClickListener {
+            ytplaylistList["Mobilization"]?.let { it2 -> startYtActivity(it2) }
+        }
+        binding.ivBodyWeight.setOnClickListener {
+            ytplaylistList["BodyWeight"]?.let { it3 -> startYtActivity(it3) }
         }
         binding.ivEquipment.setOnClickListener {
-            ytplaylistList["Equipment"]?.let { it3 -> startYtActivity(it3) }
+            ytplaylistList["Equipment"]?.let { it4 -> startYtActivity(it4) }
         }
-        binding.ivMobilize.setOnClickListener {
-            ytplaylistList["Mobilization"]?.let { it4 -> startYtActivity(it4) }
-        }
-        binding.ivBodyweight.setOnClickListener {
+        binding.ivNight.setOnClickListener {
             ytplaylistList["GoodNight"]?.let { it5 -> startYtActivity(it5) }
         }
     }

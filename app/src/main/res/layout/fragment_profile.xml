@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/black"
     android:paddingStart="10dp"
     android:paddingTop="10dp"
     android:paddingEnd="10dp"
@@ -43,7 +44,7 @@
                 android:fontFamily="@font/vicecityfont"
                 android:gravity="center"
                 android:text="name null"
-                android:textColor="@color/white"
+                android:textColor="@color/grey"
                 android:textSize="30sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -55,7 +56,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="email null"
-                android:textColor="@color/white"
+                android:textColor="@color/grey"
                 android:textSize="20sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -79,7 +80,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:text="Profil Infó"
-            android:textColor="@color/black"
+            android:textColor="@color/grey"
             android:textSize="25sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -91,7 +92,7 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_marginTop="10dp"
-            android:src="@drawable/ic_name"
+            android:src="@drawable/icon_name"
             app:layout_constraintStart_toStartOf="@id/tvProfilInfo"
             app:layout_constraintTop_toBottomOf="@id/tvProfilInfo" />
 
@@ -101,7 +102,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:text="Név"
-            android:textColor="@color/black"
+            android:textColor="@color/grey"
             android:textSize="20sp"
             app:layout_constraintStart_toEndOf="@id/ivProf"
             app:layout_constraintTop_toTopOf="@id/ivProf" />
@@ -125,7 +126,7 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_marginTop="20dp"
-            android:src="@drawable/ic_email"
+            android:src="@drawable/icon_email"
             app:layout_constraintStart_toStartOf="@id/tvProfilInfo"
             app:layout_constraintTop_toBottomOf="@id/ivProf" />
 
@@ -135,7 +136,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:text="Email"
-            android:textColor="@color/black"
+            android:textColor="@color/grey"
             android:textSize="20sp"
             app:layout_constraintStart_toEndOf="@id/ivEmail"
             app:layout_constraintTop_toTopOf="@id/ivEmail" />
@@ -159,7 +160,7 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_marginTop="20dp"
-            android:src="@drawable/ic_mobile"
+            android:src="@drawable/icon_mobile"
             app:layout_constraintStart_toStartOf="@id/tvProfilInfo"
             app:layout_constraintTop_toBottomOf="@id/ivEmail" />
 
@@ -169,7 +170,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:text="Telefonszám"
-            android:textColor="@color/black"
+            android:textColor="@color/grey"
             android:textSize="20sp"
             app:layout_constraintStart_toEndOf="@id/ivMobile"
             app:layout_constraintTop_toTopOf="@id/ivMobile" />
@@ -187,51 +188,18 @@
             app:layout_constraintStart_toStartOf="@id/tvMobile"
             app:layout_constraintTop_toBottomOf="@id/tvMobile" />
 
-        <!-- Edzés helyszíne -->
-        <ImageView
-            android:id="@+id/ivAddress"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_marginTop="20dp"
-            android:src="@drawable/ic_address"
-            app:layout_constraintStart_toStartOf="@id/tvProfilInfo"
-            app:layout_constraintTop_toBottomOf="@id/ivMobile" />
-
-        <TextView
-            android:id="@+id/tvAddress"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:text="Edzés helyszíne"
-            android:textColor="@color/black"
-            android:textSize="20sp"
-            app:layout_constraintStart_toEndOf="@id/ivAddress"
-            app:layout_constraintTop_toTopOf="@id/ivAddress" />
-
-        <TextView
-            android:id="@+id/tvProfFragmentAddress"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:text="address null"
-            android:textColor="#a1a1a1"
-            android:textSize="17sp"
-            android:textStyle="italic"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@id/tvAddress"
-            app:layout_constraintTop_toBottomOf="@id/tvAddress" />
-
         <Button
             android:id="@+id/btnModifyData"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:backgroundTint="#a1a1a1"
+            android:background="@drawable/button_background"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
             android:text="Adatmódosítás"
+            android:textColor="@color/grey"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/ivAddress" />
+            app:layout_constraintTop_toBottomOf="@id/ivMobile" />
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>
