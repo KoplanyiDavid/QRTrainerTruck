@@ -22,7 +22,7 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.vicegym.qrtrainertruck.data.Post
-import com.vicegym.qrtrainertruck.data.myUser
+import com.vicegym.qrtrainertruck.data.MyUser
 import com.vicegym.qrtrainertruck.databinding.ActivityCreatePostBinding
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -211,7 +211,7 @@ class CreatePostActivity : BaseActivity() {
 
     private fun uploadPostWithImage() {
         val storageReference = Firebase.storage.reference
-        val newImageName = myUser.id + "_${Date().time}" + ".jpg"
+        val newImageName = MyUser.id + "_${Date().time}" + ".jpg"
         val newImageRef = storageReference.child("images/$newImageName")
 
         val bitmap: Bitmap = (binding.ivDailyChallengePicture.drawable as BitmapDrawable).bitmap
@@ -231,15 +231,15 @@ class CreatePostActivity : BaseActivity() {
                 newImageRef.downloadUrl
             }
             .addOnSuccessListener { downloadUri ->
-                uploadPost("gs://qrtrainertruck.appspot.com/${myUser.id}/profileimage.jpg", downloadUri.toString())
+                uploadPost("gs://qrtrainertruck.appspot.com/${MyUser.id}/profileimage.jpg", downloadUri.toString())
             }
     }
 
     private fun uploadPost(profilePicture: String? = null, imageUrl: String? = null) {
         val newPost = Post(
-            myUser.id,
+            MyUser.id,
             profilePicture,
-            myUser.name,
+            MyUser.name,
             binding.etDailyChallengeTime.text.toString(),
             binding.etDailyChallengeDescription.text.toString(),
             imageUrl

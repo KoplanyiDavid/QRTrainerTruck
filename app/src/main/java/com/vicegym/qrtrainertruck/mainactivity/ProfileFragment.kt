@@ -19,7 +19,7 @@ import com.google.firebase.storage.ktx.component1
 import com.google.firebase.storage.ktx.component2
 import com.google.firebase.storage.ktx.storage
 import com.google.firebase.storage.ktx.storageMetadata
-import com.vicegym.qrtrainertruck.data.myUser
+import com.vicegym.qrtrainertruck.data.MyUser
 import com.vicegym.qrtrainertruck.databinding.FragmentProfileBinding
 import com.vicegym.qrtrainertruck.otheractivities.UserDataModifyActivity
 
@@ -41,12 +41,12 @@ class ProfileFragment : Fragment() {
     }
 
     private fun init() {
-        binding.tvProfName.text = myUser.name
-        binding.tvProfEmail.text = myUser.email
-        binding.tvProfFragmentName.text = myUser.name
-        binding.tvProfFragmentEmail.text = myUser.email
-        binding.tvProfFragmentMobile.text = myUser.mobile
-        binding.ivProfPic.setImageURI(Uri.parse(myUser.profilePicture))
+        binding.tvProfName.text = MyUser.name
+        binding.tvProfEmail.text = MyUser.email
+        binding.tvProfFragmentName.text = MyUser.name
+        binding.tvProfFragmentEmail.text = MyUser.email
+        binding.tvProfFragmentMobile.text = MyUser.mobile
+        binding.ivProfPic.setImageURI(Uri.parse(MyUser.profilePicture))
         binding.ivProfPic.setOnClickListener {
             changeProfilePicture()
         }
@@ -93,7 +93,7 @@ class ProfileFragment : Fragment() {
         if (requestCode == REQUEST_GALLERY) {
             data?.data?.let {
                 uploadImageToStorage(it)
-                myUser.profilePicture = it.toString()
+                MyUser.profilePicture = it.toString()
                 binding.ivProfPic.setImageURI(it)
             }
         }
@@ -106,7 +106,7 @@ class ProfileFragment : Fragment() {
     private fun uploadImageToStorage(file: Uri) {
         val storageRef = Firebase.storage.reference
         val metadata = storageMetadata { contentType = "profile_image/jpeg" }
-        val uploadTask = storageRef.child("profile_pictures/${myUser.id!!}.jpg").putFile(file, metadata)
+        val uploadTask = storageRef.child("profile_pictures/${MyUser.id!!}.jpg").putFile(file, metadata)
         uploadTask.addOnProgressListener { (bytesTransferred, totalByteCount) ->
             val progress = (100.0 * bytesTransferred) / totalByteCount
             Log.d("UploadImage", "Upload is $progress% done")

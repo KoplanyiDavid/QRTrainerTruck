@@ -18,8 +18,8 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.vicegym.qrtrainertruck.R
+import com.vicegym.qrtrainertruck.data.MyUser
 import com.vicegym.qrtrainertruck.data.TrainingData
-import com.vicegym.qrtrainertruck.data.myUser
 import com.vicegym.qrtrainertruck.databinding.ActivityLoginBinding
 import com.vicegym.qrtrainertruck.mainactivity.MainActivity
 import com.vicegym.qrtrainertruck.otheractivities.LoadingScreenActivity
@@ -54,7 +54,6 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun popupWindow() {
-
         val popupView = layoutInflater.inflate(R.layout.popup_window_forgot_password, null)
         val popupWindow = PopupWindow(
             popupView,
@@ -127,15 +126,24 @@ class LoginActivity : AppCompatActivity() {
         Firebase.firestore.collection("users").document("${Firebase.auth.currentUser?.uid}").get()
             .addOnSuccessListener { document ->
                 if (document != null) {
-                    myUser.id = document.data?.get("id") as String?
-                    myUser.name = document.data?.get("name") as String?
-                    myUser.email = document.data?.get("email") as String?
-                    myUser.password = document.data?.get("password") as String?
-                    myUser.mobile = document.data?.get("mobile") as String?
-                    myUser.acceptedTermsAndConditions = document.data?.get("acceptedtermsandcons") as Boolean
-                    myUser.rank = document.data?.get("rank") as String
-                    myUser.score = document.data?.get("score") as Number
-                    myUser.trainingList = document.data?.get("trainings") as MutableList<TrainingData>
+                    MyUser.id = document.data?.get("id") as String?
+                    MyUser.name = document.data?.get("name") as String?
+                    MyUser.email = document.data?.get("email") as String?
+                    MyUser.password = document.data?.get("password") as String?
+                    MyUser.mobile = document.data?.get("mobile") as String?
+                    MyUser.acceptedTermsAndConditions = document.data?.get("acceptedtermsandcons") as Boolean
+                    MyUser.rank = document.data?.get("rank") as String
+                    MyUser.score = document.data?.get("score") as Number
+                    val trainings = document.data?.get("trainings") as ArrayList<HashMap<String, String>>
+                    for (training in trainings) {
+                        val trainingData = TrainingData()
+                        trainingData.id = training["id"]
+                        trainingData.title = training["title"]
+                        trainingData.date = training["date"]
+                        trainingData.location = training["location"]
+                        trainingData.trainer = training["trainer"]
+                        MyUser.trainingList.add(trainingData)
+                    }
                     Log.d("FC", "${document.data}")
                     downloadUserProfilePicture()
                 } else {
@@ -149,11 +157,11 @@ class LoginActivity : AppCompatActivity() {
 
     private fun downloadUserProfilePicture() {
         val storageRef = Firebase.storage.reference
-        val imageRef = storageRef.child("profile_pictures/${myUser.id!!}.jpg")
+        val imageRef = storageRef.child("profile_pictures/${MyUser.id!!}.jpg")
         val localFile = File.createTempFile("profilepicture", "jpg")
         imageRef.getFile(localFile).addOnSuccessListener {
             Log.d("DWPIC", "OK")
-            myUser.profilePicture = Uri.fromFile(localFile).toString()
+            MyUser.profilePicture = Uri.fromFile(localFile).toString()
             startActivity(Intent(baseContext, MainActivity::class.java))
         }
             .addOnFailureListener {

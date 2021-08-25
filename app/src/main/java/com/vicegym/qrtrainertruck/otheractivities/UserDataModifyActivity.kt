@@ -14,7 +14,7 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.vicegym.qrtrainertruck.authentication.LoginActivity
-import com.vicegym.qrtrainertruck.data.myUser
+import com.vicegym.qrtrainertruck.data.MyUser
 import com.vicegym.qrtrainertruck.databinding.ActivityUserDataModifyBinding
 
 class UserDataModifyActivity : BaseActivity() {
@@ -37,9 +37,9 @@ class UserDataModifyActivity : BaseActivity() {
         binding.btnChangePassword.setOnClickListener { changePasswordRequest() }
 
         /*--hint szövegek--*/
-        binding.etProfName.hint = myUser.name
-        binding.etProfEmail.hint = myUser.email
-        binding.etProfMobile.hint = myUser.mobile
+        binding.etProfName.hint = MyUser.name
+        binding.etProfEmail.hint = MyUser.email
+        binding.etProfMobile.hint = MyUser.mobile
 
         /*--edittextek szövegváltozás figyelői--*/
         binding.etProfName.addTextChangedListener(object : TextWatcher {
@@ -50,9 +50,9 @@ class UserDataModifyActivity : BaseActivity() {
             override fun afterTextChanged(s: Editable?) {
                 if (s.isNullOrEmpty())
                     return
-                myUser.name = s.toString()
+                MyUser.name = s.toString()
                 val profileUpdates = userProfileChangeRequest {
-                    displayName = myUser.name
+                    displayName = MyUser.name
                 }
 
                 Firebase.auth.currentUser!!.updateProfile(profileUpdates)
@@ -61,7 +61,7 @@ class UserDataModifyActivity : BaseActivity() {
                             Log.d("FBUpdateUserName", "User profile updated.")
                         }
                     }
-                Firebase.firestore.collection("users").document("${myUser.id}").update("name", myUser.name)
+                Firebase.firestore.collection("users").document("${MyUser.id}").update("name", MyUser.name)
             }
         })
         binding.etProfEmail.addTextChangedListener(object : TextWatcher {
@@ -73,16 +73,16 @@ class UserDataModifyActivity : BaseActivity() {
                 if (s.isNullOrEmpty())
                     return
                 if (s.contains('@', true) && s.contains('.', true)) {
-                    myUser.email = s.toString()
+                    MyUser.email = s.toString()
                     val user = Firebase.auth.currentUser
-                    user!!.updateEmail(myUser.email!!)
+                    user!!.updateEmail(MyUser.email!!)
                         .addOnCompleteListener { task ->
                             if (task.isSuccessful) {
                                 Log.d("FBUpdateUserEmail", "User email address updated.")
                             }
                         }
                     val db = Firebase.firestore
-                    db.collection("users").document("${myUser.id}").update("email", myUser.email)
+                    db.collection("users").document("${MyUser.id}").update("email", MyUser.email)
                 }
             }
         })
@@ -95,16 +95,16 @@ class UserDataModifyActivity : BaseActivity() {
                 if (s.isNullOrEmpty())
                     return
                 if (s.length == 11 || s.length == 12) {
-                    myUser.mobile = s.toString()
+                    MyUser.mobile = s.toString()
                     val db = Firebase.firestore
-                    db.collection("users").document("${myUser.id}").update("mobile", myUser.mobile)
+                    db.collection("users").document("${MyUser.id}").update("mobile", MyUser.mobile)
                 }
             }
         })
     }
 
     private fun changePasswordRequest() {
-        myUser.email?.let {
+        MyUser.email?.let {
             Firebase.auth.sendPasswordResetEmail(it)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
@@ -125,7 +125,7 @@ class UserDataModifyActivity : BaseActivity() {
     private fun reAuthUser() {
         val user = Firebase.auth.currentUser!!
         val credential = EmailAuthProvider
-            .getCredential(myUser.email!!, myUser.password!!)
+            .getCredential(MyUser.email!!, MyUser.password!!)
 
         user.reauthenticate(credential)
             .addOnCompleteListener { deleteUser() }
@@ -134,13 +134,13 @@ class UserDataModifyActivity : BaseActivity() {
     private fun deleteUser() {
         /* Delete user data from firestore */
         val db = Firebase.firestore
-        db.collection("users").document(myUser.id!!)
+        db.collection("users").document(MyUser.id!!)
             .delete()
 
         /* Delete user data from Storage */
 
         val storageRef = Firebase.storage.reference
-        val desertRef = storageRef.child("profile_pictures/${myUser.id!!}.jpg")
+        val desertRef = storageRef.child("profile_pictures/${MyUser.id!!}.jpg")
         desertRef.delete()
 
         Firebase.auth.currentUser!!.delete()
@@ -154,13 +154,13 @@ class UserDataModifyActivity : BaseActivity() {
 
     private fun validateUserData() {
         val db = Firebase.firestore
-        db.collection("users").document("${myUser.id}").get().addOnSuccessListener { document ->
+        db.collection("users").document("${MyUser.id}").get().addOnSuccessListener { document ->
             if (document != null) {
                 val uName = document.data?.get("name") as String?
                 val uEmail = document.data?.get("email") as String?
                 val uMobile = document.data?.get("mobile") as String?
 
-                if (uName == myUser.name && uEmail == myUser.email && uMobile == myUser.mobile) {
+                if (uName == MyUser.name && uEmail == MyUser.email && uMobile == MyUser.mobile) {
                     Log.d("validateUserData", "OK")
                     finish()
                 } else

@@ -2,7 +2,7 @@ package com.vicegym.qrtrainertruck.data
 
 import com.vicegym.qrtrainertruck.R
 
-object myUser {
+object MyUser {
     var id: String? = null
     var name: String? = null
     var email: String? = null
@@ -12,5 +12,5 @@ object myUser {
     var acceptedTermsAndConditions: Boolean = false
     var rank: String = "Újonc"
     var score: Number = 0
-    var trainingList: MutableList<TrainingData> = mutableListOf()
+    var trainingList: ArrayList<TrainingData> = arrayListOf()
 }

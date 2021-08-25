@@ -34,7 +34,7 @@ import com.google.firebase.storage.ktx.component2
 import com.google.firebase.storage.ktx.storage
 import com.google.firebase.storage.ktx.storageMetadata
 import com.vicegym.qrtrainertruck.R
-import com.vicegym.qrtrainertruck.data.myUser
+import com.vicegym.qrtrainertruck.data.MyUser
 import com.vicegym.qrtrainertruck.databinding.FragmentHomeBinding
 
 
@@ -67,15 +67,15 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun init() {
-        binding.tvUserName.text = myUser.name
-        binding.tvUserRank.text = myUser.rank
-        binding.tvUserScore.text = myUser.score.toString()
-        binding.ivProfilePicture.setImageURI(myUser.profilePicture.toUri())
+        binding.tvUserName.text = MyUser.name
+        binding.tvUserRank.text = MyUser.rank
+        binding.tvUserScore.text = MyUser.score.toString()
+        binding.ivProfilePicture.setImageURI(MyUser.profilePicture.toUri())
         binding.ivProfilePicture.setOnClickListener { changeProfilePicture() }
 
-        if (myUser.trainingList.isNotEmpty()) {
-            binding.tvTrainingTime.text = myUser.trainingList[0].date.toString()
-            binding.tvTrainingPlace.text = myUser.trainingList[0].location
+        if (MyUser.trainingList.isNotEmpty()) {
+            //binding.tvTrainingTime.text = MyUser.trainingList[0].date
+            //binding.tvTrainingPlace.text = MyUser.trainingList[0].location
         }
     }
 
@@ -117,7 +117,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         if (requestCode == REQUEST_GALLERY) {
             data?.data?.let {
                 uploadImageToStorage(it)
-                myUser.profilePicture = it.toString()
+                MyUser.profilePicture = it.toString()
                 binding.ivProfilePicture.setImageURI(it)
             }
         }
@@ -126,7 +126,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     private fun uploadImageToStorage(file: Uri) {
         val storageRef = Firebase.storage.reference
         val metadata = storageMetadata { contentType = "profile_image/jpeg" }
-        val uploadTask = storageRef.child("profile_pictures/${myUser.id!!}.jpg").putFile(file, metadata)
+        val uploadTask = storageRef.child("profile_pictures/${MyUser.id!!}.jpg").putFile(file, metadata)
         uploadTask.addOnProgressListener { (bytesTransferred, totalByteCount) ->
             val progress = (100.0 * bytesTransferred) / totalByteCount
             Log.d("UploadImage", "Upload is $progress% done")

@@ -1,6 +1,6 @@
 package com.vicegym.qrtrainertruck.data
 
-class Post(
+data class Post(
     var uid: String? = null,
     var profilePic: String? = null,
     var author: String? = null,

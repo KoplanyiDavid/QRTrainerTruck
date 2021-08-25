@@ -22,7 +22,7 @@ import com.google.firebase.storage.ktx.component1
 import com.google.firebase.storage.ktx.component2
 import com.google.firebase.storage.ktx.storage
 import com.google.firebase.storage.ktx.storageMetadata
-import com.vicegym.qrtrainertruck.data.myUser
+import com.vicegym.qrtrainertruck.data.MyUser
 import com.vicegym.qrtrainertruck.databinding.ActivityRegisterFormBinding
 
 open class RegisterFormActivity : AppCompatActivity() {
@@ -63,7 +63,7 @@ open class RegisterFormActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_GALLERY && resultCode == RESULT_OK) {
             data?.data?.let {
-                myUser.profilePicture = it.toString()
+                MyUser.profilePicture = it.toString()
                 binding.ivRegisterProfPic.setImageURI(it)
             }
         } else
@@ -108,13 +108,13 @@ open class RegisterFormActivity : AppCompatActivity() {
                         if (task.isSuccessful) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "createUserWithEmail:success")
-                            /* -- Set myUser object data --*/
+                            /* -- Set MyUser object data --*/
                             user = Firebase.auth.currentUser
-                            myUser.id = user!!.uid
-                            myUser.name = binding.etName.text.toString()
-                            myUser.email = binding.etEmail.text.toString()
-                            myUser.password = binding.etPassword.text.toString()
-                            myUser.acceptedTermsAndConditions = true
+                            MyUser.id = user!!.uid
+                            MyUser.name = binding.etName.text.toString()
+                            MyUser.email = binding.etEmail.text.toString()
+                            MyUser.password = binding.etPassword.text.toString()
+                            MyUser.acceptedTermsAndConditions = true
                             uploadUserData() //upload username, email etc to cloud firebase
                             sendVerificationEmail()
                             finish()
@@ -139,19 +139,19 @@ open class RegisterFormActivity : AppCompatActivity() {
 
     private fun uploadUserData() {
         val userHashMap = hashMapOf(
-            "id" to myUser.id,
-            "name" to myUser.name,
-            "mobile" to myUser.mobile,
-            "email" to myUser.email,
-            "password" to myUser.password,
-            "profpic" to myUser.profilePicture,
-            "acceptedtermsandcons" to myUser.acceptedTermsAndConditions,
-            "rank" to myUser.rank,
-            "score" to myUser.score,
-            "trainings" to myUser.trainingList
+            "id" to MyUser.id,
+            "name" to MyUser.name,
+            "mobile" to MyUser.mobile,
+            "email" to MyUser.email,
+            "password" to MyUser.password,
+            "profpic" to MyUser.profilePicture,
+            "acceptedtermsandcons" to MyUser.acceptedTermsAndConditions,
+            "rank" to MyUser.rank,
+            "score" to MyUser.score,
+            "trainings" to MyUser.trainingList
         )
 
-        Firebase.firestore.collection("users").document(myUser.id!!)
+        Firebase.firestore.collection("users").document(MyUser.id!!)
             .set(userHashMap)
             .addOnSuccessListener {
                 Toast.makeText(
@@ -159,7 +159,7 @@ open class RegisterFormActivity : AppCompatActivity() {
                     "Document snapshot successfully written",
                     Toast.LENGTH_SHORT
                 ).show()
-                uploadUserProfilePicture(myUser.profilePicture.toUri())
+                uploadUserProfilePicture(MyUser.profilePicture.toUri())
             }
             .addOnFailureListener {
                 Toast.makeText(this, "Error writing document", Toast.LENGTH_SHORT).show()
@@ -169,7 +169,7 @@ open class RegisterFormActivity : AppCompatActivity() {
     private fun uploadUserProfilePicture(file: Uri) {
         val storageRef = Firebase.storage.reference
         val metadata = storageMetadata { contentType = "profile_image/jpeg" }
-        val uploadTask = storageRef.child("profile_pictures/${myUser.id!!}.jpg").putFile(file, metadata)
+        val uploadTask = storageRef.child("profile_pictures/${MyUser.id!!}.jpg").putFile(file, metadata)
         uploadTask.addOnProgressListener { (bytesTransferred, totalByteCount) ->
             val progress = (100.0 * bytesTransferred) / totalByteCount
             Log.d("UploadImage", "Upload is $progress% done")

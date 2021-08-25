@@ -13,7 +13,7 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.vicegym.qrtrainertruck.data.TrainingData
-import com.vicegym.qrtrainertruck.data.myUser
+import com.vicegym.qrtrainertruck.data.MyUser
 import com.vicegym.qrtrainertruck.databinding.FragmentSignupBinding
 import java.util.*
 
@@ -82,7 +82,7 @@ class SignUpFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimePicke
 
     //a kiválasztott dátumot tartalmazza
     override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {
-        //trainingData = TrainingData(myUser.id, "$year.${month + 1}.$dayOfMonth")
+        //trainingData = TrainingData(MyUser.id, "$year.${month + 1}.$dayOfMonth")
         //trainingData.date = "$year.${month + 1}.$dayOfMonth"
         trainingDate = TrainingDate(year, month, dayOfMonth, 0, 0)
         showTimePickerDialog()
@@ -92,7 +92,7 @@ class SignUpFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimePicke
     override fun onTimeSet(view: TimePicker?, hourOfDay: Int, minute: Int) {
         trainingDate.hourOfDay = hourOfDay
         trainingDate.minute = minute
-        trainingData = TrainingData(myUser.id)
+        trainingData = TrainingData(MyUser.id)
         /*trainingData.date = GregorianCalendar(
             trainingDate.year,
             trainingDate.month,
@@ -107,11 +107,11 @@ class SignUpFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimePicke
         if (trainingData.date == null || trainingData.location == null)
             Toast.makeText(requireContext(), "Hiányzó adatok", Toast.LENGTH_SHORT).show()
         else if (trainingDataValidate()) {
-            myUser.trainingList.add(trainingData)
+            MyUser.trainingList.add(trainingData)
             val db = Firebase.firestore
             /*-- új TrainingData felvétele a Userhez tartozó dokumentumba --*/
             db.collection("users")
-                .document("${myUser.id}")
+                .document("${MyUser.id}")
                 .update("trainings", FieldValue.arrayUnion(trainingData)).addOnSuccessListener {
                     Log.d("EdzesekUpdate", "OK")
                 }
@@ -130,7 +130,7 @@ class SignUpFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimePicke
         var notExistInList = true
         var before3Days = true
 
-        myUser.trainingList.forEach {
+        MyUser.trainingList.forEach {
             if (it.date == trainingData.date) {
                 notExistInList = false
                 return@forEach

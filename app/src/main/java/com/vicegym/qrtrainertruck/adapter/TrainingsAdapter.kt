@@ -2,19 +2,22 @@ package com.vicegym.qrtrainertruck.adapter
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Color.DKGRAY
+import android.graphics.Color.GREEN
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.vicegym.qrtrainertruck.data.MyUser
 import com.vicegym.qrtrainertruck.data.TrainingData
-import com.vicegym.qrtrainertruck.data.myUser
 import com.vicegym.qrtrainertruck.databinding.CardTrainingBinding
 
 class TrainingsAdapter(private val context: Context) :
@@ -40,13 +43,58 @@ class TrainingsAdapter(private val context: Context) :
         holder.tvTrainer.text = tmpTraining.trainer
         holder.tvGymPlace.text = tmpTraining.location
         holder.tvDate.text = tmpTraining.date
-        holder.card.setOnClickListener { signUpToTraining(tmpTraining.id!!) }
+        if (MyUser.trainingList.contains(tmpTraining))
+            holder.card.setCardBackgroundColor(GREEN)
+        holder.card.setOnClickListener {
+            manageTraining(tmpTraining.id!!, holder.card)
+        }
         setAnimation(holder.itemView, position)
     }
 
-    private fun signUpToTraining(id: String) {
+    private fun manageTraining(id: String, card: CardView) {
         val db = Firebase.firestore.collection("trainings").document(id)
-        db.update("trainees", FieldValue.arrayUnion(myUser.id))
+        db.get().addOnSuccessListener { document ->
+            val trainingList = document.data?.get("trainees") as ArrayList<*>?
+            if (trainingList != null) {
+                if (!(trainingList.contains(MyUser.id))) {
+                    db.update("trainees", FieldValue.arrayUnion(MyUser.id))
+                    val trainingData = TrainingData()
+                    db.get().addOnSuccessListener { document1 ->
+                        trainingData.id = document1.data?.get("id") as String?
+                        trainingData.title = document1.data?.get("title") as String?
+                        trainingData.date = document1.data?.get("date") as String?
+                        trainingData.location = document1.data?.get("location") as String?
+                        trainingData.trainer = document1.data?.get("trainer") as String?
+                        uploadUserTrainingData(trainingData)
+                        card.setCardBackgroundColor(GREEN)
+                    }
+                } else if (trainingList.contains(MyUser.id)) {
+                    db.update("trainees", FieldValue.arrayRemove(MyUser.id))
+                    val trainingData = TrainingData()
+                    db.get().addOnSuccessListener { document1 ->
+                        trainingData.id = document1.data?.get("id") as String?
+                        trainingData.title = document1.data?.get("title") as String?
+                        trainingData.date = document1.data?.get("date") as String?
+                        trainingData.location = document1.data?.get("location") as String?
+                        trainingData.trainer = document1.data?.get("trainer") as String?
+                        deleteUserTrainingData(trainingData)
+                        card.setCardBackgroundColor(DKGRAY)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun uploadUserTrainingData(trainingData: TrainingData) {
+        val db = Firebase.firestore.collection("users").document(MyUser.id!!)
+        db.update("trainings", FieldValue.arrayUnion(trainingData))
+        MyUser.trainingList.add(trainingData)
+    }
+
+    private fun deleteUserTrainingData(trainingData: TrainingData) {
+        val db = Firebase.firestore.collection("users").document(MyUser.id!!)
+        db.update("trainings", FieldValue.arrayRemove(trainingData))
+        MyUser.trainingList.remove(trainingData)
     }
 
     fun addTrainings(training: TrainingData?) {
