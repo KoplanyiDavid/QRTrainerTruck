@@ -14,15 +14,20 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
-import com.vicegym.qrtrainertruck.data.Post
+import com.vicegym.qrtrainertruck.R
+import com.vicegym.qrtrainertruck.authentication.LoginActivity
 import com.vicegym.qrtrainertruck.data.MyUser
+import com.vicegym.qrtrainertruck.data.Post
 import com.vicegym.qrtrainertruck.databinding.ActivityCreatePostBinding
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -57,7 +62,7 @@ class CreatePostActivity : BaseActivity() {
     private fun checkCameraPermission() {
         when (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)) {
             PackageManager.PERMISSION_GRANTED -> {
-                createPhoto()
+                checkWritePermission()
             }
             else -> ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), REQUEST_CAMERA)
         }
@@ -66,7 +71,7 @@ class CreatePostActivity : BaseActivity() {
     private fun checkWritePermission() {
         when (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
             PackageManager.PERMISSION_GRANTED -> {
-                return
+                createPhoto()
             }
             else -> ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), REQUEST_WRITE)
         }
@@ -77,7 +82,7 @@ class CreatePostActivity : BaseActivity() {
             REQUEST_CAMERA -> {
                 // If request is cancelled, the result arrays are empty.
                 if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                    createPhoto()
+                    checkCameraPermission()
                 } else {
                     val dialog = AlertDialog.Builder(this).setTitle("FIGYELEM")
                         .setMessage("Engedély nélkül nem tudom megnyitni a kamerát :(")
@@ -93,7 +98,7 @@ class CreatePostActivity : BaseActivity() {
             REQUEST_WRITE -> {
                 // If request is cancelled, the result arrays are empty.
                 if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                    createPhoto()
+                    checkWritePermission()
                 } else {
                     val dialog = AlertDialog.Builder(this).setTitle("FIGYELEM")
                         .setMessage("Engedély nélkül nem tudom elmenteni a fotót a háttértárra :(")
@@ -113,7 +118,6 @@ class CreatePostActivity : BaseActivity() {
     }
 
     private fun createPhoto() {
-        checkWritePermission()
         Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
             // Ensure that there's a camera activity to handle the intent
             takePictureIntent.resolveActivity(packageManager)?.also {
@@ -231,7 +235,7 @@ class CreatePostActivity : BaseActivity() {
                 newImageRef.downloadUrl
             }
             .addOnSuccessListener { downloadUri ->
-                uploadPost("gs://qrtrainertruck.appspot.com/${MyUser.id}/profileimage.jpg", downloadUri.toString())
+                uploadPost("gs://qrtrainertruck.appspot.com/profile_pictures/${MyUser.id}.jpg", downloadUri.toString())
             }
     }
 
@@ -254,5 +258,33 @@ class CreatePostActivity : BaseActivity() {
                 finish()
             }
             .addOnFailureListener { e -> Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show() }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.toolbar_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.menu_logout -> {
+                Firebase.auth.signOut()
+                startActivity(Intent(baseContext, LoginActivity::class.java))
+                return true
+            }
+            R.id.menu_TandC -> {
+                val intent = Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse("https://docs.google.com/document/d/1jmm1wLmqKIgFZMPiUWM2nMmfHlh4yq1HrLc_-bT-EAo/edit?usp=sharing")
+                )
+                startActivity(intent)
+                return true
+            }
+            R.id.menu_help -> {
+                //TODO
+                return true
+            }
+            else -> return super.onOptionsItemSelected(item)
+        }
     }
 }

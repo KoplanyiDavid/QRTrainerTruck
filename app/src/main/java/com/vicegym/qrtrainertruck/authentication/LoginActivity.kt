@@ -6,8 +6,6 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
 import android.widget.PopupWindow
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -17,10 +15,10 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
-import com.vicegym.qrtrainertruck.R
 import com.vicegym.qrtrainertruck.data.MyUser
 import com.vicegym.qrtrainertruck.data.TrainingData
 import com.vicegym.qrtrainertruck.databinding.ActivityLoginBinding
+import com.vicegym.qrtrainertruck.databinding.PopupWindowForgotPasswordBinding
 import com.vicegym.qrtrainertruck.mainactivity.MainActivity
 import com.vicegym.qrtrainertruck.otheractivities.LoadingScreenActivity
 import java.io.File
@@ -40,10 +38,10 @@ class LoginActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         user = auth.currentUser
-        // Check if user is signed in (non-null)
-        if (user != null && user!!.isEmailVerified)
+        user?.reload() // <-- enélkül ha fb-ből törlődik a user, az app crashel, mert cacheből még betölti a usert
+        if (user != null && user!!.isEmailVerified) {
             getUserData()
-        else
+        } else
             init()
     }
 
@@ -54,39 +52,36 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun popupWindow() {
-        val popupView = layoutInflater.inflate(R.layout.popup_window_forgot_password, null)
-        val popupWindow = PopupWindow(
-            popupView,
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-
-        val etEmail = findViewById<EditText>(R.id.etForgotPasswordEmail)
-
+        val popupBinding: PopupWindowForgotPasswordBinding = PopupWindowForgotPasswordBinding.inflate(layoutInflater)
+        val popupWindow = PopupWindow(popupBinding.root, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        val etEmail = popupBinding.popupWindowEmail
         popupWindow.elevation = 5.0f
 
-        popupView.findViewById<Button>(R.id.btnForgotPasswordGo).setOnClickListener {
-            if (etEmail != null)
-                if (etEmail.text.toString().isNotEmpty())
-                    passwordResetEmail(etEmail.text.toString())
+        popupBinding.btnForgotPasswordGo.setOnClickListener {
+            val email = etEmail.text.toString()
+            if (email.isNotEmpty()) {
+                passwordResetEmail(email)
+                popupWindow.dismiss()
+            }
         }
 
-        popupView.findViewById<Button>(R.id.btnForgotPasswordCancel).setOnClickListener {
+        popupBinding.btnForgotPasswordCancel.setOnClickListener {
             popupWindow.dismiss()
         }
 
-        popupWindow.showAtLocation(binding.root, Gravity.CENTER, 0, 0)
+        popupWindow.showAtLocation(popupBinding.root, Gravity.CENTER, 0, 0)
         popupWindow.isFocusable = true
         popupWindow.update()
     }
 
     private fun passwordResetEmail(email: String?) {
-        if (email != null && email.isNotEmpty())
+        if (!email.isNullOrEmpty() && email.isNotBlank() && email.contains('@', true))
             Firebase.auth.sendPasswordResetEmail(email)
                 .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
+                    if (task.isSuccessful)
                         Toast.makeText(this, "A jelszó módosításához elküldtük az emailt :)", Toast.LENGTH_SHORT).show()
-                    }
+                    else
+                        Toast.makeText(applicationContext, "A megadott email-cím nem szerepel az adatbázisban :(", Toast.LENGTH_SHORT).show()
                 }
         else
             Toast.makeText(applicationContext, "Az email mező üres!", Toast.LENGTH_SHORT).show()
@@ -113,7 +108,7 @@ class LoginActivity : AppCompatActivity() {
                         // If sign in fails, display a message to the user.
                         Log.w("SignInWithEAP", "signInWithEmail:failure", task.exception)
                         Toast.makeText(
-                            baseContext, "Sikertelen autentikáció",
+                            baseContext, "A felhasználónév, vagy a jelszó helytelen!",
                             Toast.LENGTH_SHORT
                         ).show()
                     }
@@ -123,9 +118,10 @@ class LoginActivity : AppCompatActivity() {
 
     private fun getUserData() {
         startActivity(Intent(this, LoadingScreenActivity::class.java))
-        Firebase.firestore.collection("users").document("${Firebase.auth.currentUser?.uid}").get()
+        val db = Firebase.firestore.collection("users").document("${Firebase.auth.currentUser?.uid}")
+        db.get()
             .addOnSuccessListener { document ->
-                if (document != null) {
+                if (document.exists() && document != null) {
                     MyUser.id = document.data?.get("id") as String?
                     MyUser.name = document.data?.get("name") as String?
                     MyUser.email = document.data?.get("email") as String?
@@ -147,6 +143,7 @@ class LoginActivity : AppCompatActivity() {
                     Log.d("FC", "${document.data}")
                     downloadUserProfilePicture()
                 } else {
+                    Toast.makeText(this, "document not exists", Toast.LENGTH_SHORT).show()
                     Log.d("FirestoreComm", "No such document")
                 }
             }

@@ -2,10 +2,13 @@ package com.vicegym.qrtrainertruck.otheractivities
 
 import android.app.AlertDialog
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Toast
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.ktx.auth
@@ -13,6 +16,7 @@ import com.google.firebase.auth.ktx.userProfileChangeRequest
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
+import com.vicegym.qrtrainertruck.R
 import com.vicegym.qrtrainertruck.authentication.LoginActivity
 import com.vicegym.qrtrainertruck.data.MyUser
 import com.vicegym.qrtrainertruck.databinding.ActivityUserDataModifyBinding
@@ -166,6 +170,34 @@ class UserDataModifyActivity : BaseActivity() {
                 } else
                     Log.d("validateUserData", "Nem OK")
             }
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.toolbar_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.menu_logout -> {
+                Firebase.auth.signOut()
+                startActivity(Intent(baseContext, LoginActivity::class.java))
+                return true
+            }
+            R.id.menu_TandC -> {
+                val intent = Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse("https://docs.google.com/document/d/1jmm1wLmqKIgFZMPiUWM2nMmfHlh4yq1HrLc_-bT-EAo/edit?usp=sharing")
+                )
+                startActivity(intent)
+                return true
+            }
+            R.id.menu_help -> {
+                //TODO
+                return true
+            }
+            else -> return super.onOptionsItemSelected(item)
         }
     }
 }

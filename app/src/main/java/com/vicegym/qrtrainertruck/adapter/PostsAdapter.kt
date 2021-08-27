@@ -34,20 +34,18 @@ class PostsAdapter(private val context: Context) :
 
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
         val tmpPost = postList[position]
+        //TODO: nem tölti be a profilképeket
         Glide.with(context).load(tmpPost.profilePic).into(holder.ivProfilePicture)
         holder.tvAuthor.text = tmpPost.author
         holder.tvTime.text = tmpPost.time
         holder.tvDescription.text = tmpPost.description
         holder.imgPost.rotation = 90f
-
         Glide.with(context).load(tmpPost.imageUrl).into(holder.imgPost)
-
         setAnimation(holder.itemView, position)
     }
 
     fun addPost(post: Post?) {
         post ?: return
-
         postList += (post)
         submitList((postList))
     }

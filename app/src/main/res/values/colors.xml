@@ -14,4 +14,7 @@
     <color name="dark_red">#50151b</color>
     <color name="red">#72262a</color>
     <color name="green">#36d630</color>
+    <color name="dark_blue">#0d284d</color>
+    <color name="marshmallow">#e38383</color>
+    <color name="dark_purple">#61146f</color>
 </resources>

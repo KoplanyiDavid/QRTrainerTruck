@@ -22,7 +22,7 @@
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="Email"
+            android:hint="@string/email"
             android:textColorHint="@color/grey">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -40,7 +40,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
-            android:hint="Jelszó"
+            android:hint="@string/password"
             android:textColorHint="@color/grey"
             app:passwordToggleEnabled="true"
             app:passwordToggleTint="@color/grey">
@@ -64,7 +64,7 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="20dp"
             android:background="@drawable/button_background"
-            android:text="Bejelentkezés"
+            android:text="@string/login_text"
             android:textAlignment="center"
             android:textAllCaps="false"
             android:textColor="@color/grey"
@@ -77,7 +77,7 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="10dp"
             android:background="@android:color/transparent"
-            android:text="Elfelejtetted a jelszót?"
+            android:text="@string/forgot_password_text"
             android:textAllCaps="false"
             android:textColor="@color/teal_700"
             android:textSize="20sp" />
@@ -99,7 +99,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="100dp"
-            android:text="Még nincs fiókod? Itt a megoldás!"
+            android:text="@string/register_text"
             android:textColor="@color/grey"
             android:textSize="20sp" />
 
@@ -110,7 +110,7 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="15dp"
             android:background="@drawable/button_background"
-            android:text="Regisztráció"
+            android:text="@string/registration"
             android:textAllCaps="false"
             android:textColor="@color/grey"
             android:textSize="20sp"

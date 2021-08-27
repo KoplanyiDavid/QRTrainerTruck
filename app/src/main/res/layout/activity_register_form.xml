@@ -27,7 +27,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/pricedown"
                 android:gravity="center"
-                android:text="HELLO!"
+                android:text="@string/hello"
                 android:textColor="@color/braun"
                 android:textSize="60sp" />
 
@@ -46,7 +46,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:hint="Név"
+                android:hint="@string/name"
                 android:textColorHint="@color/grey">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -64,7 +64,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:hint="Email-cím"
+                android:hint="@string/email"
                 android:textColorHint="@color/grey">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -82,7 +82,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:hint="Jelszó"
+                android:hint="@string/password"
                 android:textColorHint="@color/grey"
                 app:passwordToggleEnabled="true"
                 app:passwordToggleTint="@color/grey">
@@ -102,7 +102,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:hint="Jelszó megerősítése"
+                android:hint="@string/confirm_password"
                 android:textColorHint="@color/grey"
                 app:passwordToggleEnabled="true"
                 app:passwordToggleTint="@color/grey">
@@ -136,7 +136,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="10dp"
                 android:background="@drawable/button_background"
-                android:text="Regisztrálok"
+                android:text="@string/registration_btn_text"
                 android:textAlignment="center"
                 android:textAllCaps="false"
                 android:textColor="@color/grey"

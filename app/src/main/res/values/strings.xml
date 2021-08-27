@@ -1,4 +1,30 @@
 <resources>
-    <string name="app_name"> <font></font> QR Trainer Truck</string>
+    <string name="app_name">QR Trainer Truck</string>
     <string name="terms_and_conditions">Elolvastam és elfogadom az<a href="https://docs.google.com/document/d/1jmm1wLmqKIgFZMPiUWM2nMmfHlh4yq1HrLc_-bT-EAo/edit?usp=sharing"> ÁSZF </a> -et</string>
+    <string name="hello">HELLO!</string>
+    <string name="name">Név</string>
+    <string name="email">Email</string>
+    <string name="password">Jelszó</string>
+    <string name="confirm_password">Jelszó megerősítése</string>
+    <string name="registration_btn_text">Regisztrálok</string>
+    <string name="popup_window_textview_text">Az elfelejtett jelszó újraállításához írd be az email-címedet:</string>
+    <string name="mehet">Mehet</string>
+    <string name="megse">Mégse</string>
+    <string name="login_text">Bejelentkezés</string>
+    <string name="forgot_password_text">Elfelejtetted a jelszót?</string>
+    <string name="register_text">Még nincs fiókod? Itt a megoldás!</string>
+    <string name="registration">Regisztráció</string>
+    <string name="training_time">Futott idő (perc:másodperc)</string>
+    <string name="training_description">Rövid leírás, hogy milyen volt a kihívás (opcionális)</string>
+    <string name="send_in">Beküldés</string>
+    <string name="loading">LOADING…</string>
+    <string name="mobile_number">Telefonszám</string>
+    <string name="save">mentés</string>
+    <string name="change_password">Jelszó módosítása</string>
+    <string name="delete_account">fiók törlése</string>
+    <string name="time">Idő:</string>
+    <string name="next_training">Következő edzés</string>
+    <string name="training_place">Helyszín:</string>
+    <string name="profile_info">Profil Infó</string>
+    <string name="modify_data">Adatmódosítás</string>
 </resources>

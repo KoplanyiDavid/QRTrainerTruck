@@ -19,7 +19,8 @@
         android:layout_gravity="end"
         android:layout_marginTop="10dp"
         android:layout_marginEnd="10dp"
-        android:src="@mipmap/camera" />
+        android:src="@mipmap/camera"
+        tools:ignore="ContentDescription" />
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
