@@ -22,10 +22,11 @@
         <entry key="..\:/Projects/AndroidStudio/QRTrainerTruck/app/src/main/res/layout/fragment_trainings.xml" value="0.16052631578947368" />
         <entry key="..\:/Projects/AndroidStudio/QRTrainerTruck/app/src/main/res/layout/popup_window_forgot_password.xml" value="0.16052631578947368" />
         <entry key="..\:/Projects/AndroidStudio/QRTrainerTruck/app/src/main/res/menu/item_bottomnavmenu.xml" value="0.16052631578947368" />
+        <entry key="app/src/main/res/layout/fragment_home.xml" value="0.23435897435897435" />
       </map>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="11" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">
