@@ -21,7 +21,8 @@
         android:theme="@style/Theme.QRTrainerTruck">
         <activity
             android:name=".otheractivities.LoadingScreenActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:noHistory="true" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -55,8 +56,8 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".authentication.LoginActivity"
-            android:screenOrientation="portrait"
-            android:exported="true">
+            android:exported="true"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

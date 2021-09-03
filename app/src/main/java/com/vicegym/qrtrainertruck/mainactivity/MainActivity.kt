@@ -1,8 +1,12 @@
 package com.vicegym.qrtrainertruck.mainactivity
 
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
@@ -13,6 +17,7 @@ import com.vicegym.qrtrainertruck.R
 import com.vicegym.qrtrainertruck.authentication.LoginActivity
 import com.vicegym.qrtrainertruck.databinding.ActivityMainBinding
 
+
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
@@ -20,6 +25,16 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        val intentFilter = IntentFilter()
+        intentFilter.addAction("com.package.ACTION_LOGOUT")
+        registerReceiver(object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                Log.d("onReceive", "Logout in progress")
+                //At this point you should start the login activity and finish this one
+                finish()
+            }
+        }, intentFilter)
 
         //Fragments
         val homeFragment = HomeFragment.newInstance()
@@ -75,6 +90,9 @@ class MainActivity : AppCompatActivity() {
             R.id.menu_logout -> {
                 Firebase.auth.signOut()
                 startActivity(Intent(baseContext, LoginActivity::class.java))
+                val broadcastIntent = Intent()
+                broadcastIntent.action = "com.package.ACTION_LOGOUT"
+                sendBroadcast(broadcastIntent)
                 return true
             }
             R.id.menu_TandC -> {

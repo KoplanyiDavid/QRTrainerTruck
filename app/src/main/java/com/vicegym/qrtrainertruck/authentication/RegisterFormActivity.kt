@@ -117,6 +117,7 @@ open class RegisterFormActivity : AppCompatActivity() {
                             MyUser.acceptedTermsAndConditions = true
                             uploadUserData() //upload username, email etc to cloud firebase
                             sendVerificationEmail()
+                            startActivity(Intent(applicationContext, LoginActivity::class.java))
                             finish()
                         } else {
                             // If sign in fails, display a message to the user.

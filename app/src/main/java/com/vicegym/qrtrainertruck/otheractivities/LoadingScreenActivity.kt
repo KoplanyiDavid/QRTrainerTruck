@@ -9,4 +9,14 @@ class LoadingScreenActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_loading_screen)
     }
+
+    override fun onStop() {
+        super.onStop()
+        finish()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        finish()
+    }
 }

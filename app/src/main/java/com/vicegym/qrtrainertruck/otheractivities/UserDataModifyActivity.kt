@@ -1,7 +1,10 @@
 package com.vicegym.qrtrainertruck.otheractivities
 
 import android.app.AlertDialog
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
@@ -26,6 +29,17 @@ class UserDataModifyActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val intentFilter = IntentFilter()
+        intentFilter.addAction("com.package.ACTION_LOGOUT")
+        registerReceiver(object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                Log.d("onReceive", "Logout in progress")
+                //At this point you should start the login activity and finish this one
+                finish()
+            }
+        }, intentFilter)
+
         binding = ActivityUserDataModifyBinding.inflate(layoutInflater)
         setContentView(binding.root)
     }
@@ -183,6 +197,9 @@ class UserDataModifyActivity : BaseActivity() {
             R.id.menu_logout -> {
                 Firebase.auth.signOut()
                 startActivity(Intent(baseContext, LoginActivity::class.java))
+                val broadcastIntent = Intent()
+                broadcastIntent.action = "com.package.ACTION_LOGOUT"
+                sendBroadcast(broadcastIntent)
                 return true
             }
             R.id.menu_TandC -> {

@@ -3,7 +3,10 @@ package com.vicegym.qrtrainertruck.otheractivities
 import android.Manifest
 import android.app.Activity
 import android.app.AlertDialog
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -49,6 +52,17 @@ class CreatePostActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val intentFilter = IntentFilter()
+        intentFilter.addAction("com.package.ACTION_LOGOUT")
+        registerReceiver(object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                Log.d("onReceive", "Logout in progress")
+                //At this point you should start the login activity and finish this one
+                finish()
+            }
+        }, intentFilter)
+
         binding = ActivityCreatePostBinding.inflate(LayoutInflater.from(this))
         setContentView(binding.root)
         init()
@@ -270,6 +284,9 @@ class CreatePostActivity : BaseActivity() {
             R.id.menu_logout -> {
                 Firebase.auth.signOut()
                 startActivity(Intent(baseContext, LoginActivity::class.java))
+                val broadcastIntent = Intent()
+                broadcastIntent.action = "com.package.ACTION_LOGOUT"
+                sendBroadcast(broadcastIntent)
                 return true
             }
             R.id.menu_TandC -> {

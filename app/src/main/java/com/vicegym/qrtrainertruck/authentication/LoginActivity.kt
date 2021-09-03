@@ -29,20 +29,76 @@ class LoginActivity : AppCompatActivity() {
     private var user: FirebaseUser? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        binding = ActivityLoginBinding.inflate(layoutInflater)
         super.onCreate(savedInstanceState)
+        binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        auth = Firebase.auth
     }
 
     override fun onStart() {
         super.onStart()
+        initFirebase()
+    }
+
+    private fun initFirebase() {
+        auth = Firebase.auth
         user = auth.currentUser
         user?.reload() // <-- enélkül ha fb-ből törlődik a user, az app crashel, mert cacheből még betölti a usert
         if (user != null && user!!.isEmailVerified) {
             getUserData()
         } else
             init()
+    }
+
+    private fun getUserData() {
+        startActivity(Intent(this, LoadingScreenActivity::class.java))
+        val db = Firebase.firestore.collection("users").document("${Firebase.auth.currentUser?.uid}")
+        db.get()
+            .addOnSuccessListener { document ->
+                if (document.exists() && document != null) {
+                    MyUser.id = document.data?.get("id") as String?
+                    MyUser.name = document.data?.get("name") as String?
+                    MyUser.email = document.data?.get("email") as String?
+                    MyUser.password = document.data?.get("password") as String?
+                    MyUser.mobile = document.data?.get("mobile") as String?
+                    MyUser.acceptedTermsAndConditions = document.data?.get("acceptedtermsandcons") as Boolean
+                    MyUser.rank = document.data?.get("rank") as String
+                    MyUser.score = document.data?.get("score") as Number
+                    val trainings = document.data?.get("trainings") as ArrayList<HashMap<String, String>>
+                    for (training in trainings) {
+                        val trainingData = TrainingData()
+                        trainingData.id = training["id"]
+                        trainingData.title = training["title"]
+                        trainingData.date = training["date"]
+                        trainingData.location = training["location"]
+                        trainingData.trainer = training["trainer"]
+                        MyUser.trainingList.add(trainingData)
+                    }
+                    Log.d("FC", "${document.data}")
+                    downloadUserProfilePicture()
+                } else {
+                    //startActivity(Intent(this, LoginActivity::class.java))
+                    Toast.makeText(this, "document not exists", Toast.LENGTH_SHORT).show()
+                    Log.d("FirestoreComm", "No such document")
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.d("FirestoreComm", "get failed with ", exception)
+            }
+    }
+
+    private fun downloadUserProfilePicture() {
+        val storageRef = Firebase.storage.reference
+        val imageRef = storageRef.child("profile_pictures/${MyUser.id!!}.jpg")
+        val localFile = File.createTempFile("profilepicture", "jpg")
+        imageRef.getFile(localFile).addOnSuccessListener {
+            Log.d("DWPIC", "OK")
+            MyUser.profilePicture = Uri.fromFile(localFile).toString()
+            startActivity(Intent(baseContext, MainActivity::class.java))
+            finish()
+        }
+            .addOnFailureListener {
+                Log.d("DWPIC", "NEM OK: $it")
+            }
     }
 
     private fun init() {
@@ -84,7 +140,7 @@ class LoginActivity : AppCompatActivity() {
                         Toast.makeText(applicationContext, "A megadott email-cím nem szerepel az adatbázisban :(", Toast.LENGTH_SHORT).show()
                 }
         else
-            Toast.makeText(applicationContext, "Az email mező üres!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(applicationContext, "Az email mező üres, vagy rossz a formátum!", Toast.LENGTH_SHORT).show()
     }
 
     private fun signInWithEmailAndPassword() {
@@ -97,72 +153,24 @@ class LoginActivity : AppCompatActivity() {
                         user = Firebase.auth.currentUser
                         user!!.reload()
                         if (user!!.isEmailVerified) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d("SignInWithEAP", "signInWithEmail:success")
                             getUserData()
                         } else {
-                            Toast.makeText(this, "Nem erősítetted meg a regisztrációt az emailben kapott link segítségével!", Toast.LENGTH_LONG)
+                            Toast.makeText(
+                                this,
+                                "Nem erősítetted meg a regisztrációt az emailben kapott link segítségével!",
+                                Toast.LENGTH_LONG
+                            )
                                 .show()
                         }
                     } else {
-                        // If sign in fails, display a message to the user.
-                        Log.w("SignInWithEAP", "signInWithEmail:failure", task.exception)
                         Toast.makeText(
-                            baseContext, "A felhasználónév, vagy a jelszó helytelen!",
+                            baseContext,
+                            "A felhasználónév, vagy a jelszó helytelen!" + task.exception,
                             Toast.LENGTH_SHORT
-                        ).show()
+                        )
+                            .show()
                     }
                 }
         }
-    }
-
-    private fun getUserData() {
-        startActivity(Intent(this, LoadingScreenActivity::class.java))
-        val db = Firebase.firestore.collection("users").document("${Firebase.auth.currentUser?.uid}")
-        db.get()
-            .addOnSuccessListener { document ->
-                if (document.exists() && document != null) {
-                    MyUser.id = document.data?.get("id") as String?
-                    MyUser.name = document.data?.get("name") as String?
-                    MyUser.email = document.data?.get("email") as String?
-                    MyUser.password = document.data?.get("password") as String?
-                    MyUser.mobile = document.data?.get("mobile") as String?
-                    MyUser.acceptedTermsAndConditions = document.data?.get("acceptedtermsandcons") as Boolean
-                    MyUser.rank = document.data?.get("rank") as String
-                    MyUser.score = document.data?.get("score") as Number
-                    val trainings = document.data?.get("trainings") as ArrayList<HashMap<String, String>>
-                    for (training in trainings) {
-                        val trainingData = TrainingData()
-                        trainingData.id = training["id"]
-                        trainingData.title = training["title"]
-                        trainingData.date = training["date"]
-                        trainingData.location = training["location"]
-                        trainingData.trainer = training["trainer"]
-                        MyUser.trainingList.add(trainingData)
-                    }
-                    Log.d("FC", "${document.data}")
-                    downloadUserProfilePicture()
-                } else {
-                    Toast.makeText(this, "document not exists", Toast.LENGTH_SHORT).show()
-                    Log.d("FirestoreComm", "No such document")
-                }
-            }
-            .addOnFailureListener { exception ->
-                Log.d("FirestoreComm", "get failed with ", exception)
-            }
-    }
-
-    private fun downloadUserProfilePicture() {
-        val storageRef = Firebase.storage.reference
-        val imageRef = storageRef.child("profile_pictures/${MyUser.id!!}.jpg")
-        val localFile = File.createTempFile("profilepicture", "jpg")
-        imageRef.getFile(localFile).addOnSuccessListener {
-            Log.d("DWPIC", "OK")
-            MyUser.profilePicture = Uri.fromFile(localFile).toString()
-            startActivity(Intent(baseContext, MainActivity::class.java))
-        }
-            .addOnFailureListener {
-                Log.d("DWPIC", "NEM OK: $it")
-            }
     }
 }
