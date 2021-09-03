@@ -14,9 +14,9 @@
 
     <application
         android:allowBackup="false"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/trucklogo"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/trucklogo"
         android:supportsRtl="true"
         android:theme="@style/Theme.QRTrainerTruck">
         <activity
