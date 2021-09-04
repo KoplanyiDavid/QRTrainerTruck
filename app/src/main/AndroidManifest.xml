@@ -19,10 +19,37 @@
         android:roundIcon="@mipmap/trucklogo"
         android:supportsRtl="true"
         android:theme="@style/Theme.QRTrainerTruck">
-        <activity
-            android:name=".otheractivities.LoadingScreenActivity"
-            android:exported="true"
-            android:noHistory="true" />
+
+        <service
+            android:name=".services.MyFirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCfjNCD5kHb-LnB5FZXKPxi1t0lXJQASB4" />
+        <!--
+ Set custom default icon. This is used when no icon is set for incoming notification messages.
+     See README(https://goo.gl/l4GJaQ) for more.
+        -->
+        <!--
+<meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_stat_ic_notification" />
+        -->
+        <!--
+ Set color used with incoming notification messages. This is used when no color is set for the incoming
+             notification message. See README(https://goo.gl/6BKBk7) for more.
+        -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/colorAccent" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -35,19 +62,15 @@
         </provider>
 
         <activity
+            android:name=".otheractivities.LoadingScreenActivity"
+            android:exported="true"
+            android:noHistory="true" />
+        <activity
             android:name=".otheractivities.CreatePostActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".otheractivities.UserDataModifyActivity"
             android:screenOrientation="portrait" />
-
-        <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyCfjNCD5kHb-LnB5FZXKPxi1t0lXJQASB4" />
-
         <activity
             android:name=".mainactivity.MainActivity"
             android:screenOrientation="portrait" />
@@ -60,6 +83,7 @@
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

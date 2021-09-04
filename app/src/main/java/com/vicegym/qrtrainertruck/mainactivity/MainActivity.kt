@@ -1,5 +1,7 @@
 package com.vicegym.qrtrainertruck.mainactivity
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -9,10 +11,12 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.ktx.messaging
 import com.vicegym.qrtrainertruck.R
 import com.vicegym.qrtrainertruck.authentication.LoginActivity
 import com.vicegym.qrtrainertruck.databinding.ActivityMainBinding
@@ -72,6 +76,35 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+        initService()
+    }
+
+    private fun initService() {
+        // Create channel to show notifications.
+        val channelId = getString(R.string.default_notification_channel_id)
+        val channelName = "QR Trainer Truck"
+        val notificationManager = getSystemService(NotificationManager::class.java)
+        notificationManager?.createNotificationChannel(
+            NotificationChannel(channelId,
+            channelName, NotificationManager.IMPORTANCE_LOW)
+        )
+
+        intent.extras?.let {
+            for (key in it.keySet()) {
+                val value = intent.extras?.get(key)
+                Log.d("FCM", "Key: $key Value: $value")
+            }
+        }
+
+        Firebase.messaging.subscribeToTopic("qrt")
+            .addOnCompleteListener { task ->
+                var msg = "Subscribed"
+                if (!task.isSuccessful) {
+                    msg = "Not subscribed"
+                }
+                Log.d("FCM", msg)
+                Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
+            }
     }
 
     private fun setCurrentFragment(fragment: Fragment) {

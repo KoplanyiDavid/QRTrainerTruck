@@ -27,4 +27,6 @@
     <string name="training_place">Helyszín:</string>
     <string name="profile_info">Profil Infó</string>
     <string name="modify_data">Adatmódosítás</string>
+    <string name="fcm_message">QR Trainer Truck</string>
+    <string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>
 </resources>
