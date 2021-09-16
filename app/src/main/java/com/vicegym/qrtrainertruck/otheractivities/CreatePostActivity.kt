@@ -219,12 +219,23 @@ class CreatePostActivity : BaseActivity() {
                 .show()
             else -> {
                 try {
+                    binding.btnDailyChallengeSendPost.isClickable = false //ne töltse fel többször ugyanazt
+                    loadingAlertDialog()
                     uploadPostWithImage()
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
             }
         }
+    }
+
+    private fun loadingAlertDialog() {
+        val dialog = AlertDialog.Builder(this).setTitle("Poszt feltöltése...")
+            .setMessage("A posztod feltöltése folyamatban van, kérlek légy türelemmel, amint befejeződik, én eltűnök...")
+            .create()
+        dialog.setCancelable(false)
+        dialog.setCanceledOnTouchOutside(false)
+        dialog.show()
     }
 
     private fun uploadPostWithImage() {
@@ -249,14 +260,16 @@ class CreatePostActivity : BaseActivity() {
                 newImageRef.downloadUrl
             }
             .addOnSuccessListener { downloadUri ->
-                uploadPost("gs://qrtrainertruck.appspot.com/profile_pictures/${MyUser.id}.jpg", downloadUri.toString())
+                Firebase.firestore.collection("users").document(MyUser.id!!)
+                    .get().addOnSuccessListener {
+                        uploadPost(downloadUri.toString())
+                    }
             }
     }
 
-    private fun uploadPost(profilePicture: String? = null, imageUrl: String? = null) {
+    private fun uploadPost(imageUrl: String? = null) {
         val newPost = Post(
             MyUser.id,
-            profilePicture,
             MyUser.name,
             binding.etDailyChallengeTime.text.toString(),
             binding.etDailyChallengeDescription.text.toString(),

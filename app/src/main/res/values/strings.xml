@@ -22,11 +22,13 @@
     <string name="save">mentés</string>
     <string name="change_password">Jelszó módosítása</string>
     <string name="delete_account">fiók törlése</string>
-    <string name="time">Idő:</string>
+    <string name="time">Időpont:</string>
     <string name="next_training">Következő edzés</string>
     <string name="training_place">Helyszín:</string>
     <string name="profile_info">Profil Infó</string>
     <string name="modify_data">Adatmódosítás</string>
     <string name="fcm_message">QR Trainer Truck</string>
     <string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>
+    <string name="no_next_training_location">Nincs következő helyszín</string>
+    <string name="no_next_training_date">Nincs következő időpont</string>
 </resources>

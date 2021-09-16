@@ -85,8 +85,10 @@ class MainActivity : AppCompatActivity() {
         val channelName = "QR Trainer Truck"
         val notificationManager = getSystemService(NotificationManager::class.java)
         notificationManager?.createNotificationChannel(
-            NotificationChannel(channelId,
-            channelName, NotificationManager.IMPORTANCE_LOW)
+            NotificationChannel(
+                channelId,
+                channelName, NotificationManager.IMPORTANCE_HIGH
+            )
         )
 
         intent.extras?.let {

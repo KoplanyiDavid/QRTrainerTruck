@@ -54,28 +54,18 @@ class TrainingsAdapter(private val context: Context) :
     }
 
     private fun getUserData(card: CardView, tmpTraining: TrainingData) {
-        val tmpList: ArrayList<TrainingData> = arrayListOf()
-        val db = Firebase.firestore.collection("users").document("${Firebase.auth.currentUser?.uid}")
-        db.get()
-            .addOnSuccessListener { document ->
-                if (document.exists() && document != null) {
-                    val trainings = document.data?.get("trainings") as ArrayList<HashMap<String, String>>
-                    for (training in trainings) {
-                        val trainingData = TrainingData()
-                        trainingData.id = training["id"]
-                        trainingData.title = training["title"]
-                        trainingData.date = training["date"]
-                        trainingData.location = training["location"]
-                        trainingData.trainer = training["trainer"]
-                        tmpList.add(trainingData)
-                    }
-                    MyUser.trainingList = tmpList
-                    if (MyUser.trainingList.contains(tmpTraining))
+        val db = Firebase.firestore.collection("users")
+        db.document("${Firebase.auth.currentUser?.uid}").get().addOnSuccessListener { document ->
+            if (document.exists() && document != null) {
+                val trainings = document.data?.get("trainings") as ArrayList<HashMap<String, Any>>
+                for (training in trainings) {
+                    if (tmpTraining.id == training["id"])
                         card.setCardBackgroundColor(GREEN)
-                } else {
-                    Toast.makeText(context, "document not exists", Toast.LENGTH_SHORT).show()
                 }
+            } else {
+                Toast.makeText(context, "document not exists", Toast.LENGTH_SHORT).show()
             }
+        }
             .addOnFailureListener { exception ->
                 Log.d("FirestoreComm", "get failed with ", exception)
             }
@@ -84,33 +74,29 @@ class TrainingsAdapter(private val context: Context) :
     private fun manageTraining(id: String, card: CardView) {
         val db = Firebase.firestore.collection("trainings").document(id)
         db.get().addOnSuccessListener { document ->
-            val trainingList = document.data?.get("trainees") as ArrayList<*>?
-            if (trainingList != null) {
-                if (!(trainingList.contains(MyUser.id))) {
-                    db.update("trainees", FieldValue.arrayUnion(MyUser.id))
-                    val trainingData = TrainingData()
-                    db.get().addOnSuccessListener { document1 ->
-                        trainingData.id = document1.data?.get("id") as String?
-                        trainingData.title = document1.data?.get("title") as String?
-                        trainingData.date = document1.data?.get("date") as String?
-                        trainingData.location = document1.data?.get("location") as String?
-                        trainingData.trainer = document1.data?.get("trainer") as String?
-                        uploadUserTrainingData(trainingData)
-                        card.setCardBackgroundColor(GREEN)
-                    }
-                } else if (trainingList.contains(MyUser.id)) {
-                    db.update("trainees", FieldValue.arrayRemove(MyUser.id))
-                    val trainingData = TrainingData()
-                    db.get().addOnSuccessListener { document1 ->
-                        trainingData.id = document1.data?.get("id") as String?
-                        trainingData.title = document1.data?.get("title") as String?
-                        trainingData.date = document1.data?.get("date") as String?
-                        trainingData.location = document1.data?.get("location") as String?
-                        trainingData.trainer = document1.data?.get("trainer") as String?
-                        deleteUserTrainingData(trainingData)
-                        card.setCardBackgroundColor(DKGRAY)
-                    }
-                }
+            val trainingList = document.data?.get("trainees") as ArrayList<String>
+            if (!(trainingList.contains(MyUser.id))) {
+                db.update("trainees", FieldValue.arrayUnion(MyUser.id))
+                val trainingData = TrainingData()
+                trainingData.id = document.data?.get("id") as String
+                trainingData.title = document.data?.get("title") as String
+                trainingData.date = document.data?.get("date") as String
+                trainingData.location = document.data?.get("location") as String
+                trainingData.trainer = document.data?.get("trainer") as String
+                trainingData.sorter = document.data?.get("sorter") as Long
+                uploadUserTrainingData(trainingData)
+                card.setCardBackgroundColor(GREEN)
+            } else if (trainingList.contains(MyUser.id)) {
+                db.update("trainees", FieldValue.arrayRemove(MyUser.id))
+                val trainingData = TrainingData()
+                trainingData.id = document.data?.get("id") as String
+                trainingData.title = document.data?.get("title") as String
+                trainingData.date = document.data?.get("date") as String
+                trainingData.location = document.data?.get("location") as String
+                trainingData.trainer = document.data?.get("trainer") as String
+                trainingData.sorter = document.data?.get("sorter") as Long
+                deleteUserTrainingData(trainingData)
+                card.setCardBackgroundColor(DKGRAY)
             }
         }
     }
@@ -118,13 +104,11 @@ class TrainingsAdapter(private val context: Context) :
     private fun uploadUserTrainingData(trainingData: TrainingData) {
         val db = Firebase.firestore.collection("users").document(MyUser.id!!)
         db.update("trainings", FieldValue.arrayUnion(trainingData))
-        MyUser.trainingList.add(trainingData)
     }
 
     private fun deleteUserTrainingData(trainingData: TrainingData) {
         val db = Firebase.firestore.collection("users").document(MyUser.id!!)
         db.update("trainings", FieldValue.arrayRemove(trainingData))
-        MyUser.trainingList.remove(trainingData)
     }
 
     fun addTrainings(training: TrainingData?) {

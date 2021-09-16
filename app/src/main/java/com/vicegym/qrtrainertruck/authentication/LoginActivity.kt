@@ -52,38 +52,42 @@ class LoginActivity : AppCompatActivity() {
     private fun getUserData() {
         startActivity(Intent(this, LoadingScreenActivity::class.java))
         val db = Firebase.firestore.collection("users").document("${Firebase.auth.currentUser?.uid}")
-        db.get()
-            .addOnSuccessListener { document ->
-                if (document.exists() && document != null) {
-                    MyUser.id = document.data?.get("id") as String?
-                    MyUser.name = document.data?.get("name") as String?
-                    MyUser.email = document.data?.get("email") as String?
-                    MyUser.password = document.data?.get("password") as String?
-                    MyUser.mobile = document.data?.get("mobile") as String?
-                    MyUser.acceptedTermsAndConditions = document.data?.get("acceptedtermsandcons") as Boolean
-                    MyUser.rank = document.data?.get("rank") as String
-                    MyUser.score = document.data?.get("score") as Number
-                    val trainings = document.data?.get("trainings") as ArrayList<HashMap<String, String>>
-                    for (training in trainings) {
-                        val trainingData = TrainingData()
-                        trainingData.id = training["id"]
-                        trainingData.title = training["title"]
-                        trainingData.date = training["date"]
-                        trainingData.location = training["location"]
-                        trainingData.trainer = training["trainer"]
-                        MyUser.trainingList.add(trainingData)
-                    }
-                    Log.d("FC", "${document.data}")
-                    downloadUserProfilePicture()
-                } else {
-                    //startActivity(Intent(this, LoginActivity::class.java))
-                    Toast.makeText(this, "document not exists", Toast.LENGTH_SHORT).show()
-                    Log.d("FirestoreComm", "No such document")
-                }
+        db.get().addOnSuccessListener { document ->
+            if (document.exists() && document != null) {
+                MyUser.id = document.data?.get("id") as String?
+                MyUser.name = document.data?.get("name") as String?
+                MyUser.email = document.data?.get("email") as String?
+                MyUser.password = document.data?.get("password") as String?
+                MyUser.mobile = document.data?.get("mobile") as String?
+                MyUser.acceptedTermsAndConditions = document.data?.get("acceptedtermsandcons") as Boolean
+                MyUser.rank = document.data?.get("rank") as String
+                MyUser.score = document.data?.get("score") as Number
+                MyUser.onlineProfilePictureUri = document.data?.get("onlineProfilePictureUri") as String?
+                val trainings = document.data?.get("trainings") as ArrayList<HashMap<String, Any>>
+                if (trainings.isNotEmpty())
+                    MyUser.nextTraining = findNextTraining(trainings)
+                downloadUserProfilePicture()
+            } else {
+                Toast.makeText(this, "document not exists", Toast.LENGTH_SHORT).show()
+                Log.d("FirestoreComm", "No such document")
             }
+        }
             .addOnFailureListener { exception ->
                 Log.d("FirestoreComm", "get failed with ", exception)
             }
+    }
+
+    private fun findNextTraining(trainingList: ArrayList<HashMap<String, Any>>): TrainingData {
+        var nextTrainingHashMap = trainingList[0]
+        for (training in trainingList) {
+            if ((training["sorter"] as Long) < (nextTrainingHashMap["sorter"] as Long)) {
+                nextTrainingHashMap = training
+            }
+        }
+        val nextTraining = TrainingData()
+        nextTraining.date = nextTrainingHashMap["date"] as String
+        nextTraining.location = nextTrainingHashMap["location"] as String
+        return nextTraining
     }
 
     private fun downloadUserProfilePicture() {

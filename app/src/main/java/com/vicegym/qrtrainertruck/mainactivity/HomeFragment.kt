@@ -28,13 +28,16 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.component1
 import com.google.firebase.storage.ktx.component2
 import com.google.firebase.storage.ktx.storage
 import com.google.firebase.storage.ktx.storageMetadata
 import com.vicegym.qrtrainertruck.R
 import com.vicegym.qrtrainertruck.data.MyUser
+import com.vicegym.qrtrainertruck.data.TrainingData
 import com.vicegym.qrtrainertruck.databinding.FragmentHomeBinding
 
 
@@ -72,10 +75,39 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         binding.tvUserScore.text = MyUser.score.toString()
         binding.ivProfilePicture.setImageURI(MyUser.profilePicture.toUri())
         binding.ivProfilePicture.setOnClickListener { changeProfilePicture() }
+        setNextTraining()
+    }
 
-        if (MyUser.trainingList.isNotEmpty()) {
-            //binding.tvTrainingTime.text = MyUser.trainingList[0].date
-            //binding.tvTrainingPlace.text = MyUser.trainingList[0].location
+    private fun setNextTraining() {
+        val db = Firebase.firestore.collection("users").document(MyUser.id!!)
+        db.get().addOnSuccessListener { document ->
+            if (document != null) {
+                val trainingList = document.data?.get("trainings") as ArrayList<HashMap<String, Any>>
+                if (trainingList.isNotEmpty()) {
+                    var nextTrainingHashMap = trainingList[0]
+                    for (training in trainingList) {
+                        if (nextTrainingHashMap["sorter"] as Long > training["sorter"] as Long)
+                            nextTrainingHashMap = training
+                    }
+                    MyUser.nextTraining = TrainingData(
+                        nextTrainingHashMap["id"] as String,
+                        nextTrainingHashMap["title"] as String,
+                        nextTrainingHashMap["trainer"] as String,
+                        nextTrainingHashMap["location"] as String,
+                        nextTrainingHashMap["date"] as String,
+                        nextTrainingHashMap["sorter"] as Long
+                    )
+                }
+                else
+                    MyUser.nextTraining = null
+            }
+            if (MyUser.nextTraining != null) {
+                binding.tvTrainingTime.text = MyUser.nextTraining?.date
+                binding.tvTrainingPlace.text = MyUser.nextTraining?.location
+            } else {
+                binding.tvTrainingTime.text = getString(R.string.no_next_training_date)
+                binding.tvTrainingPlace.text = getString(R.string.no_next_training_location)
+            }
         }
     }
 
@@ -135,7 +167,14 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         }.addOnFailureListener {
             Log.d("UploadImage", "NEM OK: $it")
         }.addOnSuccessListener {
+            getUri(storageRef.child("profile_pictures/${MyUser.id!!}.jpg"))
             Log.d("UploadImage", "OK")
+        }
+    }
+
+    private fun getUri(child: StorageReference) {
+        child.downloadUrl.addOnSuccessListener {
+            Firebase.firestore.collection("users").document(MyUser.id!!).update("onlineProfilePictureUri", it.toString())
         }
     }
 

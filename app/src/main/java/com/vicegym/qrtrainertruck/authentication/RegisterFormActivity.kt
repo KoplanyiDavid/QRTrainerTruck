@@ -18,6 +18,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.component1
 import com.google.firebase.storage.ktx.component2
 import com.google.firebase.storage.ktx.storage
@@ -139,6 +140,7 @@ open class RegisterFormActivity : AppCompatActivity() {
     }
 
     private fun uploadUserData() {
+        val trainings: ArrayList<HashMap<String, Any>> = arrayListOf()
         val userHashMap = hashMapOf(
             "id" to MyUser.id,
             "name" to MyUser.name,
@@ -149,7 +151,8 @@ open class RegisterFormActivity : AppCompatActivity() {
             "acceptedtermsandcons" to MyUser.acceptedTermsAndConditions,
             "rank" to MyUser.rank,
             "score" to MyUser.score,
-            "trainings" to MyUser.trainingList
+            "nextTraining" to MyUser.nextTraining,
+            "trainings" to trainings
         )
 
         Firebase.firestore.collection("users").document(MyUser.id!!)
@@ -179,7 +182,14 @@ open class RegisterFormActivity : AppCompatActivity() {
         }.addOnFailureListener {
             Log.d("UploadImage", "NEM OK: $it")
         }.addOnSuccessListener {
+            getUri(storageRef.child("profile_pictures/${MyUser.id!!}.jpg"))
             Log.d("UploadImage", "OK")
+        }
+    }
+
+    private fun getUri(child: StorageReference) {
+        child.downloadUrl.addOnSuccessListener {
+            Firebase.firestore.collection("users").document(MyUser.id!!).update("onlineProfilePictureUri", it.toString())
         }
     }
 

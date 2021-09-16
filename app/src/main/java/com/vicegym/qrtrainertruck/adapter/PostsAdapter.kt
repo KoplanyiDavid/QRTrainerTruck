@@ -12,6 +12,9 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.google.android.material.imageview.ShapeableImageView
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import com.vicegym.qrtrainertruck.data.Post
 import com.vicegym.qrtrainertruck.databinding.CardPostBinding
 
@@ -22,7 +25,7 @@ class PostsAdapter(private val context: Context) :
     private var lastPosition = -1
 
     class PostViewHolder(binding: CardPostBinding) : RecyclerView.ViewHolder(binding.root) {
-        val ivProfilePicture = binding.ivPostCardProfilePicture
+        val ivProfilePicture: ShapeableImageView = binding.ivPostCardProfilePicture
         val tvAuthor: TextView = binding.tvAuthor
         val tvTime: TextView = binding.tvDailyChallengeTime
         val tvDescription: TextView = binding.tvDailyChallengeDescription
@@ -34,8 +37,9 @@ class PostsAdapter(private val context: Context) :
 
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
         val tmpPost = postList[position]
-        //TODO: nem tölti be a profilképeket
-        Glide.with(context).load(tmpPost.profilePic).into(holder.ivProfilePicture)
+        Firebase.firestore.collection("users").document(tmpPost.uid!!).get().addOnSuccessListener {
+            Glide.with(context).load(it.data?.get("onlineProfilePictureUri")).into(holder.ivProfilePicture)
+        }
         holder.tvAuthor.text = tmpPost.author
         holder.tvTime.text = tmpPost.time
         holder.tvDescription.text = tmpPost.description

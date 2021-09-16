@@ -14,7 +14,9 @@ import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.component1
 import com.google.firebase.storage.ktx.component2
 import com.google.firebase.storage.ktx.storage
@@ -115,7 +117,14 @@ class ProfileFragment : Fragment() {
         }.addOnFailureListener {
             Log.d("UploadImage", "NEM OK: $it")
         }.addOnSuccessListener {
+            getUri(storageRef.child("profile_pictures/${MyUser.id!!}.jpg"))
             Log.d("UploadImage", "OK")
+        }
+    }
+
+    private fun getUri(child: StorageReference) {
+        child.downloadUrl.addOnSuccessListener {
+            Firebase.firestore.collection("users").document(MyUser.id!!).update("onlineProfilePictureUri", it.toString())
         }
     }
 
