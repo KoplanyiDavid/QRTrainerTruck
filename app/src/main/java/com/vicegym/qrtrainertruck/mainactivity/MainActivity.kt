@@ -11,7 +11,6 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.google.firebase.auth.ktx.auth
@@ -105,7 +104,6 @@ class MainActivity : AppCompatActivity() {
                     msg = "Not subscribed"
                 }
                 Log.d("FCM", msg)
-                Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
             }
     }
 

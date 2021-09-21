@@ -1,6 +1,7 @@
 package com.vicegym.qrtrainertruck.mainactivity
 
 import android.Manifest
+import android.app.Activity.RESULT_OK
 import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -13,7 +14,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
@@ -146,7 +146,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_GALLERY) {
+        if (requestCode == REQUEST_GALLERY && resultCode == RESULT_OK) {
             data?.data?.let {
                 uploadImageToStorage(it)
                 MyUser.profilePicture = it.toString()
@@ -259,6 +259,5 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
                 .icon(BitmapDescriptorFactory.fromBitmap(Bitmap.createScaledBitmap(markerIcon, 80, 60, false)))
         )
         gMap.animateCamera(CameraUpdateFactory.newLatLngZoom(truckLatLng, 16f))
-        Toast.makeText(requireContext(), truckLatLng.toString(), Toast.LENGTH_SHORT).show()
     }
 }

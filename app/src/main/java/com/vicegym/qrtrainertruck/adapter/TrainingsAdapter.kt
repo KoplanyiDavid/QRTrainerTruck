@@ -10,7 +10,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.TextView
-import android.widget.Toast
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -46,14 +45,14 @@ class TrainingsAdapter(private val context: Context) :
         holder.tvTrainer.text = tmpTraining.trainer
         holder.tvGymPlace.text = tmpTraining.location
         holder.tvDate.text = tmpTraining.date
-        getUserData(holder.card, tmpTraining)
+        setGreenCards(holder.card, tmpTraining)
         holder.card.setOnClickListener {
             manageTraining(tmpTraining.id!!, holder.card)
         }
         setAnimation(holder.itemView, position)
     }
 
-    private fun getUserData(card: CardView, tmpTraining: TrainingData) {
+    private fun setGreenCards(card: CardView, tmpTraining: TrainingData) {
         val db = Firebase.firestore.collection("users")
         db.document("${Firebase.auth.currentUser?.uid}").get().addOnSuccessListener { document ->
             if (document.exists() && document != null) {
@@ -62,8 +61,6 @@ class TrainingsAdapter(private val context: Context) :
                     if (tmpTraining.id == training["id"])
                         card.setCardBackgroundColor(GREEN)
                 }
-            } else {
-                Toast.makeText(context, "document not exists", Toast.LENGTH_SHORT).show()
             }
         }
             .addOnFailureListener { exception ->

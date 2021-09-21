@@ -125,9 +125,8 @@ class UserDataModifyActivity : BaseActivity() {
         MyUser.email?.let {
             Firebase.auth.sendPasswordResetEmail(it)
                 .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        Toast.makeText(this, "A jelszó módosításához elküldtük az emailt :)", Toast.LENGTH_SHORT).show()
-                    }
+                    if (task.isSuccessful)
+                        buildAlertDialog(dialogMessage = "A jelszó módosításához elküldtük az emailt :)")
                 }
         }
     }
@@ -157,14 +156,16 @@ class UserDataModifyActivity : BaseActivity() {
 
         /* Delete user data from Storage */
 
-        val storageRef = Firebase.storage.reference
-        val desertRef = storageRef.child("profile_pictures/${MyUser.id!!}.jpg")
-        desertRef.delete()
+        val storageRef = Firebase.storage.reference.child("profile_pictures/${MyUser.id!!}.jpg")
+        storageRef.delete()
 
         Firebase.auth.currentUser!!.delete()
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     Toast.makeText(this, "Fiók törölve!", Toast.LENGTH_LONG).show()
+                    val broadcastIntent = Intent()
+                    broadcastIntent.action = "com.package.ACTION_LOGOUT"
+                    sendBroadcast(broadcastIntent)
                     startActivity(Intent(applicationContext, LoginActivity::class.java))
                 }
             }

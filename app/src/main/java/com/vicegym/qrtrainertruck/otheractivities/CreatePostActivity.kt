@@ -141,7 +141,7 @@ class CreatePostActivity : BaseActivity() {
                 } catch (ex: IOException) {
                     // Error occurred while creating the File
                     Log.e("Create file for Photo", "Error")
-                    Toast.makeText(this, "Error while creating the file for photo", Toast.LENGTH_SHORT).show()
+                    buildAlertDialog("HIBA", "Nem sikerült a fotót elkészíteni :(")
                     null
                 }
                 // Continue only if the File was successfully created
@@ -168,7 +168,7 @@ class CreatePostActivity : BaseActivity() {
                 .apply { photoPath = absolutePath }
         } else {
             Log.e("PhotoSave", "Photo not saved")
-            Toast.makeText(this, "Photo not saved", Toast.LENGTH_SHORT).show()
+            buildAlertDialog(dialogMessage = "A fotót nem sikerült elmenteni :( (hiányzik valami engedély?)")
             null
         }
     }
@@ -214,9 +214,8 @@ class CreatePostActivity : BaseActivity() {
 
     private fun sendClick() {
         when {
-            !isPictureTaken -> Toast.makeText(baseContext, "Nem készítettél képet!", Toast.LENGTH_SHORT).show()
-            binding.etDailyChallengeTime.text.isNullOrEmpty() -> Toast.makeText(baseContext, "Nem írtad be a futott idődet!", Toast.LENGTH_SHORT)
-                .show()
+            !isPictureTaken -> buildAlertDialog(dialogMessage = "Nem készítettél képet!")
+            binding.etDailyChallengeTime.text.isNullOrEmpty() -> buildAlertDialog(dialogMessage = "Nem írtad be a futott idődet!")
             else -> {
                 try {
                     binding.btnDailyChallengeSendPost.isClickable = false //ne töltse fel többször ugyanazt
@@ -250,7 +249,7 @@ class CreatePostActivity : BaseActivity() {
 
         newImageRef.putBytes(imageInBytes)
             .addOnFailureListener { exception ->
-                Toast.makeText(this, exception.message, Toast.LENGTH_SHORT).show()
+                buildAlertDialog(dialogMessage = "Hiba történt a kép feltöltése közben: ${exception.message}")
             }
             .continueWithTask { task ->
                 if (!task.isSuccessful) {
@@ -281,10 +280,10 @@ class CreatePostActivity : BaseActivity() {
         db.collection("posts").document("${Date().time}")
             .set(newPost)
             .addOnSuccessListener {
-                Toast.makeText(this, "Post created", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Poszt feltöltve", Toast.LENGTH_SHORT).show()
                 finish()
             }
-            .addOnFailureListener { e -> Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show() }
+            .addOnFailureListener { e -> buildAlertDialog(dialogMessage = "Hiba a poszt feltöltése közben: $e") }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

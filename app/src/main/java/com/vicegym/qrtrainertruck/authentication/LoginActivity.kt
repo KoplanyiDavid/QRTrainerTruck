@@ -1,6 +1,9 @@
 package com.vicegym.qrtrainertruck.authentication
 
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -30,6 +33,17 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val intentFilter = IntentFilter()
+        intentFilter.addAction("com.package.ACTION_LOGOUT")
+        registerReceiver(object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                Log.d("onReceive", "Logout in progress")
+                //At this point you should start the login activity and finish this one
+                finish()
+            }
+        }, intentFilter)
+
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
     }
@@ -68,7 +82,6 @@ class LoginActivity : AppCompatActivity() {
                     MyUser.nextTraining = findNextTraining(trainings)
                 downloadUserProfilePicture()
             } else {
-                Toast.makeText(this, "document not exists", Toast.LENGTH_SHORT).show()
                 Log.d("FirestoreComm", "No such document")
             }
         }

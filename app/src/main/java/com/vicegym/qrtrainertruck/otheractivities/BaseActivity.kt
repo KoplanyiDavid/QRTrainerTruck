@@ -1,5 +1,6 @@
 package com.vicegym.qrtrainertruck.otheractivities
 
+import android.app.AlertDialog
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
@@ -18,5 +19,19 @@ abstract class BaseActivity : AppCompatActivity() {
             Log.e("haveInternetConnection", "contect argument is null")
             false
         }
+    }
+
+    protected fun buildAlertDialog(
+        dialogTitle: String? = null,
+        dialogMessage: String? = null
+    ) {
+        if (dialogTitle == null && dialogMessage == null)
+            return
+        val dialog = AlertDialog.Builder(applicationContext)
+        if (dialogTitle != null)
+            dialog.setTitle(dialogTitle)
+        if (dialogMessage != null)
+            dialog.setMessage(dialogMessage)
+        dialog.create().show()
     }
 }

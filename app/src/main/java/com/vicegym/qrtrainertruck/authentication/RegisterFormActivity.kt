@@ -9,8 +9,6 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.text.method.LinkMovementMethod
 import android.util.Log
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
@@ -25,8 +23,9 @@ import com.google.firebase.storage.ktx.storage
 import com.google.firebase.storage.ktx.storageMetadata
 import com.vicegym.qrtrainertruck.data.MyUser
 import com.vicegym.qrtrainertruck.databinding.ActivityRegisterFormBinding
+import com.vicegym.qrtrainertruck.otheractivities.BaseActivity
 
-open class RegisterFormActivity : AppCompatActivity() {
+open class RegisterFormActivity : BaseActivity() {
 
     companion object {
         private const val TAG = "UserRegistration"
@@ -67,20 +66,16 @@ open class RegisterFormActivity : AppCompatActivity() {
                 MyUser.profilePicture = it.toString()
                 binding.ivRegisterProfPic.setImageURI(it)
             }
-        } else
-            Toast.makeText(this, "baj", Toast.LENGTH_SHORT).show()
+        } else {
+            buildAlertDialog(dialogMessage = "Nem férek hozzá a galériához :(")
+        }
     }
 
     private fun sendVerificationEmail() {
         user!!.sendEmailVerification()
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    Log.d(TAG, "Email sent.")
-                    Toast.makeText(
-                        this,
-                        "A regisztráció megerősítésére vonatkozó email-t elküldtük a megadott email címre, megerősítés után tudsz belépni :)",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    buildAlertDialog(dialogMessage = "A regisztráció megerősítésére vonatkozó email-t elküldtük a megadott email címre, megerősítés után tudsz belépni :)")
                 }
             }
     }
@@ -91,13 +86,9 @@ open class RegisterFormActivity : AppCompatActivity() {
             || binding.etPassword.text.toString().isEmpty()
             || binding.etConfirmPassword.text.toString().isEmpty()
         )
-            Toast.makeText(this, "Hiányzó adatok!", Toast.LENGTH_SHORT).show()
+            buildAlertDialog(dialogMessage = "Hiányzó adatok!")
         else if (binding.etPassword.text.toString() != binding.etConfirmPassword.text.toString())
-            Toast.makeText(
-                this,
-                "A jelszó megerősítése sikertelen.(Elírtál valamit?)",
-                Toast.LENGTH_SHORT
-            ).show()
+            buildAlertDialog(dialogMessage = "A jelszó megerősítése sikertelen.(Elírtál valamit?)")
         else {
             if (binding.cbTermsAndConditions.isChecked) {
                 //register to database
@@ -123,19 +114,11 @@ open class RegisterFormActivity : AppCompatActivity() {
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "createUserWithEmail:failure", task.exception)
-                            Toast.makeText(
-                                baseContext, task.exception.toString(),
-                                Toast.LENGTH_LONG
-                            ).show()
+                            buildAlertDialog("ERROR", task.exception.toString())
                         }
                     }
             } else
-                Toast.makeText(
-                    baseContext,
-                    "Nem fogadtad el a felhasználási feltételeket.",
-                    Toast.LENGTH_SHORT
-                )
-                    .show()
+                buildAlertDialog(dialogMessage = "Nem fogadtad el a felhasználási feltételeket.")
         }
     }
 
@@ -158,15 +141,10 @@ open class RegisterFormActivity : AppCompatActivity() {
         Firebase.firestore.collection("users").document(MyUser.id!!)
             .set(userHashMap)
             .addOnSuccessListener {
-                Toast.makeText(
-                    this,
-                    "Document snapshot successfully written",
-                    Toast.LENGTH_SHORT
-                ).show()
                 uploadUserProfilePicture(MyUser.profilePicture.toUri())
             }
             .addOnFailureListener {
-                Toast.makeText(this, "Error writing document", Toast.LENGTH_SHORT).show()
+                buildAlertDialog("FIGYELEM", "Hiba történt az adatok feltöltése közben.Hiba: $it")
             }
     }
 
