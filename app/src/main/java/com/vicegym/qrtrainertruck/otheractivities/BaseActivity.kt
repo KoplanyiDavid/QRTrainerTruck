@@ -27,7 +27,7 @@ abstract class BaseActivity : AppCompatActivity() {
     ) {
         if (dialogTitle == null && dialogMessage == null)
             return
-        val dialog = AlertDialog.Builder(applicationContext)
+        val dialog = AlertDialog.Builder(this)
         if (dialogTitle != null)
             dialog.setTitle(dialogTitle)
         if (dialogMessage != null)

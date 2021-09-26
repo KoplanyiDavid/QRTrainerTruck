@@ -83,6 +83,7 @@ class LoginActivity : AppCompatActivity() {
                 downloadUserProfilePicture()
             } else {
                 Log.d("FirestoreComm", "No such document")
+                startActivity(Intent(baseContext, LoginActivity::class.java))
             }
         }
             .addOnFailureListener { exception ->

@@ -75,7 +75,14 @@ open class RegisterFormActivity : BaseActivity() {
         user!!.sendEmailVerification()
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    buildAlertDialog(dialogMessage = "A regisztráció megerősítésére vonatkozó email-t elküldtük a megadott email címre, megerősítés után tudsz belépni :)")
+                    val dialog = AlertDialog.Builder(this)
+                        .setMessage("A regisztráció megerősítésére vonatkozó email-t elküldtük a megadott email címre, megerősítés után tudsz belépni :)")
+                        .setPositiveButton("OK") { dialog, _ ->
+                            dialog.dismiss()
+                            startActivity(Intent(baseContext, LoginActivity::class.java))
+                            finish()
+                        }
+                    dialog.create().show()
                 }
             }
     }
@@ -109,8 +116,6 @@ open class RegisterFormActivity : BaseActivity() {
                             MyUser.acceptedTermsAndConditions = true
                             uploadUserData() //upload username, email etc to cloud firebase
                             sendVerificationEmail()
-                            startActivity(Intent(applicationContext, LoginActivity::class.java))
-                            finish()
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "createUserWithEmail:failure", task.exception)
