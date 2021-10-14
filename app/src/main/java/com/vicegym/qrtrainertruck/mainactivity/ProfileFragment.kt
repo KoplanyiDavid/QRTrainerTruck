@@ -4,25 +4,20 @@ import android.Manifest
 import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import com.bumptech.glide.Glide
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.StorageReference
-import com.google.firebase.storage.ktx.component1
-import com.google.firebase.storage.ktx.component2
-import com.google.firebase.storage.ktx.storage
-import com.google.firebase.storage.ktx.storageMetadata
 import com.vicegym.qrtrainertruck.data.MyUser
 import com.vicegym.qrtrainertruck.databinding.FragmentProfileBinding
+import com.vicegym.qrtrainertruck.otheractivities.BaseActivity
 import com.vicegym.qrtrainertruck.otheractivities.UserDataModifyActivity
 
 class ProfileFragment : Fragment() {
@@ -48,7 +43,9 @@ class ProfileFragment : Fragment() {
         binding.tvProfFragmentName.text = MyUser.name
         binding.tvProfFragmentEmail.text = MyUser.email
         binding.tvProfFragmentMobile.text = MyUser.mobile
-        binding.ivProfPic.setImageURI(Uri.parse(MyUser.profilePicture))
+        Firebase.firestore.collection("users").document(MyUser.id!!).get().addOnSuccessListener {
+            Glide.with(requireContext()).load(it.data?.get("onlineProfilePictureUri")).into(binding.ivProfPic)
+        }
         binding.ivProfPic.setOnClickListener {
             changeProfilePicture()
         }
@@ -94,8 +91,12 @@ class ProfileFragment : Fragment() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_GALLERY) {
             data?.data?.let {
-                uploadImageToStorage(it)
-                MyUser.profilePicture = it.toString()
+                (activity as MainActivity).uploadImageToStorage(it)
+                (activity as MainActivity).updateUserProfilePictureUri(
+                    (activity as BaseActivity).storage
+                        .child("profile_pictures/${MyUser.id!!}.jpg")
+                )
+                //MyUser.profilePicture = it.toString()
                 binding.ivProfPic.setImageURI(it)
             }
         }
@@ -105,7 +106,7 @@ class ProfileFragment : Fragment() {
         }
     }
 
-    private fun uploadImageToStorage(file: Uri) {
+/*    private fun uploadImageToStorage(file: Uri) {
         val storageRef = Firebase.storage.reference
         val metadata = storageMetadata { contentType = "profile_image/jpeg" }
         val uploadTask = storageRef.child("profile_pictures/${MyUser.id!!}.jpg").putFile(file, metadata)
@@ -126,7 +127,7 @@ class ProfileFragment : Fragment() {
         child.downloadUrl.addOnSuccessListener {
             Firebase.firestore.collection("users").document(MyUser.id!!).update("onlineProfilePictureUri", it.toString())
         }
-    }
+    }*/
 
     companion object {
         private const val REQUEST_GALLERY = 1000

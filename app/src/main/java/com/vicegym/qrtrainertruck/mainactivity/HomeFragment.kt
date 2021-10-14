@@ -7,7 +7,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
@@ -16,8 +15,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
+import com.bumptech.glide.Glide
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
@@ -30,14 +29,8 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.StorageReference
-import com.google.firebase.storage.ktx.component1
-import com.google.firebase.storage.ktx.component2
-import com.google.firebase.storage.ktx.storage
-import com.google.firebase.storage.ktx.storageMetadata
 import com.vicegym.qrtrainertruck.R
 import com.vicegym.qrtrainertruck.data.MyUser
-import com.vicegym.qrtrainertruck.data.TrainingData
 import com.vicegym.qrtrainertruck.databinding.FragmentHomeBinding
 
 
@@ -73,7 +66,10 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         binding.tvUserName.text = MyUser.name
         binding.tvUserRank.text = MyUser.rank
         binding.tvUserScore.text = MyUser.score.toString()
-        binding.ivProfilePicture.setImageURI(MyUser.profilePicture.toUri())
+        //binding.ivProfilePicture.setImageURI(MyUser.profilePicture.toUri())
+        Firebase.firestore.collection("users").document(MyUser.id!!).get().addOnSuccessListener {
+            Glide.with(requireContext()).load(it.data?.get("onlineProfilePictureUri")).into(binding.ivProfilePicture)
+        }
         binding.ivProfilePicture.setOnClickListener { changeProfilePicture() }
         setNextTraining()
     }
@@ -85,28 +81,17 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
                 val trainingList = document.data?.get("trainings") as ArrayList<HashMap<String, Any>>
                 if (trainingList.isNotEmpty()) {
                     var nextTrainingHashMap = trainingList[0]
-                    for (training in trainingList) {
-                        if (nextTrainingHashMap["sorter"] as Long > training["sorter"] as Long)
-                            nextTrainingHashMap = training
-                    }
-                    MyUser.nextTraining = TrainingData(
-                        nextTrainingHashMap["id"] as String,
-                        nextTrainingHashMap["title"] as String,
-                        nextTrainingHashMap["trainer"] as String,
-                        nextTrainingHashMap["location"] as String,
-                        nextTrainingHashMap["date"] as String,
-                        nextTrainingHashMap["sorter"] as Long
-                    )
+                    if (trainingList.size > 1)
+                        for (training in trainingList) {
+                            if (nextTrainingHashMap["sorter"] as Long > training["sorter"] as Long)
+                                nextTrainingHashMap = training
+                        }
+                    binding.tvTrainingTime.text = nextTrainingHashMap["date"] as String
+                    binding.tvTrainingPlace.text = nextTrainingHashMap["location"] as String
+                } else {
+                    binding.tvTrainingTime.text = getString(R.string.no_next_training_date)
+                    binding.tvTrainingPlace.text = getString(R.string.no_next_training_location)
                 }
-                else
-                    MyUser.nextTraining = null
-            }
-            if (MyUser.nextTraining != null) {
-                binding.tvTrainingTime.text = MyUser.nextTraining?.date
-                binding.tvTrainingPlace.text = MyUser.nextTraining?.location
-            } else {
-                binding.tvTrainingTime.text = getString(R.string.no_next_training_date)
-                binding.tvTrainingPlace.text = getString(R.string.no_next_training_location)
             }
         }
     }
@@ -124,7 +109,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         when (requestCode) {
             REQUEST_GALLERY -> {
-                // If request is cancelled, the result arrays are empty.
                 if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                     changeProfilePicture()
                 } else {
@@ -148,14 +132,17 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_GALLERY && resultCode == RESULT_OK) {
             data?.data?.let {
-                uploadImageToStorage(it)
-                MyUser.profilePicture = it.toString()
+                (activity as MainActivity).uploadImageToStorage(it)
+                (activity as MainActivity).updateUserProfilePictureUri(
+                    (activity as MainActivity).storage.child("profile_pictures/${MyUser.id!!}.jpg")
+                )
+                //MyUser.profilePicture = it.toString()
                 binding.ivProfilePicture.setImageURI(it)
             }
         }
     }
 
-    private fun uploadImageToStorage(file: Uri) {
+/*    private fun uploadImageToStorage(file: Uri) {
         val storageRef = Firebase.storage.reference
         val metadata = storageMetadata { contentType = "profile_image/jpeg" }
         val uploadTask = storageRef.child("profile_pictures/${MyUser.id!!}.jpg").putFile(file, metadata)
@@ -176,7 +163,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         child.downloadUrl.addOnSuccessListener {
             Firebase.firestore.collection("users").document(MyUser.id!!).update("onlineProfilePictureUri", it.toString())
         }
-    }
+    }*/
 
     override fun onStart() {
         super.onStart()

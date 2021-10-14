@@ -1,49 +1,31 @@
 package com.vicegym.qrtrainertruck.authentication
 
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.PopupWindow
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.ktx.storage
 import com.vicegym.qrtrainertruck.data.MyUser
-import com.vicegym.qrtrainertruck.data.TrainingData
 import com.vicegym.qrtrainertruck.databinding.ActivityLoginBinding
 import com.vicegym.qrtrainertruck.databinding.PopupWindowForgotPasswordBinding
 import com.vicegym.qrtrainertruck.mainactivity.MainActivity
+import com.vicegym.qrtrainertruck.otheractivities.BaseActivity
 import com.vicegym.qrtrainertruck.otheractivities.LoadingScreenActivity
-import java.io.File
 
-class LoginActivity : AppCompatActivity() {
+class LoginActivity : BaseActivity() {
+
     private lateinit var binding: ActivityLoginBinding
     private lateinit var auth: FirebaseAuth
     private var user: FirebaseUser? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val intentFilter = IntentFilter()
-        intentFilter.addAction("com.package.ACTION_LOGOUT")
-        registerReceiver(object : BroadcastReceiver() {
-            override fun onReceive(context: Context?, intent: Intent?) {
-                Log.d("onReceive", "Logout in progress")
-                //At this point you should start the login activity and finish this one
-                finish()
-            }
-        }, intentFilter)
-
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
     }
@@ -51,6 +33,7 @@ class LoginActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         initFirebase()
+        initBroadcastReceiver()
     }
 
     private fun initFirebase() {
@@ -63,8 +46,18 @@ class LoginActivity : AppCompatActivity() {
             init()
     }
 
+    private fun init() {
+        binding.btnSignIn.setOnClickListener { signInWithEmailAndPassword() }
+        binding.btnRegister.setOnClickListener {
+            startActivity(Intent(this, RegisterFormActivity::class.java))
+            finish()
+        }
+        binding.btnForgotPassword.setOnClickListener { popupWindow() }
+    }
+
     private fun getUserData() {
         startActivity(Intent(this, LoadingScreenActivity::class.java))
+        finish()
         val db = Firebase.firestore.collection("users").document("${Firebase.auth.currentUser?.uid}")
         db.get().addOnSuccessListener { document ->
             if (document.exists() && document != null) {
@@ -77,10 +70,7 @@ class LoginActivity : AppCompatActivity() {
                 MyUser.rank = document.data?.get("rank") as String
                 MyUser.score = document.data?.get("score") as Number
                 MyUser.onlineProfilePictureUri = document.data?.get("onlineProfilePictureUri") as String?
-                val trainings = document.data?.get("trainings") as ArrayList<HashMap<String, Any>>
-                if (trainings.isNotEmpty())
-                    MyUser.nextTraining = findNextTraining(trainings)
-                downloadUserProfilePicture()
+                startActivity(Intent(baseContext, MainActivity::class.java))
             } else {
                 Log.d("FirestoreComm", "No such document")
                 startActivity(Intent(baseContext, LoginActivity::class.java))
@@ -91,7 +81,7 @@ class LoginActivity : AppCompatActivity() {
             }
     }
 
-    private fun findNextTraining(trainingList: ArrayList<HashMap<String, Any>>): TrainingData {
+/*    private fun findNextTraining(trainingList: ArrayList<HashMap<String, Any>>): TrainingData {
         var nextTrainingHashMap = trainingList[0]
         for (training in trainingList) {
             if ((training["sorter"] as Long) < (nextTrainingHashMap["sorter"] as Long)) {
@@ -102,9 +92,9 @@ class LoginActivity : AppCompatActivity() {
         nextTraining.date = nextTrainingHashMap["date"] as String
         nextTraining.location = nextTrainingHashMap["location"] as String
         return nextTraining
-    }
+    }*/
 
-    private fun downloadUserProfilePicture() {
+    /*private fun downloadUserProfilePicture() {
         val storageRef = Firebase.storage.reference
         val imageRef = storageRef.child("profile_pictures/${MyUser.id!!}.jpg")
         val localFile = File.createTempFile("profilepicture", "jpg")
@@ -117,13 +107,8 @@ class LoginActivity : AppCompatActivity() {
             .addOnFailureListener {
                 Log.d("DWPIC", "NEM OK: $it")
             }
-    }
+    }*/
 
-    private fun init() {
-        binding.btnSignIn.setOnClickListener { signInWithEmailAndPassword() }
-        binding.btnRegister.setOnClickListener { startActivity(Intent(this, RegisterFormActivity::class.java)) }
-        binding.btnForgotPassword.setOnClickListener { popupWindow() }
-    }
 
     private fun popupWindow() {
         val popupBinding: PopupWindowForgotPasswordBinding = PopupWindowForgotPasswordBinding.inflate(layoutInflater)
@@ -153,18 +138,20 @@ class LoginActivity : AppCompatActivity() {
             Firebase.auth.sendPasswordResetEmail(email)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful)
-                        Toast.makeText(this, "A jelszó módosításához elküldtük az emailt :)", Toast.LENGTH_SHORT).show()
+                        buildAlertDialog("Új jelszó kérelem sikeres", "Elküldtük az emailt a jelszó módosításához :)")
                     else
-                        Toast.makeText(applicationContext, "A megadott email-cím nem szerepel az adatbázisban :(", Toast.LENGTH_SHORT).show()
+                        buildAlertDialog("Új jelszó kérelem HIBA", "A megadott email-cím nem szerepel az adatbázisban :(")
                 }
         else
-            Toast.makeText(applicationContext, "Az email mező üres, vagy rossz a formátum!", Toast.LENGTH_SHORT).show()
+            buildAlertDialog("HIBA", "Az email mező üres, vagy rossz a formátum!")
     }
 
     private fun signInWithEmailAndPassword() {
-        if (binding.etEmail.text.toString().isEmpty() || binding.etPassword.text.toString().isEmpty()) {
-            Toast.makeText(baseContext, "Hiányzó adatok!", Toast.LENGTH_SHORT).show()
-        } else {
+        val emailText = binding.etEmail.text.toString()
+        val passwordText = binding.etPassword.text.toString()
+        if (emailText.isEmpty() || passwordText.isEmpty()) {
+            buildAlertDialog(dialogMessage = "Hiányzó adatok!")
+        } else if (emailText.contains('@', true)) {
             Firebase.auth.signInWithEmailAndPassword(binding.etEmail.text.toString(), binding.etPassword.text.toString())
                 .addOnCompleteListener(this) { task ->
                     if (task.isSuccessful) {
@@ -173,22 +160,13 @@ class LoginActivity : AppCompatActivity() {
                         if (user!!.isEmailVerified) {
                             getUserData()
                         } else {
-                            Toast.makeText(
-                                this,
-                                "Nem erősítetted meg a regisztrációt az emailben kapott link segítségével!",
-                                Toast.LENGTH_LONG
-                            )
-                                .show()
+                            buildAlertDialog("FIGYELEM!", "Nem erősítetted meg a regisztrációt az emailben kapott link segítségével!")
                         }
                     } else {
-                        Toast.makeText(
-                            baseContext,
-                            "A felhasználónév, vagy a jelszó helytelen!" + task.exception,
-                            Toast.LENGTH_SHORT
-                        )
-                            .show()
+                        buildAlertDialog("FIGYELEM!", "A felhasználónév, vagy a jelszó helytelen!")
                     }
                 }
-        }
+        } else
+            buildAlertDialog(dialogMessage = "Rossz formátum! (Elírtad az email-címed?)")
     }
 }

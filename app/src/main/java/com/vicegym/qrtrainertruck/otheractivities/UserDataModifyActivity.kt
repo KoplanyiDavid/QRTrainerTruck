@@ -55,9 +55,9 @@ class UserDataModifyActivity : BaseActivity() {
         binding.btnChangePassword.setOnClickListener { changePasswordRequest() }
 
         /*--hint szövegek--*/
-        binding.etProfName.hint = MyUser.name
-        binding.etProfEmail.hint = MyUser.email
-        binding.etProfMobile.hint = MyUser.mobile
+        binding.etProfName.setText(MyUser.name)
+        binding.etProfEmail.setText(MyUser.email)
+        binding.etProfMobile.setText(MyUser.mobile)
 
         /*--edittextek szövegváltozás figyelői--*/
         binding.etProfName.addTextChangedListener(object : TextWatcher {
@@ -182,8 +182,10 @@ class UserDataModifyActivity : BaseActivity() {
                 if (uName == MyUser.name && uEmail == MyUser.email && uMobile == MyUser.mobile) {
                     Log.d("validateUserData", "OK")
                     finish()
-                } else
+                } else {
+                    buildAlertDialog("HIBA!", "Az adatok módosítása sikertelen, kérlek próbáld meg újra és ellenőrizd az internet elérésedet!")
                     Log.d("validateUserData", "Nem OK")
+                }
             }
         }
     }

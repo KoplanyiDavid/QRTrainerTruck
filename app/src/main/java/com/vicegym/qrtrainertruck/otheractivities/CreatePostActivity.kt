@@ -259,10 +259,7 @@ class CreatePostActivity : BaseActivity() {
                 newImageRef.downloadUrl
             }
             .addOnSuccessListener { downloadUri ->
-                Firebase.firestore.collection("users").document(MyUser.id!!)
-                    .get().addOnSuccessListener {
-                        uploadPost(downloadUri.toString())
-                    }
+                uploadPost(downloadUri.toString())
             }
     }
 

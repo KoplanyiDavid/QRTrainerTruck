@@ -44,7 +44,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/ivProf"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@id/tvName"
-        android:importantForAutofill="no"
+        android:autofillHints="name"
         tools:ignore="LabelFor" />
 
     <!-- Email -->

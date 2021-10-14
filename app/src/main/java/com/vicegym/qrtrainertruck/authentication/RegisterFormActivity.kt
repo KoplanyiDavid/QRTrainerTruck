@@ -4,23 +4,17 @@ import android.Manifest
 import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.method.LinkMovementMethod
 import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.net.toUri
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.StorageReference
-import com.google.firebase.storage.ktx.component1
-import com.google.firebase.storage.ktx.component2
-import com.google.firebase.storage.ktx.storage
-import com.google.firebase.storage.ktx.storageMetadata
+import com.vicegym.qrtrainertruck.R
 import com.vicegym.qrtrainertruck.data.MyUser
 import com.vicegym.qrtrainertruck.databinding.ActivityRegisterFormBinding
 import com.vicegym.qrtrainertruck.otheractivities.BaseActivity
@@ -61,9 +55,9 @@ open class RegisterFormActivity : BaseActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_GALLERY && resultCode == RESULT_OK) {
+        if (requestCode == REQUEST_GALLERY) {
             data?.data?.let {
-                MyUser.profilePicture = it.toString()
+                uploadImageToStorage(it)
                 binding.ivRegisterProfPic.setImageURI(it)
             }
         } else {
@@ -88,40 +82,37 @@ open class RegisterFormActivity : BaseActivity() {
     }
 
     private fun registerWithEmailAndPassword() {
-        if (binding.etName.text.toString().isEmpty()
-            || binding.etEmail.text.toString().isEmpty()
-            || binding.etPassword.text.toString().isEmpty()
-            || binding.etConfirmPassword.text.toString().isEmpty()
-        )
+        val name = binding.etName.text.toString()
+        val email = binding.etEmail.text.toString()
+        val password = binding.etPassword.text.toString()
+        val confirmPassword = binding.etConfirmPassword.text.toString()
+
+        if (name.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty())
             buildAlertDialog(dialogMessage = "Hiányzó adatok!")
-        else if (binding.etPassword.text.toString() != binding.etConfirmPassword.text.toString())
+        else if (!email.contains('@', true))
+            buildAlertDialog(dialogMessage = "A megadott email-cím formátuma nem jó!")
+        else if (password != confirmPassword)
             buildAlertDialog(dialogMessage = "A jelszó megerősítése sikertelen.(Elírtál valamit?)")
         else {
             if (binding.cbTermsAndConditions.isChecked) {
                 //register to database
-                Firebase.auth.createUserWithEmailAndPassword(
-                    binding.etEmail.text.toString(),
-                    binding.etPassword.text.toString()
-                )
-                    .addOnCompleteListener(this) { task ->
-                        if (task.isSuccessful) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "createUserWithEmail:success")
-                            /* -- Set MyUser object data --*/
-                            user = Firebase.auth.currentUser
-                            MyUser.id = user!!.uid
-                            MyUser.name = binding.etName.text.toString()
-                            MyUser.email = binding.etEmail.text.toString()
-                            MyUser.password = binding.etPassword.text.toString()
-                            MyUser.acceptedTermsAndConditions = true
-                            uploadUserData() //upload username, email etc to cloud firebase
-                            sendVerificationEmail()
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w(TAG, "createUserWithEmail:failure", task.exception)
-                            buildAlertDialog("ERROR", task.exception.toString())
-                        }
+                Firebase.auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this) { task ->
+                    if (task.isSuccessful) {
+                        Log.d(TAG, "createUserWithEmail:success")
+                        /* -- Set MyUser object data --*/
+                        user = Firebase.auth.currentUser
+                        MyUser.id = user!!.uid
+                        MyUser.name = binding.etName.text.toString()
+                        MyUser.email = email
+                        MyUser.password = password
+                        MyUser.acceptedTermsAndConditions = true
+                        uploadUserData() //upload username, email etc to cloud firebase
+                        sendVerificationEmail()
+                    } else {
+                        // If sign in fails, display a message to the user.
+                        buildAlertDialog("HIBA", "Hibakód:\n" + task.exception.toString())
                     }
+                }
             } else
                 buildAlertDialog(dialogMessage = "Nem fogadtad el a felhasználási feltételeket.")
         }
@@ -135,45 +126,19 @@ open class RegisterFormActivity : BaseActivity() {
             "mobile" to MyUser.mobile,
             "email" to MyUser.email,
             "password" to MyUser.password,
-            "profpic" to MyUser.profilePicture,
+            "onlineProfilePictureUri" to "android.resource://com.vicegym.qrtrainertruck/" + R.drawable.default_profpic,
             "acceptedtermsandcons" to MyUser.acceptedTermsAndConditions,
             "rank" to MyUser.rank,
             "score" to MyUser.score,
-            "nextTraining" to MyUser.nextTraining,
             "trainings" to trainings
         )
 
         Firebase.firestore.collection("users").document(MyUser.id!!)
             .set(userHashMap)
-            .addOnSuccessListener {
-                uploadUserProfilePicture(MyUser.profilePicture.toUri())
-            }
+            .addOnSuccessListener { updateUserProfilePictureUri(storage.child("profile_pictures/${MyUser.id!!}.jpg")) }
             .addOnFailureListener {
-                buildAlertDialog("FIGYELEM", "Hiba történt az adatok feltöltése közben.Hiba: $it")
+                buildAlertDialog("FIGYELEM", "Hiba történt az adatok feltöltése közben.Hiba:\n $it")
             }
-    }
-
-    private fun uploadUserProfilePicture(file: Uri) {
-        val storageRef = Firebase.storage.reference
-        val metadata = storageMetadata { contentType = "profile_image/jpeg" }
-        val uploadTask = storageRef.child("profile_pictures/${MyUser.id!!}.jpg").putFile(file, metadata)
-        uploadTask.addOnProgressListener { (bytesTransferred, totalByteCount) ->
-            val progress = (100.0 * bytesTransferred) / totalByteCount
-            Log.d("UploadImage", "Upload is $progress% done")
-        }.addOnPausedListener {
-            Log.d("UploadImage", "Upload is paused")
-        }.addOnFailureListener {
-            Log.d("UploadImage", "NEM OK: $it")
-        }.addOnSuccessListener {
-            getUri(storageRef.child("profile_pictures/${MyUser.id!!}.jpg"))
-            Log.d("UploadImage", "OK")
-        }
-    }
-
-    private fun getUri(child: StorageReference) {
-        child.downloadUrl.addOnSuccessListener {
-            Firebase.firestore.collection("users").document(MyUser.id!!).update("onlineProfilePictureUri", it.toString())
-        }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
