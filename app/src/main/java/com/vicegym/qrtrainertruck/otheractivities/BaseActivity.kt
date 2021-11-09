@@ -5,36 +5,16 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.net.ConnectivityManager
-import android.net.NetworkInfo
-import android.net.Uri
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.StorageReference
-import com.google.firebase.storage.ktx.component1
-import com.google.firebase.storage.ktx.component2
 import com.google.firebase.storage.ktx.storage
-import com.google.firebase.storage.ktx.storageMetadata
-import com.vicegym.qrtrainertruck.data.MyUser
 
 abstract class BaseActivity : AppCompatActivity() {
 
     val uid = Firebase.auth.uid
     val storage = Firebase.storage.reference
-
-    protected fun haveInternedConnection(context: Context?): Boolean {
-        return if (context != null) {
-            val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-            val activeNetwork: NetworkInfo? = cm.activeNetworkInfo
-            activeNetwork?.isConnected == true
-        } else {
-            Log.e("haveInternetConnection", "contect argument is null")
-            false
-        }
-    }
 
     protected fun initBroadcastReceiver() {
         val intentFilter = IntentFilter()
@@ -59,7 +39,7 @@ abstract class BaseActivity : AppCompatActivity() {
         dialog.create().show()
     }
 
-    fun uploadImageToStorage(file: Uri) {
+    /*fun uploadImageToStorage(file: Uri) {
         val metadata = storageMetadata { contentType = "profile_image/jpeg" }
         val uploadTask = storage.child("profile_pictures/${MyUser.id!!}.jpg").putFile(file, metadata)
         uploadTask.addOnProgressListener { (bytesTransferred, totalByteCount) ->
@@ -72,11 +52,11 @@ abstract class BaseActivity : AppCompatActivity() {
         }.addOnSuccessListener {
             Log.d("UploadImage", "OK")
         }
-    }
+    }*/
 
-    fun updateUserProfilePictureUri(child: StorageReference) {
+    /*fun updateUserProfilePictureUri(child: StorageReference) {
         child.downloadUrl.addOnSuccessListener {
             Firebase.firestore.collection("users").document(MyUser.id!!).update("onlineProfilePictureUri", it.toString())
         }
-    }
+    }*/
 }

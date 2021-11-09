@@ -45,7 +45,7 @@ class TrainingsFragment : Fragment() {
     private fun initTrainingsListener() {
         val db = Firebase.firestore
         db.collection("trainings")
-            .orderBy("sorter") //TODO: ha date vhogy bugos akkor sorter használata
+            .orderBy("sorter")
             .addSnapshotListener { snapshots, e ->
                 if (e != null) {
                     return@addSnapshotListener

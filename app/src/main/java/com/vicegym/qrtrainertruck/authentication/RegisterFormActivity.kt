@@ -10,14 +10,15 @@ import android.text.method.LinkMovementMethod
 import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import com.vicegym.qrtrainertruck.R
-import com.vicegym.qrtrainertruck.data.MyUser
+import com.vicegym.qrtrainertruck.data.TrainingData
 import com.vicegym.qrtrainertruck.databinding.ActivityRegisterFormBinding
+import com.vicegym.qrtrainertruck.helpers.FirebaseHelper
 import com.vicegym.qrtrainertruck.otheractivities.BaseActivity
+import kotlinx.coroutines.launch
 
 open class RegisterFormActivity : BaseActivity() {
 
@@ -57,7 +58,6 @@ open class RegisterFormActivity : BaseActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_GALLERY) {
             data?.data?.let {
-                uploadImageToStorage(it)
                 binding.ivRegisterProfPic.setImageURI(it)
             }
         } else {
@@ -101,12 +101,24 @@ open class RegisterFormActivity : BaseActivity() {
                         Log.d(TAG, "createUserWithEmail:success")
                         /* -- Set MyUser object data --*/
                         user = Firebase.auth.currentUser
-                        MyUser.id = user!!.uid
-                        MyUser.name = binding.etName.text.toString()
-                        MyUser.email = email
-                        MyUser.password = password
-                        MyUser.acceptedTermsAndConditions = true
-                        uploadUserData() //upload username, email etc to cloud firebase
+                        val trainings = ArrayList<TrainingData>()
+                        lifecycleScope.launch {
+                            FirebaseHelper.uploadImageFromImageView(binding.ivRegisterProfPic, "profile_pictures/${user!!.uid}")
+                            val profilePictureUrl = FirebaseHelper.getImageUrl("profile_pictures/${user!!.uid}")
+                            val userData = hashMapOf<String, Any>(
+                                "id" to user!!.uid,
+                                "name" to binding.etName.text.toString(),
+                                "email" to email,
+                                "mobile" to "null",
+                                "acceptedtermsandcons" to true,
+                                "profilePictureUrl" to profilePictureUrl.toString(),
+                                "rank" to "Újonc",
+                                "score" to 0,
+                                "trainings" to trainings
+                            )
+                            FirebaseHelper.setCollectionDocument("users", user!!.uid, userData)
+                        }
+
                         sendVerificationEmail()
                     } else {
                         // If sign in fails, display a message to the user.
@@ -116,29 +128,6 @@ open class RegisterFormActivity : BaseActivity() {
             } else
                 buildAlertDialog(dialogMessage = "Nem fogadtad el a felhasználási feltételeket.")
         }
-    }
-
-    private fun uploadUserData() {
-        val trainings: ArrayList<HashMap<String, Any>> = arrayListOf()
-        val userHashMap = hashMapOf(
-            "id" to MyUser.id,
-            "name" to MyUser.name,
-            "mobile" to MyUser.mobile,
-            "email" to MyUser.email,
-            "password" to MyUser.password,
-            "onlineProfilePictureUri" to "android.resource://com.vicegym.qrtrainertruck/" + R.drawable.default_profpic,
-            "acceptedtermsandcons" to MyUser.acceptedTermsAndConditions,
-            "rank" to MyUser.rank,
-            "score" to MyUser.score,
-            "trainings" to trainings
-        )
-
-        Firebase.firestore.collection("users").document(MyUser.id!!)
-            .set(userHashMap)
-            .addOnSuccessListener { updateUserProfilePictureUri(storage.child("profile_pictures/${MyUser.id!!}.jpg")) }
-            .addOnFailureListener {
-                buildAlertDialog("FIGYELEM", "Hiba történt az adatok feltöltése közben.Hiba:\n $it")
-            }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {

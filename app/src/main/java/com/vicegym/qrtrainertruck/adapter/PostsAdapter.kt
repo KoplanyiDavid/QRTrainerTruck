@@ -2,6 +2,7 @@ package com.vicegym.qrtrainertruck.adapter
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -38,12 +39,12 @@ class PostsAdapter(private val context: Context) :
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
         val tmpPost = postList[position]
         Firebase.firestore.collection("users").document(tmpPost.uid!!).get().addOnSuccessListener {
-            Glide.with(context).load(it.data?.get("onlineProfilePictureUri")).into(holder.ivProfilePicture)
+            if (it.exists())
+                Glide.with(context).load(Uri.parse(it.data?.get("profilePictureUrl") as String?)).into(holder.ivProfilePicture)
         }
-        holder.tvAuthor.text = tmpPost.author
+        holder.tvAuthor.text = tmpPost.authorName
         holder.tvTime.text = tmpPost.time
         holder.tvDescription.text = tmpPost.description
-        holder.imgPost.rotation = 90f
         Glide.with(context).load(tmpPost.imageUrl).into(holder.imgPost)
         setAnimation(holder.itemView, position)
     }

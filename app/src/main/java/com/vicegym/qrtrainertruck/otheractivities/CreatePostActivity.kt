@@ -8,9 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -19,20 +17,19 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.lifecycle.lifecycleScope
+import com.google.common.math.IntMath.pow
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.ktx.storage
 import com.vicegym.qrtrainertruck.R
 import com.vicegym.qrtrainertruck.authentication.LoginActivity
 import com.vicegym.qrtrainertruck.data.MyUser
-import com.vicegym.qrtrainertruck.data.Post
 import com.vicegym.qrtrainertruck.databinding.ActivityCreatePostBinding
-import java.io.ByteArrayOutputStream
+import com.vicegym.qrtrainertruck.helpers.FirebaseHelper
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -46,9 +43,10 @@ class CreatePostActivity : BaseActivity() {
         private const val REQUEST_CAMERA = 100
     }
 
-    private var isPictureTaken = false
+    //private var isPictureTaken = false
     private lateinit var binding: ActivityCreatePostBinding
     private lateinit var photoPath: String
+    private val user = Firebase.auth.currentUser
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -181,7 +179,7 @@ class CreatePostActivity : BaseActivity() {
 
         if (requestCode == REQUEST_CAMERA) {
             setPic()
-            isPictureTaken = true
+            //isPictureTaken = true
         }
     }
 
@@ -214,13 +212,13 @@ class CreatePostActivity : BaseActivity() {
 
     private fun sendClick() {
         when {
-            !isPictureTaken -> buildAlertDialog(dialogMessage = "Nem készítettél képet!")
+            //!isPictureTaken -> buildAlertDialog(dialogMessage = "Nem készítettél képet!")
             binding.etDailyChallengeTime.text.isNullOrEmpty() -> buildAlertDialog(dialogMessage = "Nem írtad be a futott idődet!")
             else -> {
                 try {
                     binding.btnDailyChallengeSendPost.isClickable = false //ne töltse fel többször ugyanazt
                     loadingAlertDialog()
-                    uploadPostWithImage()
+                    uploadPost()
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
@@ -237,50 +235,37 @@ class CreatePostActivity : BaseActivity() {
         dialog.show()
     }
 
-    private fun uploadPostWithImage() {
-        val storageReference = Firebase.storage.reference
-        val newImageName = MyUser.id + "_${Date().time}" + ".jpg"
-        val newImageRef = storageReference.child("images/$newImageName")
-
-        val bitmap: Bitmap = (binding.ivDailyChallengePicture.drawable as BitmapDrawable).bitmap
-        val baos = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
-        val imageInBytes = baos.toByteArray()
-
-        newImageRef.putBytes(imageInBytes)
-            .addOnFailureListener { exception ->
-                buildAlertDialog(dialogMessage = "Hiba történt a kép feltöltése közben: ${exception.message}")
-            }
-            .continueWithTask { task ->
-                if (!task.isSuccessful) {
-                    task.exception?.let { throw it }
-                }
-
-                newImageRef.downloadUrl
-            }
-            .addOnSuccessListener { downloadUri ->
-                uploadPost(downloadUri.toString())
-            }
-    }
-
-    private fun uploadPost(imageUrl: String? = null) {
-        val newPost = Post(
-            MyUser.id,
-            MyUser.name,
-            binding.etDailyChallengeTime.text.toString(),
-            binding.etDailyChallengeDescription.text.toString(),
-            imageUrl
-        )
-
-        val db = Firebase.firestore
-
-        db.collection("posts").document("${Date().time}")
-            .set(newPost)
-            .addOnSuccessListener {
-                Toast.makeText(this, "Poszt feltöltve", Toast.LENGTH_SHORT).show()
-                finish()
-            }
-            .addOnFailureListener { e -> buildAlertDialog(dialogMessage = "Hiba a poszt feltöltése közben: $e") }
+    private fun uploadPost() {
+        var sorter = Date().time
+        var temp = sorter
+        var i = 0
+        while (temp != 0L) {
+            temp /= 10
+            i += 1
+        }
+        if (i > 10) {
+            val a = i - 10
+            sorter /= pow(10, a)
+        }
+        else if (i < 10) {
+            val a = 10 - i
+            sorter *= pow(10, a)
+        }
+        lifecycleScope.launch {
+            val time = Date().time
+            FirebaseHelper.uploadImageFromImageView(binding.ivDailyChallengePicture, "postimages/${user!!.uid}_$time.jpg")
+            val imageUrl = FirebaseHelper.getImageUrl("postimages/${user.uid}_$time.jpg")
+            val newPost = hashMapOf<String, Any>(
+                "uid" to user.uid,
+                "authorName" to MyUser.name!!,
+                "time" to binding.etDailyChallengeTime.text.toString(),
+                "description" to binding.etDailyChallengeDescription.text.toString(),
+                "imageUrl" to imageUrl.toString(),
+                "sorter" to sorter
+                )
+            FirebaseHelper.setCollectionDocument("posts", sorter.toString(), newPost)
+            finish()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

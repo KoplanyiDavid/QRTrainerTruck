@@ -13,7 +13,6 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
-import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.auth.ktx.userProfileChangeRequest
 import com.google.firebase.firestore.ktx.firestore
@@ -26,6 +25,7 @@ import com.vicegym.qrtrainertruck.databinding.ActivityUserDataModifyBinding
 
 class UserDataModifyActivity : BaseActivity() {
     private lateinit var binding: ActivityUserDataModifyBinding
+    private val user = Firebase.auth.currentUser
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,7 +79,7 @@ class UserDataModifyActivity : BaseActivity() {
                             Log.d("FBUpdateUserName", "User profile updated.")
                         }
                     }
-                Firebase.firestore.collection("users").document("${MyUser.id}").update("name", MyUser.name)
+                Firebase.firestore.collection("users").document(user!!.uid).update("name", MyUser.name)
             }
         })
         binding.etProfEmail.addTextChangedListener(object : TextWatcher {
@@ -100,7 +100,7 @@ class UserDataModifyActivity : BaseActivity() {
                             }
                         }
                     val db = Firebase.firestore
-                    db.collection("users").document("${MyUser.id}").update("email", MyUser.email)
+                    db.collection("users").document(user.uid).update("email", MyUser.email)
                 }
             }
         })
@@ -115,7 +115,7 @@ class UserDataModifyActivity : BaseActivity() {
                 if (s.length == 11 || s.length == 12) {
                     MyUser.mobile = s.toString()
                     val db = Firebase.firestore
-                    db.collection("users").document("${MyUser.id}").update("mobile", MyUser.mobile)
+                    db.collection("users").document(user!!.uid).update("mobile", MyUser.mobile)
                 }
             }
         })
@@ -133,30 +133,21 @@ class UserDataModifyActivity : BaseActivity() {
 
     private fun deleteUserDialog() {
         val dialog = AlertDialog.Builder(this).setTitle("FIÓK VÉGLEGES TÖRLÉSE").setMessage("Biztosan törlöd a fiókodat?")
-            .setPositiveButton("Igen") { _, _ -> reAuthUser() }
+            .setPositiveButton("Igen") { _, _ -> deleteUser() }
             .setNegativeButton("Nem") { dialog, _ -> dialog.cancel() }
             .create()
         dialog.show()
     }
 
-    private fun reAuthUser() {
-        val user = Firebase.auth.currentUser!!
-        val credential = EmailAuthProvider
-            .getCredential(MyUser.email!!, MyUser.password!!)
-
-        user.reauthenticate(credential)
-            .addOnCompleteListener { deleteUser() }
-    }
-
     private fun deleteUser() {
         /* Delete user data from firestore */
         val db = Firebase.firestore
-        db.collection("users").document(MyUser.id!!)
+        db.collection("users").document(user!!.uid)
             .delete()
 
         /* Delete user data from Storage */
 
-        val storageRef = Firebase.storage.reference.child("profile_pictures/${MyUser.id!!}.jpg")
+        val storageRef = Firebase.storage.reference.child("profile_pictures/${user.uid}.jpg")
         storageRef.delete()
 
         Firebase.auth.currentUser!!.delete()
@@ -173,7 +164,7 @@ class UserDataModifyActivity : BaseActivity() {
 
     private fun validateUserData() {
         val db = Firebase.firestore
-        db.collection("users").document("${MyUser.id}").get().addOnSuccessListener { document ->
+        db.collection("users").document(user!!.uid).get().addOnSuccessListener { document ->
             if (document != null) {
                 val uName = document.data?.get("name") as String?
                 val uEmail = document.data?.get("email") as String?

@@ -16,6 +16,7 @@ import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException
 import com.google.android.gms.maps.*
@@ -23,6 +24,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -32,6 +34,8 @@ import com.google.firebase.ktx.Firebase
 import com.vicegym.qrtrainertruck.R
 import com.vicegym.qrtrainertruck.data.MyUser
 import com.vicegym.qrtrainertruck.databinding.FragmentHomeBinding
+import com.vicegym.qrtrainertruck.helpers.FirebaseHelper
+import kotlinx.coroutines.launch
 
 
 class HomeFragment : Fragment(), OnMapReadyCallback {
@@ -39,6 +43,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     private lateinit var mapView: MapView
     private lateinit var gMap: GoogleMap
     private var marker: Marker? = null
+    private val user = Firebase.auth.currentUser
 
     companion object {
         private const val REQUEST_GALLERY = 101
@@ -66,19 +71,17 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         binding.tvUserName.text = MyUser.name
         binding.tvUserRank.text = MyUser.rank
         binding.tvUserScore.text = MyUser.score.toString()
-        //binding.ivProfilePicture.setImageURI(MyUser.profilePicture.toUri())
-        Firebase.firestore.collection("users").document(MyUser.id!!).get().addOnSuccessListener {
-            Glide.with(requireContext()).load(it.data?.get("onlineProfilePictureUri")).into(binding.ivProfilePicture)
-        }
+        Glide.with(requireContext()).load(MyUser.profilePictureUrl).into(binding.ivProfilePicture)
+
         binding.ivProfilePicture.setOnClickListener { changeProfilePicture() }
         setNextTraining()
     }
 
     private fun setNextTraining() {
-        val db = Firebase.firestore.collection("users").document(MyUser.id!!)
+        val db = Firebase.firestore.collection("users").document(user!!.uid)
         db.get().addOnSuccessListener { document ->
             if (document != null) {
-                val trainingList = document.data?.get("trainings") as ArrayList<HashMap<String, Any>>
+                val trainingList = document.data!!["trainings"] as ArrayList<HashMap<String, Any>>
                 if (trainingList.isNotEmpty()) {
                     var nextTrainingHashMap = trainingList[0]
                     if (trainingList.size > 1)
@@ -132,12 +135,12 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_GALLERY && resultCode == RESULT_OK) {
             data?.data?.let {
-                (activity as MainActivity).uploadImageToStorage(it)
-                (activity as MainActivity).updateUserProfilePictureUri(
-                    (activity as MainActivity).storage.child("profile_pictures/${MyUser.id!!}.jpg")
-                )
-                //MyUser.profilePicture = it.toString()
                 binding.ivProfilePicture.setImageURI(it)
+                lifecycleScope.launch {
+                    FirebaseHelper.uploadImageFromUri(it, "profile_pictures/${user!!.uid}")
+                    val newImageUrl = FirebaseHelper.getImageUrl("profile_pictures/${user.uid}").toString()
+                    FirebaseHelper.updateFieldInCollectionDocument("users", user.uid, "profilePictureUrl", newImageUrl)
+                }
             }
         }
     }

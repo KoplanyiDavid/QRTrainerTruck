@@ -2,21 +2,20 @@ package com.vicegym.qrtrainertruck.authentication
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.PopupWindow
+import androidx.lifecycle.lifecycleScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import com.vicegym.qrtrainertruck.data.MyUser
 import com.vicegym.qrtrainertruck.databinding.ActivityLoginBinding
 import com.vicegym.qrtrainertruck.databinding.PopupWindowForgotPasswordBinding
+import com.vicegym.qrtrainertruck.helpers.FirebaseHelper
 import com.vicegym.qrtrainertruck.mainactivity.MainActivity
 import com.vicegym.qrtrainertruck.otheractivities.BaseActivity
-import com.vicegym.qrtrainertruck.otheractivities.LoadingScreenActivity
+import kotlinx.coroutines.launch
 
 class LoginActivity : BaseActivity() {
 
@@ -41,7 +40,11 @@ class LoginActivity : BaseActivity() {
         user = auth.currentUser
         user?.reload() // <-- enélkül ha fb-ből törlődik a user, az app crashel, mert cacheből még betölti a usert
         if (user != null && user!!.isEmailVerified) {
-            getUserData()
+            lifecycleScope.launch {
+                FirebaseHelper.loadMyUser(user!!.uid)
+                startActivity(Intent(baseContext, MainActivity::class.java))
+                finish()
+            }
         } else
             init()
     }
@@ -50,12 +53,11 @@ class LoginActivity : BaseActivity() {
         binding.btnSignIn.setOnClickListener { signInWithEmailAndPassword() }
         binding.btnRegister.setOnClickListener {
             startActivity(Intent(this, RegisterFormActivity::class.java))
-            finish()
         }
         binding.btnForgotPassword.setOnClickListener { popupWindow() }
     }
 
-    private fun getUserData() {
+    /*private fun getUserData() {
         startActivity(Intent(this, LoadingScreenActivity::class.java))
         finish()
         val db = Firebase.firestore.collection("users").document("${Firebase.auth.currentUser?.uid}")
@@ -79,7 +81,7 @@ class LoginActivity : BaseActivity() {
             .addOnFailureListener { exception ->
                 Log.d("FirestoreComm", "get failed with ", exception)
             }
-    }
+    }*/
 
 /*    private fun findNextTraining(trainingList: ArrayList<HashMap<String, Any>>): TrainingData {
         var nextTrainingHashMap = trainingList[0]
@@ -158,7 +160,11 @@ class LoginActivity : BaseActivity() {
                         user = Firebase.auth.currentUser
                         user!!.reload()
                         if (user!!.isEmailVerified) {
-                            getUserData()
+                            lifecycleScope.launch {
+                                FirebaseHelper.loadMyUser(user!!.uid)
+                                startActivity(Intent(baseContext, MainActivity::class.java))
+                                finish()
+                            }
                         } else {
                             buildAlertDialog("FIGYELEM!", "Nem erősítetted meg a regisztrációt az emailben kapott link segítségével!")
                         }

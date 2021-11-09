@@ -18,7 +18,6 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import com.vicegym.qrtrainertruck.data.MyUser
 import com.vicegym.qrtrainertruck.data.TrainingData
 import com.vicegym.qrtrainertruck.databinding.CardTrainingBinding
 
@@ -27,6 +26,7 @@ class TrainingsAdapter(private val context: Context) :
 
     private val trainingsList: MutableList<TrainingData> = mutableListOf()
     private var lastPosition = -1
+    private val user = Firebase.auth.currentUser
 
     class TrainingsViewHolder(binding: CardTrainingBinding) : RecyclerView.ViewHolder(binding.root) {
         val tvTrainingType = binding.tvTrainingType
@@ -54,7 +54,7 @@ class TrainingsAdapter(private val context: Context) :
 
     private fun setGreenCards(card: CardView, tmpTraining: TrainingData) {
         val db = Firebase.firestore.collection("users")
-        db.document("${Firebase.auth.currentUser?.uid}").get().addOnSuccessListener { document ->
+        db.document(user!!.uid).get().addOnSuccessListener { document ->
             if (document.exists() && document != null) {
                 val trainings = document.data?.get("trainings") as ArrayList<HashMap<String, Any>>
                 for (training in trainings) {
@@ -72,8 +72,8 @@ class TrainingsAdapter(private val context: Context) :
         val db = Firebase.firestore.collection("trainings").document(id)
         db.get().addOnSuccessListener { document ->
             val trainingList = document.data?.get("trainees") as ArrayList<String>
-            if (!(trainingList.contains(MyUser.id))) {
-                db.update("trainees", FieldValue.arrayUnion(MyUser.id))
+            if (!(trainingList.contains(user!!.uid))) {
+                db.update("trainees", FieldValue.arrayUnion(user.uid))
                 val trainingData = TrainingData()
                 trainingData.id = document.data?.get("id") as String
                 trainingData.title = document.data?.get("title") as String
@@ -83,8 +83,8 @@ class TrainingsAdapter(private val context: Context) :
                 trainingData.sorter = document.data?.get("sorter") as Long
                 uploadUserTrainingData(trainingData)
                 card.setCardBackgroundColor(GREEN)
-            } else if (trainingList.contains(MyUser.id)) {
-                db.update("trainees", FieldValue.arrayRemove(MyUser.id))
+            } else if (trainingList.contains(user.uid)) {
+                db.update("trainees", FieldValue.arrayRemove(user.uid))
                 val trainingData = TrainingData()
                 trainingData.id = document.data?.get("id") as String
                 trainingData.title = document.data?.get("title") as String
@@ -99,12 +99,12 @@ class TrainingsAdapter(private val context: Context) :
     }
 
     private fun uploadUserTrainingData(trainingData: TrainingData) {
-        val db = Firebase.firestore.collection("users").document(MyUser.id!!)
+        val db = Firebase.firestore.collection("users").document(user!!.uid)
         db.update("trainings", FieldValue.arrayUnion(trainingData))
     }
 
     private fun deleteUserTrainingData(trainingData: TrainingData) {
-        val db = Firebase.firestore.collection("users").document(MyUser.id!!)
+        val db = Firebase.firestore.collection("users").document(user!!.uid)
         db.update("trainings", FieldValue.arrayRemove(trainingData))
     }
 

@@ -12,17 +12,20 @@ import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
-import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.vicegym.qrtrainertruck.data.MyUser
 import com.vicegym.qrtrainertruck.databinding.FragmentProfileBinding
-import com.vicegym.qrtrainertruck.otheractivities.BaseActivity
+import com.vicegym.qrtrainertruck.helpers.FirebaseHelper
 import com.vicegym.qrtrainertruck.otheractivities.UserDataModifyActivity
+import kotlinx.coroutines.launch
 
 class ProfileFragment : Fragment() {
 
     private lateinit var binding: FragmentProfileBinding
+    private val user = Firebase.auth.currentUser
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -43,9 +46,7 @@ class ProfileFragment : Fragment() {
         binding.tvProfFragmentName.text = MyUser.name
         binding.tvProfFragmentEmail.text = MyUser.email
         binding.tvProfFragmentMobile.text = MyUser.mobile
-        Firebase.firestore.collection("users").document(MyUser.id!!).get().addOnSuccessListener {
-            Glide.with(requireContext()).load(it.data?.get("onlineProfilePictureUri")).into(binding.ivProfPic)
-        }
+        Glide.with(requireContext()).load(MyUser.profilePictureUrl).into(binding.ivProfPic)
         binding.ivProfPic.setOnClickListener {
             changeProfilePicture()
         }
@@ -91,13 +92,13 @@ class ProfileFragment : Fragment() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_GALLERY) {
             data?.data?.let {
-                (activity as MainActivity).uploadImageToStorage(it)
-                (activity as MainActivity).updateUserProfilePictureUri(
-                    (activity as BaseActivity).storage
-                        .child("profile_pictures/${MyUser.id!!}.jpg")
-                )
-                //MyUser.profilePicture = it.toString()
+                MyUser.profilePictureUrl = it.toString()
                 binding.ivProfPic.setImageURI(it)
+                lifecycleScope.launch {
+                    FirebaseHelper.uploadImageFromUri(it, "profile_pictures/${user!!.uid}")
+                    val newPath = FirebaseHelper.getImageUrl("profile_pictures/${user.uid}")
+                    FirebaseHelper.updateFieldInCollectionDocument("users", user.uid, "profilePictureUrl", newPath.toString())
+                }
             }
         }
 
