@@ -95,6 +95,7 @@ class ProfileFragment : Fragment() {
                 MyUser.profilePictureUrl = it.toString()
                 binding.ivProfPic.setImageURI(it)
                 lifecycleScope.launch {
+                    MyUser.profilePictureUrl = it.toString()
                     FirebaseHelper.uploadImageFromUri(it, "profile_pictures/${user!!.uid}")
                     val newPath = FirebaseHelper.getImageUrl("profile_pictures/${user.uid}")
                     FirebaseHelper.updateFieldInCollectionDocument("users", user.uid, "profilePictureUrl", newPath.toString())

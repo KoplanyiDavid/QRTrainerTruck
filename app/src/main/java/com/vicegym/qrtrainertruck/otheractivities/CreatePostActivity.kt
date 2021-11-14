@@ -256,7 +256,7 @@ class CreatePostActivity : BaseActivity() {
             FirebaseHelper.uploadImageFromImageView(binding.ivDailyChallengePicture, "postimages/${user!!.uid}_$time.jpg")
             val imageUrl = FirebaseHelper.getImageUrl("postimages/${user.uid}_$time.jpg")
             val newPost = hashMapOf<String, Any>(
-                "uid" to user.uid,
+                "authorId" to user.uid,
                 "authorName" to MyUser.name!!,
                 "time" to binding.etDailyChallengeTime.text.toString(),
                 "description" to binding.etDailyChallengeDescription.text.toString(),

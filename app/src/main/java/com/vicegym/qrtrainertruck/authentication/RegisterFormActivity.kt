@@ -13,6 +13,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.vicegym.qrtrainertruck.data.TrainingData
 import com.vicegym.qrtrainertruck.databinding.ActivityRegisterFormBinding
@@ -117,9 +118,12 @@ open class RegisterFormActivity : BaseActivity() {
                                 "trainings" to trainings
                             )
                             FirebaseHelper.setCollectionDocument("users", user!!.uid, userData)
+                            sendVerificationEmail()
+                            //Firebase.firestore.collection("users").document(user!!.uid).set(userData).addOnSuccessListener {
+                                //sendVerificationEmail()
+                            //}
                         }
 
-                        sendVerificationEmail()
                     } else {
                         // If sign in fails, display a message to the user.
                         buildAlertDialog("HIBA", "Hibakód:\n" + task.exception.toString())

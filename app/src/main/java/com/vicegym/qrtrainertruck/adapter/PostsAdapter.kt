@@ -16,8 +16,10 @@ import com.bumptech.glide.Glide
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 import com.vicegym.qrtrainertruck.data.Post
 import com.vicegym.qrtrainertruck.databinding.CardPostBinding
+import com.vicegym.qrtrainertruck.helpers.FirebaseHelper
 
 class PostsAdapter(private val context: Context) :
     ListAdapter<Post, PostsAdapter.PostViewHolder>(ItemCallback) {
@@ -38,10 +40,11 @@ class PostsAdapter(private val context: Context) :
 
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
         val tmpPost = postList[position]
-        Firebase.firestore.collection("users").document(tmpPost.uid!!).get().addOnSuccessListener {
-            if (it.exists())
-                Glide.with(context).load(Uri.parse(it.data?.get("profilePictureUrl") as String?)).into(holder.ivProfilePicture)
+
+        Firebase.storage.reference.child("profile_pictures/${tmpPost.authorId}").downloadUrl.addOnSuccessListener {
+            Glide.with(context).load(it).into(holder.ivProfilePicture)
         }
+
         holder.tvAuthor.text = tmpPost.authorName
         holder.tvTime.text = tmpPost.time
         holder.tvDescription.text = tmpPost.description

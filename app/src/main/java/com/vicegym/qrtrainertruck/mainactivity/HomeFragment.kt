@@ -137,6 +137,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
             data?.data?.let {
                 binding.ivProfilePicture.setImageURI(it)
                 lifecycleScope.launch {
+                    MyUser.profilePictureUrl = it.toString()
                     FirebaseHelper.uploadImageFromUri(it, "profile_pictures/${user!!.uid}")
                     val newImageUrl = FirebaseHelper.getImageUrl("profile_pictures/${user.uid}").toString()
                     FirebaseHelper.updateFieldInCollectionDocument("users", user.uid, "profilePictureUrl", newImageUrl)

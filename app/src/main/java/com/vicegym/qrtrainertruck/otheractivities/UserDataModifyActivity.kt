@@ -22,6 +22,7 @@ import com.vicegym.qrtrainertruck.R
 import com.vicegym.qrtrainertruck.authentication.LoginActivity
 import com.vicegym.qrtrainertruck.data.MyUser
 import com.vicegym.qrtrainertruck.databinding.ActivityUserDataModifyBinding
+import com.vicegym.qrtrainertruck.helpers.FirebaseHelper
 
 class UserDataModifyActivity : BaseActivity() {
     private lateinit var binding: ActivityUserDataModifyBinding
@@ -69,17 +70,9 @@ class UserDataModifyActivity : BaseActivity() {
                 if (s.isNullOrEmpty())
                     return
                 MyUser.name = s.toString()
-                val profileUpdates = userProfileChangeRequest {
-                    displayName = MyUser.name
-                }
 
-                Firebase.auth.currentUser!!.updateProfile(profileUpdates)
-                    .addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-                            Log.d("FBUpdateUserName", "User profile updated.")
-                        }
-                    }
-                Firebase.firestore.collection("users").document(user!!.uid).update("name", MyUser.name)
+                //Firebase.firestore.collection("users").document(user!!.uid).update("name", MyUser.name)
+                FirebaseHelper.updateFieldInCollectionDocument("users", user!!.uid, "name", MyUser.name)
             }
         })
         binding.etProfEmail.addTextChangedListener(object : TextWatcher {
@@ -99,8 +92,8 @@ class UserDataModifyActivity : BaseActivity() {
                                 Log.d("FBUpdateUserEmail", "User email address updated.")
                             }
                         }
-                    val db = Firebase.firestore
-                    db.collection("users").document(user.uid).update("email", MyUser.email)
+                    //Firebase.firestore.collection("users").document(user.uid).update("email", MyUser.email)
+                    FirebaseHelper.updateFieldInCollectionDocument("users", user.uid, "email", MyUser.email)
                 }
             }
         })
@@ -114,8 +107,8 @@ class UserDataModifyActivity : BaseActivity() {
                     return
                 if (s.length == 11 || s.length == 12) {
                     MyUser.mobile = s.toString()
-                    val db = Firebase.firestore
-                    db.collection("users").document(user!!.uid).update("mobile", MyUser.mobile)
+                    //Firebase.firestore.collection("users").document(user!!.uid).update("mobile", MyUser.mobile)
+                    FirebaseHelper.updateFieldInCollectionDocument("users", user!!.uid, "mobile", MyUser.mobile)
                 }
             }
         })
@@ -147,7 +140,7 @@ class UserDataModifyActivity : BaseActivity() {
 
         /* Delete user data from Storage */
 
-        val storageRef = Firebase.storage.reference.child("profile_pictures/${user.uid}.jpg")
+        val storageRef = Firebase.storage.reference.child("profile_pictures/${user.uid}")
         storageRef.delete()
 
         Firebase.auth.currentUser!!.delete()

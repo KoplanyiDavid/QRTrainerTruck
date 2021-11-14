@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
@@ -17,15 +18,10 @@ object FirebaseHelper: AppCompatActivity() {
 
     val storage = Firebase.storage.reference
 
-    fun setCollectionDocument(collection: String, document: String, data: HashMap<String, Any>) {
+    suspend fun setCollectionDocument(collection: String, document: String, data: HashMap<String, Any>) {
         val db = Firebase.firestore.collection(collection).document(document)
-        db.set(data)
-            .addOnSuccessListener {
-                //TODO
-            }
-            .addOnFailureListener { e ->
-                //TODO
-            }
+        db.set(data).await()
+
     }
 
     suspend fun loadMyUser(userid: String) {
