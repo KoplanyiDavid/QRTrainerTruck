@@ -13,7 +13,6 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.vicegym.qrtrainertruck.data.TrainingData
 import com.vicegym.qrtrainertruck.databinding.ActivityRegisterFormBinding
@@ -105,14 +104,12 @@ open class RegisterFormActivity : BaseActivity() {
                         val trainings = ArrayList<TrainingData>()
                         lifecycleScope.launch {
                             FirebaseHelper.uploadImageFromImageView(binding.ivRegisterProfPic, "profile_pictures/${user!!.uid}")
-                            val profilePictureUrl = FirebaseHelper.getImageUrl("profile_pictures/${user!!.uid}")
                             val userData = hashMapOf<String, Any>(
                                 "id" to user!!.uid,
                                 "name" to binding.etName.text.toString(),
                                 "email" to email,
                                 "mobile" to "null",
                                 "acceptedtermsandcons" to true,
-                                "profilePictureUrl" to profilePictureUrl.toString(),
                                 "rank" to "Újonc",
                                 "score" to 0,
                                 "trainings" to trainings

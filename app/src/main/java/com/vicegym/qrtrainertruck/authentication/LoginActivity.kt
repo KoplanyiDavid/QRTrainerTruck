@@ -84,35 +84,6 @@ class LoginActivity : BaseActivity() {
             }
     }*/
 
-/*    private fun findNextTraining(trainingList: ArrayList<HashMap<String, Any>>): TrainingData {
-        var nextTrainingHashMap = trainingList[0]
-        for (training in trainingList) {
-            if ((training["sorter"] as Long) < (nextTrainingHashMap["sorter"] as Long)) {
-                nextTrainingHashMap = training
-            }
-        }
-        val nextTraining = TrainingData()
-        nextTraining.date = nextTrainingHashMap["date"] as String
-        nextTraining.location = nextTrainingHashMap["location"] as String
-        return nextTraining
-    }*/
-
-    /*private fun downloadUserProfilePicture() {
-        val storageRef = Firebase.storage.reference
-        val imageRef = storageRef.child("profile_pictures/${MyUser.id!!}.jpg")
-        val localFile = File.createTempFile("profilepicture", "jpg")
-        imageRef.getFile(localFile).addOnSuccessListener {
-            Log.d("DWPIC", "OK")
-            MyUser.profilePicture = Uri.fromFile(localFile).toString()
-            startActivity(Intent(baseContext, MainActivity::class.java))
-            finish()
-        }
-            .addOnFailureListener {
-                Log.d("DWPIC", "NEM OK: $it")
-            }
-    }*/
-
-
     private fun popupWindow() {
         val popupBinding: PopupWindowForgotPasswordBinding = PopupWindowForgotPasswordBinding.inflate(layoutInflater)
         val popupWindow = PopupWindow(popupBinding.root, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)

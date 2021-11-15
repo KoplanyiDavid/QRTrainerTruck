@@ -4,7 +4,6 @@ import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.widget.ImageView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
@@ -16,7 +15,7 @@ import java.io.ByteArrayOutputStream
 
 object FirebaseHelper: AppCompatActivity() {
 
-    val storage = Firebase.storage.reference
+    private val storage = Firebase.storage.reference
 
     suspend fun setCollectionDocument(collection: String, document: String, data: HashMap<String, Any>) {
         val db = Firebase.firestore.collection(collection).document(document)
@@ -30,7 +29,7 @@ object FirebaseHelper: AppCompatActivity() {
         MyUser.name = db.get().await().data!!["name"] as String
         MyUser.email = db.get().await().data!!["email"] as String
         MyUser.mobile = db.get().await().data!!["mobile"] as String
-        MyUser.profilePictureUrl = db.get().await().data!!["profilePictureUrl"] as String
+        MyUser.profilePictureUrl = getImageUrl("profile_pictures/$userid").toString()
         MyUser.rank = db.get().await().data!!["rank"] as String
         MyUser.score = db.get().await().data!!["score"] as Number
     }
