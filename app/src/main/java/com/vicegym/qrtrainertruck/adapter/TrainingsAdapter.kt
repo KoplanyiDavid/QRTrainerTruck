@@ -2,9 +2,8 @@ package com.vicegym.qrtrainertruck.adapter
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Color.DKGRAY
 import android.graphics.Color.GREEN
-import android.util.Log
+import android.graphics.Color.LTGRAY
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -45,67 +44,53 @@ class TrainingsAdapter(private val context: Context) :
         holder.tvTrainer.text = tmpTraining.trainer
         holder.tvGymPlace.text = tmpTraining.location
         holder.tvDate.text = tmpTraining.date
-        setGreenCards(holder.card, tmpTraining)
+        setCardsColor(holder.card, tmpTraining.trainees!!)
         holder.card.setOnClickListener {
-            manageTraining(tmpTraining.id!!, holder.card)
+            manageTraining(tmpTraining, holder.card)
         }
         setAnimation(holder.itemView, position)
     }
 
-    private fun setGreenCards(card: CardView, tmpTraining: TrainingData) {
-        val db = Firebase.firestore.collection("users")
-        db.document(user!!.uid).get().addOnSuccessListener { document ->
-            if (document.exists() && document != null) {
-                val trainings = document.data?.get("trainings") as ArrayList<HashMap<String, Any>>
-                for (training in trainings) {
-                    if (tmpTraining.id == training["id"])
-                        card.setCardBackgroundColor(GREEN)
-                }
-            }
+    private fun setCardsColor(card: CardView, trainees: ArrayList<String>) {
+        if (trainees.contains(user!!.uid))
+            card.setCardBackgroundColor(GREEN)
+        else
+            card.setCardBackgroundColor(LTGRAY)
+    }
+
+    private fun manageTraining(training: TrainingData, card: CardView) {
+        /* Ha a user nem szerepel a trainees között */
+        //user felvétele az edzés trainees-hez//
+        if (!(training.trainees!!.contains(user!!.uid))) {
+            val db = Firebase.firestore
+            db.collection("trainings").document(training.sorter.toString())
+                .update("trainees", FieldValue.arrayUnion(user.uid))
+
+            //edzes felvétele a userhez
+            val data = hashMapOf(
+                "date" to training.date,
+                "location" to training.location,
+                "sorter" to training.sorter
+            )
+            db.collection("users").document(user.uid).update("trainings", FieldValue.arrayUnion(data))
+
+            card.setCardBackgroundColor(GREEN)
         }
-            .addOnFailureListener { exception ->
-                Log.d("FirestoreComm", "get failed with ", exception)
-            }
-    }
+        else {
+            val db = Firebase.firestore
+            db.collection("trainings").document(training.sorter.toString())
+                .update("trainees", FieldValue.arrayRemove(user.uid))
 
-    private fun manageTraining(id: String, card: CardView) {
-        val db = Firebase.firestore.collection("trainings").document(id)
-        db.get().addOnSuccessListener { document ->
-            val trainingList = document.data?.get("trainees") as ArrayList<String>
-            if (!(trainingList.contains(user!!.uid))) {
-                db.update("trainees", FieldValue.arrayUnion(user.uid))
-                val trainingData = TrainingData()
-                trainingData.id = document.data?.get("id") as String
-                trainingData.title = document.data?.get("title") as String
-                trainingData.date = document.data?.get("date") as String
-                trainingData.location = document.data?.get("location") as String
-                trainingData.trainer = document.data?.get("trainer") as String
-                trainingData.sorter = document.data?.get("sorter") as Long
-                uploadUserTrainingData(trainingData)
-                card.setCardBackgroundColor(GREEN)
-            } else if (trainingList.contains(user.uid)) {
-                db.update("trainees", FieldValue.arrayRemove(user.uid))
-                val trainingData = TrainingData()
-                trainingData.id = document.data?.get("id") as String
-                trainingData.title = document.data?.get("title") as String
-                trainingData.date = document.data?.get("date") as String
-                trainingData.location = document.data?.get("location") as String
-                trainingData.trainer = document.data?.get("trainer") as String
-                trainingData.sorter = document.data?.get("sorter") as Long
-                deleteUserTrainingData(trainingData)
-                card.setCardBackgroundColor(DKGRAY)
-            }
+            //edzes torlese a userbol
+            val data = hashMapOf(
+                "date" to training.date,
+                "location" to training.location,
+                "sorter" to training.sorter
+            )
+            db.collection("users").document(user.uid).update("trainings", FieldValue.arrayRemove(data))
+
+            card.setBackgroundColor(LTGRAY)
         }
-    }
-
-    private fun uploadUserTrainingData(trainingData: TrainingData) {
-        val db = Firebase.firestore.collection("users").document(user!!.uid)
-        db.update("trainings", FieldValue.arrayUnion(trainingData))
-    }
-
-    private fun deleteUserTrainingData(trainingData: TrainingData) {
-        val db = Firebase.firestore.collection("users").document(user!!.uid)
-        db.update("trainings", FieldValue.arrayRemove(trainingData))
     }
 
     fun addTrainings(training: TrainingData?) {
@@ -113,6 +98,13 @@ class TrainingsAdapter(private val context: Context) :
 
         trainingsList += (training)
         submitList((trainingsList))
+    }
+
+    fun removeTrainings(training: TrainingData?) {
+        training ?: return
+
+        trainingsList -= training
+        submitList(trainingsList)
     }
 
     private fun setAnimation(viewToAnimate: View, position: Int) {

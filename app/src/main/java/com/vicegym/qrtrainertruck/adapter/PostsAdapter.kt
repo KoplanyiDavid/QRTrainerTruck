@@ -2,7 +2,6 @@ package com.vicegym.qrtrainertruck.adapter
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,12 +13,10 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.material.imageview.ShapeableImageView
-import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.vicegym.qrtrainertruck.data.Post
 import com.vicegym.qrtrainertruck.databinding.CardPostBinding
-import com.vicegym.qrtrainertruck.helpers.FirebaseHelper
 
 class PostsAdapter(private val context: Context) :
     ListAdapter<Post, PostsAdapter.PostViewHolder>(ItemCallback) {
@@ -55,6 +52,12 @@ class PostsAdapter(private val context: Context) :
     fun addPost(post: Post?) {
         post ?: return
         postList += (post)
+        submitList((postList))
+    }
+
+    fun removePost(post: Post?) {
+        post ?: return
+        postList -= (post)
         submitList((postList))
     }
 

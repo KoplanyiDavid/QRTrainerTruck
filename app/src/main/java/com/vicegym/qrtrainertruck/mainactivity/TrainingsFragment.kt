@@ -55,8 +55,7 @@ class TrainingsFragment : Fragment() {
                         DocumentChange.Type.ADDED -> trainingsAdapter.addTrainings(dc.document.toObject())
                         DocumentChange.Type.MODIFIED -> {
                         }
-                        DocumentChange.Type.REMOVED -> {
-                        }
+                        DocumentChange.Type.REMOVED -> trainingsAdapter.removeTrainings(dc.document.toObject())
                     }
                 }
             }

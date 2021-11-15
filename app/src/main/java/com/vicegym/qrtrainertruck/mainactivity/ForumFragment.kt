@@ -61,7 +61,7 @@ class ForumFragment : Fragment() {
                     when (dc.type) {
                         DocumentChange.Type.ADDED -> postsAdapter.addPost(dc.document.toObject())
                         DocumentChange.Type.MODIFIED -> {}
-                        DocumentChange.Type.REMOVED -> {}
+                        DocumentChange.Type.REMOVED -> postsAdapter.removePost(dc.document.toObject())
                     }
                 }
             }
