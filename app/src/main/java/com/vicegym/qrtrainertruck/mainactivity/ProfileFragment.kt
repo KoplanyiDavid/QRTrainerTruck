@@ -46,7 +46,7 @@ class ProfileFragment : Fragment() {
         binding.tvProfFragmentName.text = MyUser.name
         binding.tvProfFragmentEmail.text = MyUser.email
         binding.tvProfFragmentMobile.text = MyUser.mobile
-        Glide.with(requireContext()).load(MyUser.profilePictureUrl).into(binding.ivProfPic)
+        Glide.with(requireContext()).load(FirebaseHelper.profilePictureUrl).into(binding.ivProfPic)
         binding.ivProfPic.setOnClickListener {
             changeProfilePicture()
         }
@@ -92,10 +92,9 @@ class ProfileFragment : Fragment() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_GALLERY) {
             data?.data?.let {
-                MyUser.profilePictureUrl = it.toString()
+                FirebaseHelper.profilePictureUrl = it
                 binding.ivProfPic.setImageURI(it)
                 lifecycleScope.launch {
-                    MyUser.profilePictureUrl = it.toString()
                     FirebaseHelper.uploadImageFromUri(it, "profile_pictures/${user!!.uid}")
                     val newPath = FirebaseHelper.getImageUrl("profile_pictures/${user.uid}")
                     FirebaseHelper.updateFieldInCollectionDocument("users", user.uid, "profilePictureUrl", newPath.toString())
@@ -107,29 +106,6 @@ class ProfileFragment : Fragment() {
             init()
         }
     }
-
-/*    private fun uploadImageToStorage(file: Uri) {
-        val storageRef = Firebase.storage.reference
-        val metadata = storageMetadata { contentType = "profile_image/jpeg" }
-        val uploadTask = storageRef.child("profile_pictures/${MyUser.id!!}.jpg").putFile(file, metadata)
-        uploadTask.addOnProgressListener { (bytesTransferred, totalByteCount) ->
-            val progress = (100.0 * bytesTransferred) / totalByteCount
-            Log.d("UploadImage", "Upload is $progress% done")
-        }.addOnPausedListener {
-            Log.d("UploadImage", "Upload is paused")
-        }.addOnFailureListener {
-            Log.d("UploadImage", "NEM OK: $it")
-        }.addOnSuccessListener {
-            getUri(storageRef.child("profile_pictures/${MyUser.id!!}.jpg"))
-            Log.d("UploadImage", "OK")
-        }
-    }
-
-    private fun getUri(child: StorageReference) {
-        child.downloadUrl.addOnSuccessListener {
-            Firebase.firestore.collection("users").document(MyUser.id!!).update("onlineProfilePictureUri", it.toString())
-        }
-    }*/
 
     companion object {
         private const val REQUEST_GALLERY = 1000

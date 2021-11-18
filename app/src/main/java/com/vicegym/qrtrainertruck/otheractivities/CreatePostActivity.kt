@@ -219,6 +219,7 @@ class CreatePostActivity : BaseActivity() {
                     binding.btnDailyChallengeSendPost.isClickable = false //ne töltse fel többször ugyanazt
                     loadingAlertDialog()
                     uploadPost()
+                    finish()
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
@@ -227,7 +228,8 @@ class CreatePostActivity : BaseActivity() {
     }
 
     private fun loadingAlertDialog() {
-        val dialog = AlertDialog.Builder(this).setTitle("Poszt feltöltése...")
+        val dialog = AlertDialog.Builder(this)
+            .setTitle("Poszt feltöltése...")
             .setMessage("A posztod feltöltése folyamatban van, kérlek légy türelemmel, amint befejeződik, én eltűnök...")
             .create()
         dialog.setCancelable(false)
@@ -264,7 +266,6 @@ class CreatePostActivity : BaseActivity() {
                 "sorter" to sorter
                 )
             FirebaseHelper.setCollectionDocument("posts", sorter.toString(), newPost)
-            finish()
         }
     }
 

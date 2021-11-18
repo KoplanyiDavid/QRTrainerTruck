@@ -4,18 +4,19 @@ import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.widget.ImageView
-import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.vicegym.qrtrainertruck.data.MyUser
+import com.vicegym.qrtrainertruck.otheractivities.BaseActivity
 import kotlinx.coroutines.tasks.await
 import java.io.ByteArrayOutputStream
 
-object FirebaseHelper: AppCompatActivity() {
+object FirebaseHelper : BaseActivity() {
 
     private val storage = Firebase.storage.reference
+    var profilePictureUrl: Uri? = null
 
     suspend fun setCollectionDocument(collection: String, document: String, data: HashMap<String, Any>) {
         val db = Firebase.firestore.collection(collection).document(document)
@@ -24,14 +25,26 @@ object FirebaseHelper: AppCompatActivity() {
     }
 
     suspend fun loadMyUser(userid: String) {
-        //startActivity(Intent(context, LoadingScreenActivity::class.java))
+        /*val loadingScreenBinding: ActivityLoadingScreenBinding = ActivityLoadingScreenBinding.inflate(layoutInflater)
+        val loadingScreenWindow = PopupWindow(loadingScreenBinding.root, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        loadingScreenWindow.elevation = 5.0f
+
+        loadingScreenWindow.showAtLocation(loadingScreenBinding.root, Gravity.CENTER, 0, 0)
+        loadingScreenWindow.isFocusable = true
+        loadingScreenWindow.update()*/
+
         val db = Firebase.firestore.collection("users").document(userid)
-        MyUser.name = db.get().await().data!!["name"] as String
-        MyUser.email = db.get().await().data!!["email"] as String
-        MyUser.mobile = db.get().await().data!!["mobile"] as String
-        MyUser.profilePictureUrl = getImageUrl("profile_pictures/$userid").toString()
-        MyUser.rank = db.get().await().data!!["rank"] as String
-        MyUser.score = db.get().await().data!!["score"] as Number
+        val data = db.get().await().data
+        if (data != null) {
+            MyUser.name = data["name"] as String
+            MyUser.email = data["email"] as String
+            MyUser.mobile = data["mobile"] as String
+            MyUser.rank = data["rank"] as String
+            MyUser.score = data["score"] as Number
+            profilePictureUrl = getImageUrl("profile_pictures/$userid")
+        }
+
+        //loadingScreenWindow.dismiss()
     }
 
     suspend fun getFieldInfoFromCollectionDocument(collection: String, document: String, field: String): Any? {
@@ -48,7 +61,7 @@ object FirebaseHelper: AppCompatActivity() {
                 //TODO
             }
             .addOnFailureListener { e ->
-            //TODO
+                //TODO
             }
     }
 
@@ -80,7 +93,7 @@ object FirebaseHelper: AppCompatActivity() {
 
         val del = hashMapOf<String, Any?>(field to FieldValue.delete())
 
-        ref.update(del).addOnCompleteListener {  }
+        ref.update(del).addOnCompleteListener { }
     }
 
     suspend fun getImageUrl(imagePath: String): Uri {

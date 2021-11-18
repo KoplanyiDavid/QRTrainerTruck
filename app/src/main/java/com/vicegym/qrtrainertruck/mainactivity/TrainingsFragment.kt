@@ -53,8 +53,7 @@ class TrainingsFragment : Fragment() {
                 for (dc in snapshots!!.documentChanges) {
                     when (dc.type) {
                         DocumentChange.Type.ADDED -> trainingsAdapter.addTrainings(dc.document.toObject())
-                        DocumentChange.Type.MODIFIED -> {
-                        }
+                        DocumentChange.Type.MODIFIED -> {}
                         DocumentChange.Type.REMOVED -> trainingsAdapter.removeTrainings(dc.document.toObject())
                     }
                 }

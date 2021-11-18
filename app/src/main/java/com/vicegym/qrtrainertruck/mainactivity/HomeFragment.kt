@@ -71,7 +71,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         binding.tvUserName.text = MyUser.name
         binding.tvUserRank.text = MyUser.rank
         binding.tvUserScore.text = MyUser.score.toString()
-        Glide.with(requireContext()).load(MyUser.profilePictureUrl).into(binding.ivProfilePicture)
+        Glide.with(requireContext()).load(FirebaseHelper.profilePictureUrl).into(binding.ivProfilePicture)
 
         binding.ivProfilePicture.setOnClickListener { changeProfilePicture() }
         setNextTraining()
@@ -137,7 +137,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
             data?.data?.let {
                 binding.ivProfilePicture.setImageURI(it)
                 lifecycleScope.launch {
-                    MyUser.profilePictureUrl = it.toString()
+                    FirebaseHelper.profilePictureUrl = it
                     FirebaseHelper.uploadImageFromUri(it, "profile_pictures/${user!!.uid}")
                     val newImageUrl = FirebaseHelper.getImageUrl("profile_pictures/${user.uid}").toString()
                     FirebaseHelper.updateFieldInCollectionDocument("users", user.uid, "profilePictureUrl", newImageUrl)
@@ -145,29 +145,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
             }
         }
     }
-
-/*    private fun uploadImageToStorage(file: Uri) {
-        val storageRef = Firebase.storage.reference
-        val metadata = storageMetadata { contentType = "profile_image/jpeg" }
-        val uploadTask = storageRef.child("profile_pictures/${MyUser.id!!}.jpg").putFile(file, metadata)
-        uploadTask.addOnProgressListener { (bytesTransferred, totalByteCount) ->
-            val progress = (100.0 * bytesTransferred) / totalByteCount
-            Log.d("UploadImage", "Upload is $progress% done")
-        }.addOnPausedListener {
-            Log.d("UploadImage", "Upload is paused")
-        }.addOnFailureListener {
-            Log.d("UploadImage", "NEM OK: $it")
-        }.addOnSuccessListener {
-            getUri(storageRef.child("profile_pictures/${MyUser.id!!}.jpg"))
-            Log.d("UploadImage", "OK")
-        }
-    }
-
-    private fun getUri(child: StorageReference) {
-        child.downloadUrl.addOnSuccessListener {
-            Firebase.firestore.collection("users").document(MyUser.id!!).update("onlineProfilePictureUri", it.toString())
-        }
-    }*/
 
     override fun onStart() {
         super.onStart()

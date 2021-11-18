@@ -82,6 +82,8 @@ open class RegisterFormActivity : BaseActivity() {
     }
 
     private fun registerWithEmailAndPassword() {
+        binding.btnRegister.isClickable = false
+
         val name = binding.etName.text.toString()
         val email = binding.etEmail.text.toString()
         val password = binding.etPassword.text.toString()
@@ -95,8 +97,14 @@ open class RegisterFormActivity : BaseActivity() {
             buildAlertDialog(dialogMessage = "A jelszó megerősítése sikertelen.(Elírtál valamit?)")
         else {
             if (binding.cbTermsAndConditions.isChecked) {
+                val registerDialog = AlertDialog.Builder(this)
+                    .setTitle("Regisztráció folyamatban...")
+                    .create()
+
                 //register to database
-                Firebase.auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this) { task ->
+                registerDialog.show()
+                Firebase.auth.createUserWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(this) { task ->
                     if (task.isSuccessful) {
                         Log.d(TAG, "createUserWithEmail:success")
                         /* -- Set MyUser object data --*/
@@ -115,20 +123,20 @@ open class RegisterFormActivity : BaseActivity() {
                                 "trainings" to trainings
                             )
                             FirebaseHelper.setCollectionDocument("users", user!!.uid, userData)
+                            registerDialog.dismiss()
                             sendVerificationEmail()
-                            //Firebase.firestore.collection("users").document(user!!.uid).set(userData).addOnSuccessListener {
-                                //sendVerificationEmail()
-                            //}
                         }
 
                     } else {
-                        // If sign in fails, display a message to the user.
+                        registerDialog.dismiss()
                         buildAlertDialog("HIBA", "Hibakód:\n" + task.exception.toString())
                     }
                 }
             } else
                 buildAlertDialog(dialogMessage = "Nem fogadtad el a felhasználási feltételeket.")
         }
+
+        binding.btnRegister.isClickable = true
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {

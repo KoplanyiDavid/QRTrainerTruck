@@ -90,6 +90,8 @@ class TrainingsAdapter(private val context: Context) :
             db.collection("users").document(user.uid).update("trainings", FieldValue.arrayRemove(data))
 
             card.setBackgroundColor(LTGRAY)
+
+            submitList(trainingsList)
         }
     }
 

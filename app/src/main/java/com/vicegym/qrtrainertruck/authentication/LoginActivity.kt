@@ -5,17 +5,14 @@ import android.os.Bundle
 import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.PopupWindow
-import androidx.lifecycle.lifecycleScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.vicegym.qrtrainertruck.databinding.ActivityLoginBinding
 import com.vicegym.qrtrainertruck.databinding.PopupWindowForgotPasswordBinding
-import com.vicegym.qrtrainertruck.helpers.FirebaseHelper
-import com.vicegym.qrtrainertruck.mainactivity.MainActivity
 import com.vicegym.qrtrainertruck.otheractivities.BaseActivity
-import kotlinx.coroutines.launch
+import com.vicegym.qrtrainertruck.otheractivities.LoadingScreenActivity
 
 class LoginActivity : BaseActivity() {
 
@@ -40,11 +37,8 @@ class LoginActivity : BaseActivity() {
         user = auth.currentUser
         user?.reload() // <-- enélkül ha fb-ből törlődik a user, az app crashel, mert cacheből még betölti a usert
         if (user != null && user!!.isEmailVerified) {
-            lifecycleScope.launch {
-                FirebaseHelper.loadMyUser(user!!.uid)
-                startActivity(Intent(baseContext, MainActivity::class.java))
-                finish()
-            }
+            startActivity(Intent(baseContext, LoadingScreenActivity::class.java))
+            finish()
         } else
             init()
     }
@@ -57,32 +51,6 @@ class LoginActivity : BaseActivity() {
         }
         binding.btnForgotPassword.setOnClickListener { popupWindow() }
     }
-
-    /*private fun getUserData() {
-        startActivity(Intent(this, LoadingScreenActivity::class.java))
-        finish()
-        val db = Firebase.firestore.collection("users").document("${Firebase.auth.currentUser?.uid}")
-        db.get().addOnSuccessListener { document ->
-            if (document.exists() && document != null) {
-                MyUser.id = document.data?.get("id") as String?
-                MyUser.name = document.data?.get("name") as String?
-                MyUser.email = document.data?.get("email") as String?
-                MyUser.password = document.data?.get("password") as String?
-                MyUser.mobile = document.data?.get("mobile") as String?
-                MyUser.acceptedTermsAndConditions = document.data?.get("acceptedtermsandcons") as Boolean
-                MyUser.rank = document.data?.get("rank") as String
-                MyUser.score = document.data?.get("score") as Number
-                MyUser.onlineProfilePictureUri = document.data?.get("onlineProfilePictureUri") as String?
-                startActivity(Intent(baseContext, MainActivity::class.java))
-            } else {
-                Log.d("FirestoreComm", "No such document")
-                startActivity(Intent(baseContext, LoginActivity::class.java))
-            }
-        }
-            .addOnFailureListener { exception ->
-                Log.d("FirestoreComm", "get failed with ", exception)
-            }
-    }*/
 
     private fun popupWindow() {
         val popupBinding: PopupWindowForgotPasswordBinding = PopupWindowForgotPasswordBinding.inflate(layoutInflater)
@@ -132,11 +100,8 @@ class LoginActivity : BaseActivity() {
                         user = Firebase.auth.currentUser
                         user!!.reload()
                         if (user!!.isEmailVerified) {
-                            lifecycleScope.launch {
-                                FirebaseHelper.loadMyUser(user!!.uid)
-                                startActivity(Intent(baseContext, MainActivity::class.java))
-                                finish()
-                            }
+                            startActivity(Intent(baseContext, LoadingScreenActivity::class.java))
+                            finish()
                         } else {
                             buildAlertDialog("FIGYELEM!", "Nem erősítetted meg a regisztrációt az emailben kapott link segítségével!")
                         }

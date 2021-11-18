@@ -8,19 +8,24 @@ import android.content.IntentFilter
 import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
+import android.text.InputType
 import android.text.TextWatcher
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.EditText
 import android.widget.Toast
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.auth.ktx.userProfileChangeRequest
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.vicegym.qrtrainertruck.R
 import com.vicegym.qrtrainertruck.authentication.LoginActivity
 import com.vicegym.qrtrainertruck.data.MyUser
+import com.vicegym.qrtrainertruck.data.TrainingData
 import com.vicegym.qrtrainertruck.databinding.ActivityUserDataModifyBinding
 import com.vicegym.qrtrainertruck.helpers.FirebaseHelper
 
@@ -56,9 +61,9 @@ class UserDataModifyActivity : BaseActivity() {
         binding.btnChangePassword.setOnClickListener { changePasswordRequest() }
 
         /*--hint szövegek--*/
-        binding.etProfName.setText(MyUser.name)
-        binding.etProfEmail.setText(MyUser.email)
-        binding.etProfMobile.setText(MyUser.mobile)
+        binding.etProfName.hint = MyUser.name
+        binding.etProfEmail.hint = MyUser.email
+        binding.etProfMobile.hint = MyUser.mobile
 
         /*--edittextek szövegváltozás figyelői--*/
         binding.etProfName.addTextChangedListener(object : TextWatcher {
@@ -71,7 +76,6 @@ class UserDataModifyActivity : BaseActivity() {
                     return
                 MyUser.name = s.toString()
 
-                //Firebase.firestore.collection("users").document(user!!.uid).update("name", MyUser.name)
                 FirebaseHelper.updateFieldInCollectionDocument("users", user!!.uid, "name", MyUser.name)
             }
         })
@@ -92,7 +96,6 @@ class UserDataModifyActivity : BaseActivity() {
                                 Log.d("FBUpdateUserEmail", "User email address updated.")
                             }
                         }
-                    //Firebase.firestore.collection("users").document(user.uid).update("email", MyUser.email)
                     FirebaseHelper.updateFieldInCollectionDocument("users", user.uid, "email", MyUser.email)
                 }
             }
@@ -107,7 +110,6 @@ class UserDataModifyActivity : BaseActivity() {
                     return
                 if (s.length == 11 || s.length == 12) {
                     MyUser.mobile = s.toString()
-                    //Firebase.firestore.collection("users").document(user!!.uid).update("mobile", MyUser.mobile)
                     FirebaseHelper.updateFieldInCollectionDocument("users", user!!.uid, "mobile", MyUser.mobile)
                 }
             }
@@ -126,33 +128,74 @@ class UserDataModifyActivity : BaseActivity() {
 
     private fun deleteUserDialog() {
         val dialog = AlertDialog.Builder(this).setTitle("FIÓK VÉGLEGES TÖRLÉSE").setMessage("Biztosan törlöd a fiókodat?")
-            .setPositiveButton("Igen") { _, _ -> deleteUser() }
+            .setPositiveButton("Igen") { dialog, _ ->
+                dialog.dismiss()
+                deleteUser()
+            }
             .setNegativeButton("Nem") { dialog, _ -> dialog.cancel() }
             .create()
         dialog.show()
     }
 
     private fun deleteUser() {
-        /* Delete user data from firestore */
-        val db = Firebase.firestore
-        db.collection("users").document(user!!.uid)
-            .delete()
+        /* Reauth the user */
+        val passwordDailog = AlertDialog.Builder(this)
+        passwordDailog.setTitle("Add meg jelszavad a fiók törléséhez!")
 
-        /* Delete user data from Storage */
+        val input = EditText(this)
+        input.hint = "jelszó"
+        input.inputType = InputType.TYPE_TEXT_VARIATION_PASSWORD
 
-        val storageRef = Firebase.storage.reference.child("profile_pictures/${user.uid}")
-        storageRef.delete()
+        passwordDailog.setView(input)
 
-        Firebase.auth.currentUser!!.delete()
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    Toast.makeText(this, "Fiók törölve!", Toast.LENGTH_LONG).show()
-                    val broadcastIntent = Intent()
-                    broadcastIntent.action = "com.package.ACTION_LOGOUT"
-                    sendBroadcast(broadcastIntent)
-                    startActivity(Intent(applicationContext, LoginActivity::class.java))
+        passwordDailog.setPositiveButton("Törlés") { dialog, which ->
+            if (input.text.isNullOrEmpty() || user == null)
+                Toast.makeText(applicationContext, "Nem adtál meg jelszót!", Toast.LENGTH_LONG).show()
+            else {
+                /* Delete user data from firestore */
+                FirebaseHelper.deleteDocumentInCollection("users", user.uid)
+
+                /* Delete user data from Storage */
+                val storageRef = Firebase.storage.reference.child("profile_pictures/${user.uid}")
+                storageRef.delete()
+
+                /* Delete user from trainings */
+
+                val db = Firebase.firestore
+                val trainings: MutableList<TrainingData?> = mutableListOf()
+                db.collection("trainings").get().addOnSuccessListener {
+                    for (doc in it.documents) {
+                        doc ?: return@addOnSuccessListener
+                        trainings += doc.toObject()
+                    }
+
+                    for (training in trainings) {
+                        if (training!!.trainees.isNullOrEmpty())
+                            return@addOnSuccessListener
+                        else
+                            if (training.trainees!!.contains(user.uid))
+                                db.collection("trainings").document(training.sorter.toString())
+                                    .update("trainees", FieldValue.arrayRemove(user.uid))
+                    }
+                }
+
+                /* Delete user from Firebase */
+                val credential = EmailAuthProvider.getCredential(user.email!!, input.text.toString())
+                user.reauthenticate(credential).addOnCompleteListener {
+                    Firebase.auth.currentUser!!.delete()
+                        .addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                Toast.makeText(this, "Fiók törölve!", Toast.LENGTH_LONG).show()
+                                val broadcastIntent = Intent()
+                                broadcastIntent.action = "com.package.ACTION_LOGOUT"
+                                sendBroadcast(broadcastIntent)
+                                startActivity(Intent(applicationContext, LoginActivity::class.java))
+                            }
+                        }
                 }
             }
+        }
+        passwordDailog.show()
     }
 
     private fun validateUserData() {
