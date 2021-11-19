@@ -74,6 +74,8 @@ class TrainingsAdapter(private val context: Context) :
             )
             db.collection("users").document(user.uid).update("trainings", FieldValue.arrayUnion(data))
 
+            training.trainees!!.add(user.uid)
+            submitList(trainingsList)
             card.setCardBackgroundColor(GREEN)
         }
         else {
@@ -89,9 +91,9 @@ class TrainingsAdapter(private val context: Context) :
             )
             db.collection("users").document(user.uid).update("trainings", FieldValue.arrayRemove(data))
 
-            card.setBackgroundColor(LTGRAY)
-
+            training.trainees!!.remove(user.uid)
             submitList(trainingsList)
+            card.setCardBackgroundColor(LTGRAY)
         }
     }
 
