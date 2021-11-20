@@ -19,6 +19,7 @@ import com.vicegym.qrtrainertruck.databinding.ActivityRegisterFormBinding
 import com.vicegym.qrtrainertruck.helpers.FirebaseHelper
 import com.vicegym.qrtrainertruck.otheractivities.BaseActivity
 import kotlinx.coroutines.launch
+import java.util.*
 
 open class RegisterFormActivity : BaseActivity() {
 
@@ -116,7 +117,7 @@ open class RegisterFormActivity : BaseActivity() {
                                 "id" to user!!.uid,
                                 "name" to binding.etName.text.toString(),
                                 "email" to email,
-                                "mobile" to "null",
+                                "mobile" to "",
                                 "acceptedtermsandcons" to true,
                                 "rank" to "Újonc",
                                 "score" to 0,

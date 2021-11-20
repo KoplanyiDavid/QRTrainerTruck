@@ -58,5 +58,20 @@ class TrainingsFragment : Fragment() {
                     }
                 }
             }
+
+        db.collection("users")
+            .addSnapshotListener { snapshots, e ->
+                if (e != null) {
+                    return@addSnapshotListener
+                }
+
+                for (dc in snapshots!!.documentChanges) {
+                    when (dc.type) {
+                        DocumentChange.Type.ADDED -> trainingsAdapter.addUser(dc.document.toObject())
+                        DocumentChange.Type.MODIFIED -> {}
+                        DocumentChange.Type.REMOVED -> trainingsAdapter.removeUser(dc.document.toObject())
+                    }
+                }
+            }
     }
 }

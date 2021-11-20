@@ -1,9 +1,11 @@
 package com.vicegym.qrtrainertruck.adapter
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.Context
 import android.graphics.Color.GREEN
 import android.graphics.Color.LTGRAY
+import android.icu.text.SimpleDateFormat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,7 +20,9 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.vicegym.qrtrainertruck.data.TrainingData
+import com.vicegym.qrtrainertruck.data.UserData
 import com.vicegym.qrtrainertruck.databinding.CardTrainingBinding
+import java.util.*
 
 class TrainingsAdapter(private val context: Context) :
     ListAdapter<TrainingData, TrainingsAdapter.TrainingsViewHolder>(ItemCallback) {
@@ -26,6 +30,8 @@ class TrainingsAdapter(private val context: Context) :
     private val trainingsList: MutableList<TrainingData> = mutableListOf()
     private var lastPosition = -1
     private val user = Firebase.auth.currentUser
+    private val usersList: MutableList<UserData> = mutableListOf()
+    private val db = Firebase.firestore
 
     class TrainingsViewHolder(binding: CardTrainingBinding) : RecyclerView.ViewHolder(binding.root) {
         val tvTrainingType = binding.tvTrainingType
@@ -59,49 +65,106 @@ class TrainingsAdapter(private val context: Context) :
     }
 
     private fun manageTraining(training: TrainingData, card: CardView) {
+
+        var traineesData = ""
+
+        if (training.trainees!!.isNotEmpty()) {
+            for (traineeId in training.trainees!!) {
+                for (u in usersList) {
+                    if (traineeId.contentEquals(u.id)) {
+                        traineesData += "${u.name}\n"
+                    }
+                }
+            }
+        }
+
+        val alertDialog = AlertDialog.Builder(context)
+        alertDialog.setTitle("Jelentkezettek")
+        alertDialog.setMessage(traineesData)
+
         /* Ha a user nem szerepel a trainees között */
-        //user felvétele az edzés trainees-hez//
         if (!(training.trainees!!.contains(user!!.uid))) {
-            val db = Firebase.firestore
-            db.collection("trainings").document(training.sorter.toString())
-                .update("trainees", FieldValue.arrayUnion(user.uid))
+            alertDialog.setPositiveButton("Jelentkezés") { dialog, _ ->
+                //user felvétele az edzés trainees-hez//
+                val db = Firebase.firestore
+                db.collection("trainings").document(training.sorter.toString())
+                    .update("trainees", FieldValue.arrayUnion(user.uid))
 
-            //edzes felvétele a userhez
-            val data = hashMapOf(
-                "date" to training.date,
-                "location" to training.location,
-                "sorter" to training.sorter
-            )
-            db.collection("users").document(user.uid).update("trainings", FieldValue.arrayUnion(data))
+                //edzes felvétele a userhez
+                val data = hashMapOf(
+                    "date" to training.date,
+                    "location" to training.location,
+                    "sorter" to training.sorter
+                )
+                db.collection("users").document(user.uid).update("trainings", FieldValue.arrayUnion(data))
 
-            training.trainees!!.add(user.uid)
-            submitList(trainingsList)
-            card.setCardBackgroundColor(GREEN)
+                //lokális lista frissítése
+                training.trainees!!.add(user.uid)
+                submitList(trainingsList)
+                card.setCardBackgroundColor(GREEN)
+                dialog.dismiss()
+            }
+            alertDialog.setNegativeButton("Vissza") { dialog, _ ->
+                dialog.dismiss()
+            }
         }
         else {
-            val db = Firebase.firestore
-            db.collection("trainings").document(training.sorter.toString())
-                .update("trainees", FieldValue.arrayRemove(user.uid))
+            alertDialog.setPositiveButton("Leiratkozás") { dialog, _ ->
+                val db = Firebase.firestore
+                db.collection("trainings").document(training.sorter.toString())
+                    .update("trainees", FieldValue.arrayRemove(user.uid))
 
-            //edzes torlese a userbol
-            val data = hashMapOf(
-                "date" to training.date,
-                "location" to training.location,
-                "sorter" to training.sorter
-            )
-            db.collection("users").document(user.uid).update("trainings", FieldValue.arrayRemove(data))
+                //edzes torlese a userbol
+                val data = hashMapOf(
+                    "date" to training.date,
+                    "location" to training.location,
+                    "sorter" to training.sorter
+                )
+                db.collection("users").document(user.uid).update("trainings", FieldValue.arrayRemove(data))
 
-            training.trainees!!.remove(user.uid)
-            submitList(trainingsList)
-            card.setCardBackgroundColor(LTGRAY)
+                training.trainees!!.remove(user.uid)
+                submitList(trainingsList)
+                card.setCardBackgroundColor(LTGRAY)
+                dialog.dismiss()
+            }
         }
+        alertDialog.create().show()
     }
 
     fun addTrainings(training: TrainingData?) {
         training ?: return
 
-        trainingsList += (training)
-        submitList((trainingsList))
+        val formatter = SimpleDateFormat("yyyyMMddHHmm", Locale.US)
+        val curDate = Date()
+        val currentDateLong = formatter.format(curDate).toLong()
+
+        if (training.sorter!! < currentDateLong) {
+            //removeTrainings(training) firebaseből REMOVE meghivodik a snapshotlistener miatt??
+            removeTrainingFromFirebase(training)
+        }
+        else {
+            trainingsList += (training)
+            submitList((trainingsList))
+        }
+    }
+
+    private fun removeTrainingFromFirebase(training: TrainingData) {
+        db.collection("trainings").document(training.sorter.toString()).delete()
+
+        val data = hashMapOf(
+            "date" to training.date,
+            "location" to training.location,
+            "sorter" to training.sorter
+        )
+
+        for (traineeId in training.trainees!!) {
+            for (u in usersList) {
+                if (u.id.contentEquals(traineeId)) {
+                    db.collection("users").document(u.id!!)
+                        .update("trainings", FieldValue.arrayRemove(data))
+                }
+            }
+        }
     }
 
     fun removeTrainings(training: TrainingData?) {
@@ -109,6 +172,16 @@ class TrainingsAdapter(private val context: Context) :
 
         trainingsList -= training
         submitList(trainingsList)
+    }
+
+    fun addUser(user: UserData?) {
+        user ?: return
+        usersList += (user)
+    }
+
+    fun removeUser(user: UserData?) {
+        user ?: return
+        usersList -= user
     }
 
     private fun setAnimation(viewToAnimate: View, position: Int) {

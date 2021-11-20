@@ -25,13 +25,6 @@ object FirebaseHelper : BaseActivity() {
     }
 
     suspend fun loadMyUser(userid: String) {
-        /*val loadingScreenBinding: ActivityLoadingScreenBinding = ActivityLoadingScreenBinding.inflate(layoutInflater)
-        val loadingScreenWindow = PopupWindow(loadingScreenBinding.root, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-        loadingScreenWindow.elevation = 5.0f
-
-        loadingScreenWindow.showAtLocation(loadingScreenBinding.root, Gravity.CENTER, 0, 0)
-        loadingScreenWindow.isFocusable = true
-        loadingScreenWindow.update()*/
 
         val db = Firebase.firestore.collection("users").document(userid)
         val data = db.get().await().data
@@ -43,8 +36,6 @@ object FirebaseHelper : BaseActivity() {
             MyUser.score = data["score"] as Number
             profilePictureUrl = getImageUrl("profile_pictures/$userid")
         }
-
-        //loadingScreenWindow.dismiss()
     }
 
     suspend fun getFieldInfoFromCollectionDocument(collection: String, document: String, field: String): Any? {

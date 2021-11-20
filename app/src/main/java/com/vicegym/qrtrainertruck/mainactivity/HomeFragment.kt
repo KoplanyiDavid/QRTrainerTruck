@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.icu.text.SimpleDateFormat
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
@@ -29,6 +30,7 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.vicegym.qrtrainertruck.R
@@ -36,6 +38,7 @@ import com.vicegym.qrtrainertruck.data.MyUser
 import com.vicegym.qrtrainertruck.databinding.FragmentHomeBinding
 import com.vicegym.qrtrainertruck.helpers.FirebaseHelper
 import kotlinx.coroutines.launch
+import java.util.*
 
 
 class HomeFragment : Fragment(), OnMapReadyCallback {
@@ -81,16 +84,40 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         val db = Firebase.firestore.collection("users").document(user!!.uid)
         db.get().addOnSuccessListener { document ->
             if (document != null) {
-                val trainingList = document.data!!["trainings"] as ArrayList<HashMap<String, Any>>
-                if (trainingList.isNotEmpty()) {
-                    var nextTrainingHashMap = trainingList[0]
-                    if (trainingList.size > 1)
-                        for (training in trainingList) {
-                            if (nextTrainingHashMap["sorter"] as Long > training["sorter"] as Long)
-                                nextTrainingHashMap = training
+
+                val trainingList = document.data?.get("trainings") as ArrayList<HashMap<String, Any>>?
+                if (trainingList != null && trainingList.isNotEmpty()) {
+                    val currentDate: Long = SimpleDateFormat("yyyyMMddHHmm", Locale.getDefault()).format(Date()).toLong()
+                    val iterator = trainingList.iterator()
+                    while (iterator.hasNext()) {
+                        val tmpTraining = iterator.next()
+                        if (currentDate > tmpTraining["sorter"] as Long) {
+                            iterator.remove()
+
+                            val data = hashMapOf(
+                                "date" to tmpTraining["date"],
+                                "location" to tmpTraining["location"],
+                                "sorter" to tmpTraining["sorter"]
+                            )
+
+                            db.update("trainings", FieldValue.arrayRemove(data))
                         }
-                    binding.tvTrainingTime.text = nextTrainingHashMap["date"] as String
-                    binding.tvTrainingPlace.text = nextTrainingHashMap["location"] as String
+                    }
+
+                    if (trainingList.isNotEmpty()) {
+                        var nextTrainingHashMap = trainingList[0]
+                        for (training in trainingList) {
+                            if ((training["sorter"] as Long) < (nextTrainingHashMap["sorter"] as Long)) {
+                                nextTrainingHashMap = training
+                            }
+                        }
+                        binding.tvTrainingTime.text = nextTrainingHashMap["date"] as String
+                        binding.tvTrainingPlace.text = nextTrainingHashMap["location"] as String
+                    }
+                    else {
+                        binding.tvTrainingTime.text = getString(R.string.no_next_training_date)
+                        binding.tvTrainingPlace.text = getString(R.string.no_next_training_location)
+                    }
                 } else {
                     binding.tvTrainingTime.text = getString(R.string.no_next_training_date)
                     binding.tvTrainingPlace.text = getString(R.string.no_next_training_location)
