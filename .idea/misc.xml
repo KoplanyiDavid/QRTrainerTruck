@@ -24,6 +24,7 @@
         <entry key="..\:/Projects/AndroidStudio/QRTrainerTruck/app/src/main/res/menu/item_bottomnavmenu.xml" value="0.16052631578947368" />
         <entry key="app/src/main/res/layout/activity_create_post.xml" value="0.23385416666666667" />
         <entry key="app/src/main/res/layout/activity_register_form.xml" value="0.11666666666666667" />
+        <entry key="app/src/main/res/layout/activity_user_data_modify.xml" value="0.23385416666666667" />
         <entry key="app/src/main/res/layout/fragment_home.xml" value="0.23435897435897435" />
       </map>
     </option>

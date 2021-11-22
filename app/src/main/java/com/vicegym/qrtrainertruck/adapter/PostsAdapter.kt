@@ -27,8 +27,8 @@ class PostsAdapter(private val context: Context) :
     class PostViewHolder(binding: CardPostBinding) : RecyclerView.ViewHolder(binding.root) {
         val ivProfilePicture: ShapeableImageView = binding.ivPostCardProfilePicture
         val tvAuthor: TextView = binding.tvAuthor
-        val tvTime: TextView = binding.tvDailyChallengeTime
-        val tvDescription: TextView = binding.tvDailyChallengeDescription
+        val tvTitle: TextView = binding.tvPostTitle
+        val tvDescription: TextView = binding.tvPostDescription
         val imgPost: ImageView = binding.imgPost
     }
 
@@ -43,7 +43,7 @@ class PostsAdapter(private val context: Context) :
         }
 
         holder.tvAuthor.text = tmpPost.authorName
-        holder.tvTime.text = tmpPost.time
+        holder.tvTitle.text = tmpPost.title
         holder.tvDescription.text = tmpPost.description
         Glide.with(context).load(tmpPost.imageUrl).into(holder.imgPost)
         setAnimation(holder.itemView, position)

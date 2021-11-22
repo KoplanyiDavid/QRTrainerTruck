@@ -47,6 +47,7 @@ class CreatePostActivity : BaseActivity() {
     private lateinit var binding: ActivityCreatePostBinding
     private lateinit var photoPath: String
     private val user = Firebase.auth.currentUser
+    private lateinit var dialog: AlertDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -211,24 +212,18 @@ class CreatePostActivity : BaseActivity() {
     }
 
     private fun sendClick() {
-        when {
-            //!isPictureTaken -> buildAlertDialog(dialogMessage = "Nem készítettél képet!")
-            binding.etDailyChallengeTime.text.isNullOrEmpty() -> buildAlertDialog(dialogMessage = "Nem írtad be a futott idődet!")
-            else -> {
-                try {
-                    binding.btnDailyChallengeSendPost.isClickable = false //ne töltse fel többször ugyanazt
-                    loadingAlertDialog()
-                    uploadPost()
-                    finish()
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }
+        try {
+            binding.btnDailyChallengeSendPost.isClickable = false //ne töltse fel többször ugyanazt
+            loadingAlertDialog()
+            uploadPost()
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
+
     }
 
     private fun loadingAlertDialog() {
-        val dialog = AlertDialog.Builder(this)
+        dialog = AlertDialog.Builder(this)
             .setTitle("Poszt feltöltése...")
             .setMessage("A posztod feltöltése folyamatban van, kérlek légy türelemmel, amint befejeződik, én eltűnök...")
             .create()
@@ -248,24 +243,26 @@ class CreatePostActivity : BaseActivity() {
         if (i > 10) {
             val a = i - 10
             sorter /= pow(10, a)
-        }
-        else if (i < 10) {
+        } else if (i < 10) {
             val a = 10 - i
             sorter *= pow(10, a)
         }
         lifecycleScope.launch {
             val time = Date().time
-            FirebaseHelper.uploadImageFromImageView(binding.ivDailyChallengePicture, "postimages/${user!!.uid}_$time.jpg")
-            val imageUrl = FirebaseHelper.getImageUrl("postimages/${user.uid}_$time.jpg")
+            FirebaseHelper.uploadImageFromImageView(binding.ivDailyChallengePicture, "postimages/${user!!.uid}_$sorter.jpg")
+            val imageUrl = FirebaseHelper.getImageUrl("postimages/${user.uid}_$sorter.jpg")
             val newPost = hashMapOf<String, Any>(
                 "authorId" to user.uid,
                 "authorName" to MyUser.name!!,
-                "time" to binding.etDailyChallengeTime.text.toString(),
-                "description" to binding.etDailyChallengeDescription.text.toString(),
+                "title" to binding.etPostTitle.text.toString(),
+                "description" to binding.etPostDescription.text.toString(),
                 "imageUrl" to imageUrl.toString(),
                 "sorter" to sorter
-                )
+            )
             FirebaseHelper.setCollectionDocument("posts", sorter.toString(), newPost)
+
+            dialog.dismiss()
+            finish()
         }
     }
 

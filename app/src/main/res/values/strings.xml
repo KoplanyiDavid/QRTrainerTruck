@@ -14,8 +14,8 @@
     <string name="forgot_password_text">Elfelejtetted a jelszót?</string>
     <string name="register_text">Még nincs fiókod? Itt a megoldás!</string>
     <string name="registration">Regisztráció</string>
-    <string name="post_title">Cím</string>
-    <string name="post_description">Leírás</string>
+    <string name="post_title">Cím (opcionális)</string>
+    <string name="post_description">Leírás (opcionális)</string>
     <string name="send_in">Beküldés</string>
     <string name="loading">LOADING…</string>
     <string name="mobile_number">Telefonszám</string>
