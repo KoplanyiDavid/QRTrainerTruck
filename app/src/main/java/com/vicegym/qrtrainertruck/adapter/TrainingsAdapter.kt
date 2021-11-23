@@ -134,7 +134,7 @@ class TrainingsAdapter(private val context: Context) :
     fun addTrainings(training: TrainingData?) {
         training ?: return
 
-        val formatter = SimpleDateFormat("yyyyMMddHHmm", Locale.US)
+        val formatter = SimpleDateFormat("yyyyMMddHHmm", Locale.getDefault())
         val curDate = Date()
         val currentDateLong = formatter.format(curDate).toLong()
 
