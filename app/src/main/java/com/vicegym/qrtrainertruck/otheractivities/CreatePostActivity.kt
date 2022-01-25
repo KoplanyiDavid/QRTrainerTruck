@@ -248,7 +248,6 @@ class CreatePostActivity : BaseActivity() {
             sorter *= pow(10, a)
         }
         lifecycleScope.launch {
-            val time = Date().time
             FirebaseHelper.uploadImageFromImageView(binding.ivDailyChallengePicture, "postimages/${user!!.uid}_$sorter.jpg")
             val imageUrl = FirebaseHelper.getImageUrl("postimages/${user.uid}_$sorter.jpg")
             val newPost = hashMapOf<String, Any>(

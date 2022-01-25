@@ -47,7 +47,6 @@ class LoginActivity : BaseActivity() {
         binding.btnSignIn.setOnClickListener { signInWithEmailAndPassword() }
         binding.btnRegister.setOnClickListener {
             startActivity(Intent(this, RegisterFormActivity::class.java))
-            finish()
         }
         binding.btnForgotPassword.setOnClickListener { popupWindow() }
     }

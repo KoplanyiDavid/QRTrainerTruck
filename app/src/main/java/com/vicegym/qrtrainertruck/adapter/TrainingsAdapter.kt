@@ -127,6 +127,9 @@ class TrainingsAdapter(private val context: Context) :
                 card.setCardBackgroundColor(LTGRAY)
                 dialog.dismiss()
             }
+            alertDialog.setNegativeButton("Vissza") { dialog, _ ->
+                dialog.dismiss()
+            }
         }
         alertDialog.create().show()
     }

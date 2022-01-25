@@ -5,12 +5,12 @@
     <item
         android:id="@+id/menu_logout"
         android:icon="@drawable/logout"
-        android:title="Log Out"
+        android:title="@string/log_out"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/menu_TandC"
-        android:title="Terms and Conditions"
+        android:title="@string/terms_and_conditions"
         app:showAsAction="never" />
 
     <item

@@ -166,8 +166,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
                 lifecycleScope.launch {
                     FirebaseHelper.profilePictureUrl = it
                     FirebaseHelper.uploadImageFromUri(it, "profile_pictures/${user!!.uid}")
-                    val newImageUrl = FirebaseHelper.getImageUrl("profile_pictures/${user.uid}").toString()
-                    FirebaseHelper.updateFieldInCollectionDocument("users", user.uid, "profilePictureUrl", newImageUrl)
                 }
             }
         }
